@@ -1,12 +1,19 @@
 import numpy as np
-
+import pickle
 import torch
 from torch import nn
 from transformers import CLIPTextModel
+# import torch.nn.functional as F
 
 from muscall.modules.textual_heads import TextTransformer
 from muscall.modules.audio_ssl import SimCLRAudio
 from muscall.modules.audio_backbones import ModifiedResNet
+from muscall.modules.MidiBERT.model import *
+from transformers import BertConfig
+
+from datasets import load_dataset
+from transformers import ClapModel, ClapProcessor
+import laion_clap
 
 # クロスエントロピー誤差
 def contrastive_loss(logits: torch.Tensor) -> torch.Tensor:
@@ -23,40 +30,47 @@ def clip_loss(similarity: torch.Tensor, sentence_sim=None, type_loss="clip") -> 
 class MusCALL(nn.Module):
     def __init__(self, config):
         super().__init__()
-        audio_config = config.audio # 音声エンコーダの設定
-        text_config = config.text # テキストエンコーダの設定
-        midi_config = config.midi # midiテキストエンコーダの設定
-
-        projection_dim = config.projection_dim
-        audio_dim = audio_config.hidden_size
-        text_dim = text_config.hidden_size
-        midi_dim = midi_config.hidden_size
+        #audio_config = config.audio # 音声エンコーダの設定
+        #text_config = config.text # テキストエンコーダの設定
+        #midi_config = config.midi # midiテキストエンコーダの設定
         
         self.type_loss = config.loss
         self.temperature = config.temperature
 
-        if config.audio.model == "ModifiedResNet":
-            self.audio_backbone = ModifiedResNet(audio_config)
-        if config.text.model == "TextTransformer":
-            self.textual_head = TextTransformer(text_config)
-        elif config.text.model == "CLIPTextModel":
-            pretrained_model = config.text.pretrained
-            self.textual_head = CLIPTextModel.from_pretrained(pretrained_model)
-        elif config.text.model == "CLAPTextModel":
-		        #[定義する必要あり]
-		        #self.textual_head = ○○
-        if config.midi.model == "MusicBERT":
-		        #[定義する必要あり]
-		        #self.midi_head = ○○
-		    
-        # テキストエンコーダのパラメータを凍結
-        for param in self.textual_head.parameters():
-            param.requires_grad = False
-        # 音声エンコーダのパラメータを凍結
-        for param in self.audio_backbone.parameters():
-		        param.requires_grad = False
+        self.clap = laion_clap.CLAP_Module(enable_fusion=False, amodel='HTSAT-base')
+        self.clap.load_ckpt('/content/Music-Tri-Modal/music_audioset_epoch_15_esc_90.14.pt')
+        
+        with open("/content/Music-Tri-Modal/muscall/modules/MidiBERT/CP.pkl", 'rb') as f:
+          e2w, w2e = pickle.load(f)
 
-        self.audio_projection = nn.Linear(audio_dim, projection_dim, bias=False)
+        configuration = BertConfig(max_position_embeddings=512, # max_seq_len
+                                position_embedding_type='relative_key_query',
+                                hidden_size=768 # args.hs
+                           )
+
+        self.midi_head = MidiBert(bertConfig=configuration, e2w=e2w, w2e=w2e)
+
+        # テキストエンコーダのパラメータを凍結
+        #for param in self.textual_head.parameters():
+        #    param.requires_grad = False
+        # 音声エンコーダのパラメータを凍結
+        #for param in self.audio_backbone.parameters():
+		    #    param.requires_grad = False
+
+        for param in self.clap.parameters():
+          param.requires_grad = False
+
+        projection_dim = config.projection_dim # 最終的な共通のエンベディングの512次元
+        
+        #audio_dim = audio_config.hidden_size
+        #text_dim = text_config.hidden_size
+        #midi_dim = midi_config.hidden_size
+
+        audio_dim = 512 # clap audio hidden size
+        text_dim = 512 # clap text hidden size
+        midi_dim = 768 # MIDI-BERT hidden size
+
+        self.audio_projection = nn.Linear(audio_dim, projection_dim, bias=False) # audio_dimをprojection_dimへ線形変換
         self.text_projection = nn.Linear(text_dim, projection_dim, bias=False)
         self.midi_projection = nn.Linear(midi_dim, projection_dim, bias=False)
 
@@ -64,26 +78,20 @@ class MusCALL(nn.Module):
             self.logit_scale = nn.Parameter(torch.ones([]) * np.log(1 / 0.07))
 
     def encode_audio(self, audio):
-        audio_features = self.audio_backbone(audio)
-        audio_features = self.audio_projection(audio_features)
+        #audio = audio.reshape(1, -1)
+        audio_features = self.clap.get_audio_embedding_from_data(audio, use_tensor=False) # オーディオエンコーダで音声エンベディングを抽出
+        audio_features = self.audio_projection(audio_features) # 最終的な共通のエンベディングの次元に変換
         return audio_features
 
     def encode_text(self, text, text_mask):
-        if isinstance(self.textual_head, TextTransformer):
-            text_features = self.textual_head(text, text_mask)
-            # take features from the eot embedding (eot_token is the highest number in each sequence)
-            pooled_outout = text_features[
-                torch.arange(text_features.shape[0]), text.argmax(dim=-1)
-            ]
-        elif isinstance(self.textual_head, CLIPTextModel):
-            outputs = self.textual_head(text, text_mask)
-            pooled_outout = outputs.pooler_output
-
-        text_features = self.text_projection(pooled_outout)
+        text_features = self.clap.get_text_embedding([text])
+        text_features = self.text_projection(text_features)
         return text_features
         
     def encode_midi(self, midi):
-	    [定義する必要あり]
+        midi_features = self.midibert.forward(midi)
+        # [ここにベクトル平均化の処理]
+        midi_features = self.midi_projection(midi_features)
 
     # 音声とテキストの特徴をエンコードし、対照学習のための損失を計算
     def forward(
@@ -120,17 +128,16 @@ class MusCALL(nn.Module):
         logits_per_midi_audio = logit_scale * midi_features @ audio_features.t()
         logits_per_audio_midi = logits_per_midi_audio.t()
 
-        loss = (F.cross_entropy(logits_per_pc_text, self.labels) + \
-                F.cross_entropy(logits_per_text_pc, self.labels)) / 2 + \
-                (F.cross_entropy(logits_per_pc_image, self.labels) + F.cross_entropy(logits_per_image_pc, self.labels)) / 2
-
+        #loss = (F.cross_entropy(logits_per_pc_text, self.labels) + \
+        #        F.cross_entropy(logits_per_text_pc, self.labels)) / 2 + \
+        #        (F.cross_entropy(logits_per_pc_image, self.labels) + F.cross_entropy(logits_per_image_pc, self.labels)) / 2
 
         # マルチモーダル損失を計算
         if return_loss:
             loss = clip_loss(logits_per_text_midi) + clip_loss(logits_per_audio_midi)
             return loss
-        else:
-            return logits_per_audio, logits_per_text
+        #else:
+        #    return logits_per_audio, logits_per_text
 
     @classmethod
     def config_path(cls):
