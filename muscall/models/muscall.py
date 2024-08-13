@@ -30,10 +30,7 @@ def clip_loss(similarity: torch.Tensor, sentence_sim=None, type_loss="clip") -> 
 class MusCALL(nn.Module):
     def __init__(self, config):
         super().__init__()
-        #audio_config = config.audio # 音声エンコーダの設定
-        #text_config = config.text # テキストエンコーダの設定
-        #midi_config = config.midi # midiテキストエンコーダの設定
-        
+
         self.type_loss = config.loss
         self.temperature = config.temperature
 
@@ -50,22 +47,10 @@ class MusCALL(nn.Module):
 
         self.midi_head = MidiBert(bertConfig=configuration, e2w=e2w, w2e=w2e)
 
-        # テキストエンコーダのパラメータを凍結
-        #for param in self.textual_head.parameters():
-        #    param.requires_grad = False
-        # 音声エンコーダのパラメータを凍結
-        #for param in self.audio_backbone.parameters():
-		    #    param.requires_grad = False
-
         for param in self.clap.parameters():
           param.requires_grad = False
 
         projection_dim = config.projection_dim # 最終的な共通のエンベディングの512次元
-        
-        #audio_dim = audio_config.hidden_size
-        #text_dim = text_config.hidden_size
-        #midi_dim = midi_config.hidden_size
-
         audio_dim = 512 # clap audio hidden size
         text_dim = 512 # clap text hidden size
         midi_dim = 768 # MIDI-BERT hidden size
