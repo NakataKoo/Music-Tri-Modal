@@ -75,7 +75,8 @@ class MusCALL(nn.Module):
     def encode_midi(self, midi):
         midi_features = self.midibert.forward(midi)
         # トークンのベクトルを平均して、シーケンス全体のベクトルを生成
-        midi_features = midi_features.last_hidden_state[0].mean(dim=0)  # (batch_size, hidden_size)
+        # midi_features = midi_features.last_hidden_state[0].mean(dim=0)  # (batch_size, hidden_size)
+        # 同一のmidiのfeaturesで平均化
         midi_features = self.midi_projection(midi_features)
 
     # 音声とテキストの特徴をエンコードし、対照学習のための損失を計算
@@ -83,7 +84,7 @@ class MusCALL(nn.Module):
         self,
         audio, # 拡張後の音声データ（バッチ）
         text, # テキストデータ（バッチ）
-        midi, 
+        midi,  # midiデータ（バッチ）
         original_audio=None, # 元音声データ
         sentence_sim=None, # 文の類似度(オプション)
         text_mask=None, #テキストのマスク(オプション)
