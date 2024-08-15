@@ -203,6 +203,120 @@ class AudioCaptionDataset(Dataset):
     def __len__(self):
         return len(self.samples)
 
+# ------------------------------------------------------------
+class AudioCaptionMidi(Dataset):
+    def __init__(self, config, tokenizer=None, dataset_type="train"):
+        """Constructs an AudioCaptionMidiDataset dataset.
+
+        Args:
+        - config: (dict-like object) dataset config
+        - tokenizer: (tokenizer object) default is BertTokenizer from transformers library
+        - dataset_type: (String) "train", "test" or "val"
+        """
+        super().__init__()
+        if config is None:
+            config = {}
+        self.config = config # audiocaption.yamlの内容
+        self._dataset_name = "audio-caption-midi-pair"
+        self._dataset_type = dataset_type
+        self._data_dir = self.config.data_dir # ${env.data_root}/datasets/${dataset_config.dataset_name}
+
+        self.dataset_json = os.path.join(
+            self._data_dir, "dataset_{}.json".format(self._dataset_type)
+        ) # データセットのJSONファイル(root/data/dataset/○○/dataset_○○.json)のパス
+
+        # audiocaption.yamlの内容
+        #self.max_seq_length = self.config.text.max_seq_length # 最大シーケンス長
+        self.sample_rate = self.config.audio.sr # サンプリングレート
+        self.num_samples = self.sample_rate * self.config.audio.crop_length # クロップ長
+        self.random_crop = self.config.audio.random_crop # ランダムクロップの有無
+        self._load()
+
+    # JSONファイルからデータを読み込み、音声ID、キャプション、音声パスをリストに格納
+    def _load(self):
+        with open(self.dataset_json) as f:
+            self.samples = json.load(f) # jsonをPythonオブジェクトとして読み込み
+            self.audio_dir = os.path.join(self._data_dir, "audio") # ${env.data_root}/datasets/${dataset_config.dataset_name}/audio
+
+            self.audio_ids = [i["audio_id"] for i in self.samples] # jsonの各オブジェくトの"audio_id"(自然数)をリストに格納
+            self.captions = [i["caption"].strip() for i in self.samples] # jsonの各オブジェくトの"caption"をリストに格納
+            self.audio_paths = [os.path.join(
+                self.audio_dir, i["audio_path"]) for i in self.samples] # jsonの各オブジェくトの"audio_path"(音声ファイルパス)をリストに格納
+
+    def get_raw_caption(self, idx):
+        """Get raw caption text"""
+
+        return self.captions[idx]
+
+    # 改良（音声データを読み込み、クロップし、テンソルに変換）
+    def get_audio(self, idx):
+        try:
+            mmapped_array = np.load(self.audio_paths[idx], mmap_mode="r")
+        except:
+            mmapped_array = np.load(self.audio_paths[idx], mmap_mode="r+")
+
+        audio = torch.tensor(self._crop_audio(mmapped_array), dtype=torch.float)
+
+        #音声が短い場合はゼロパディングし、長い場合はトリミング
+        # zero pad short audio
+        if len(audio.shape) == 2:
+            # Convert stereo to mono by averaging the channels
+            audio = torch.mean(audio, dim=0)
+        
+        if len(audio) < self.num_samples:
+            zeros_needed = torch.zeros(self.num_samples - len(audio))
+            audio = torch.cat((audio, zeros_needed), dim=0)
+        elif len(audio) > self.num_samples:
+            audio = audio[:self.num_samples]
+
+        return audio
+
+    # 改良
+    def _crop_audio(self, mmapped_array):
+        if len(mmapped_array.shape) == 2:
+            audio_length = mmapped_array.shape[1]
+        else:
+            audio_length = mmapped_array.shape[0]
+
+        if audio_length <= self.num_samples:
+            start_index = 0
+            end_index = None
+        else:
+            if self._dataset_type == "train" and self.random_crop:
+                start_index = np.random.randint(0, audio_length - self.num_samples)
+            else:
+                start_index = (audio_length - self.num_samples) // 2
+            end_index = start_index + self.num_samples
+
+        if len(mmapped_array.shape) == 2:
+            audio = mmapped_array[:, start_index:end_index].astype("float32").mean(axis=0)
+        else:
+            audio = mmapped_array[start_index:end_index].astype("float32")
+
+        return audio
+
+    def __getitem__(self, idx):
+        audio_id = torch.tensor(self.audio_ids[idx], dtype=torch.long) # audio_idsは"audio_id"リスト
+
+        input_audio = self.get_audio(idx) # 音声データを取得
+        #text_input_ids, text_input_type_ids, text_attention_mask = self.get_text_input(
+        #    idx
+        #)
+
+        input_text = self.get_raw_caption(idx)
+
+        idx = torch.tensor(idx)
+
+        return (
+            audio_id,
+            input_audio,
+            input_text,
+            idx,
+        )
+
+    def __len__(self):
+        return len(self.samples)
+
     @classmethod
     def config_path(cls):
         return "configs/datasets/audiocaption.yaml"
