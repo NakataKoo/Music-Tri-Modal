@@ -10,7 +10,7 @@ from transformers.models.clip.tokenization_clip import CLIPTokenizer
 
 from muscall.tasks.retrieval import Retrieval
 from muscall.datasets.tagging import MTTDataset
-from muscall.datasets.gtzan import GTZAN
+from muscall.modules.MidiBERT.gtzan import GTZAN
 
 
 def prepare_labels(labels, prompt=None):

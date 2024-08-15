@@ -177,7 +177,7 @@ class MusCALLTrainer(BaseTrainer):
         # データローダーからバッチを取り出し、学習を実行
         for i, batch in enumerate(data_loader):
             batch = tuple(t.to(device=self.device, non_blocking=True) for t in batch) # data_loaderからバッチを取得し、GPUに転送
-            audio_id, input_audio, text_input_ids, data_idx = batch # バッチ内のデータを展開し、それぞれの変数に割り当て(__getitem__メソッドにより取得)
+            audio_id, input_audio, input_text, input_midi, data_idx = batch # バッチ内のデータを展開し、それぞれの変数に割り当て(__getitem__メソッドにより取得)
 
             # モデルの損失関数がweighted_clipの場合
             if self.config.model_config.loss == "weighted_clip":
