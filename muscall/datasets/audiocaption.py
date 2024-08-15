@@ -206,6 +206,7 @@ class AudioCaptionDataset(Dataset):
 # ------------------------------------------------------------
 
 from muscall.datasets.model import CP
+import glob
 
 class AudioCaptionMidi(Dataset):
     def __init__(self, config, tokenizer=None, dataset_type="train"):
@@ -302,21 +303,21 @@ class AudioCaptionMidi(Dataset):
 
         return audio
     
-    # midiデータを取得し、トークン化
+    # 1つの曲の複数midiデータを取得し、すべてトークン化
     def get_midi(self, idx):
-        self.midi_dir_paths[idx]
+        files = glob.glob(self.midi_dir_paths[idx]+'/*.mid', recursive=True) # ["path_to_midi0", "path_to_midi1","path_to_midi2", ...]
+        all_words, _, _, _ = self.CP.prepare_data(files, task="", max_len=512) # all_wordsリストに、1つの曲のMIDIデータのトークン化されたデータが格納されている。all_wordsの各要素はリストで、これは1つのMIDIをスライシングした後に、それぞれトークン化し、それを複数MIDIに適用したもの。all_words=[[slice_words[0]], [slice_words[1]], ...], slice_words=[[[token0], [token1], ...], [[token0], [token1], ...], ...]
         
-        # files = glob.glob('lmd_aligned/**/*.mid', recursive=True)
-        # files = ["path_to_midi0", "path_to_midi1","path_to_midi2", ...]となる
+        # len(all_words)が1曲分のエンベディング平均化時の「分母」となる
         
-        self.CP.prepare_data(files, task="", max_len=512)
+        return all_words
 
     def __getitem__(self, idx):
         audio_id = torch.tensor(self.audio_ids[idx], dtype=torch.long) # audio_idsは"audio_id"リスト
 
         input_audio = self.get_audio(idx) # 音声データを取得
         input_text = self.get_raw_caption(idx) # キャプションを取得
-        input_midi = self.get_midi() # midiデータを取得
+        input_midi = self.get_midi(idx) # midiデータを取得
 
         idx = torch.tensor(idx)
 
