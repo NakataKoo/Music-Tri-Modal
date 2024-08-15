@@ -207,6 +207,7 @@ class AudioCaptionDataset(Dataset):
 
 from muscall.datasets.model import CP
 import glob
+import librosa
 
 class AudioCaptionMidi(Dataset):
     def __init__(self, config, tokenizer=None, dataset_type="train"):
@@ -258,58 +259,22 @@ class AudioCaptionMidi(Dataset):
 
     # 改良（音声データを読み込み、クロップし、テンソルに変換）
     def get_audio(self, idx):
-        try:
-            mmapped_array = np.load(self.audio_paths[idx], mmap_mode="r")
-        except:
-            mmapped_array = np.load(self.audio_paths[idx], mmap_mode="r+")
-
-        audio = torch.tensor(self._crop_audio(mmapped_array), dtype=torch.float)
-
-        #音声が短い場合はゼロパディングし、長い場合はトリミング
-        # zero pad short audio
-        if len(audio.shape) == 2:
-            # Convert stereo to mono by averaging the channels
-            audio = torch.mean(audio, dim=0)
-        
-        if len(audio) < self.num_samples:
-            zeros_needed = torch.zeros(self.num_samples - len(audio))
-            audio = torch.cat((audio, zeros_needed), dim=0)
-        elif len(audio) > self.num_samples:
-            audio = audio[:self.num_samples]
-
-        return audio
-
-    # 改良
-    def _crop_audio(self, mmapped_array):
-        if len(mmapped_array.shape) == 2:
-            audio_length = mmapped_array.shape[1]
-        else:
-            audio_length = mmapped_array.shape[0]
-
-        if audio_length <= self.num_samples:
-            start_index = 0
-            end_index = None
-        else:
-            if self._dataset_type == "train" and self.random_crop:
-                start_index = np.random.randint(0, audio_length - self.num_samples)
-            else:
-                start_index = (audio_length - self.num_samples) // 2
-            end_index = start_index + self.num_samples
-
-        if len(mmapped_array.shape) == 2:
-            audio = mmapped_array[:, start_index:end_index].astype("float32").mean(axis=0)
-        else:
-            audio = mmapped_array[start_index:end_index].astype("float32")
-
+        audio_path = self.audio_paths[idx]
+        audio, sr = librosa.load(audio_path, sr=48000, mono=True)
+        audio = audio.reshape(1, -1)
         return audio
     
     # 1つの曲の複数midiデータを取得し、すべてトークン化
     def get_midi(self, idx):
         files = glob.glob(self.midi_dir_paths[idx]+'/*.mid', recursive=True) # ["path_to_midi0", "path_to_midi1","path_to_midi2", ...]
-        all_words, _, _, _ = self.CP.prepare_data(files, task="", max_len=512) # all_wordsリストに、1つの曲のMIDIデータのトークン化されたデータが格納されている。all_wordsの各要素はリストで、これは1つのMIDIをスライシングした後に、それぞれトークン化し、それを複数MIDIに適用したもの。all_words=[[slice_words[0]], [slice_words[1]], ...], slice_words=[[[token0], [token1], ...], [[token0], [token1], ...], ...]
+        all_words, _, _, _ = self.CP.prepare_data(files, task="", max_len=512) 
+        '''
+        all_wordsリストに、1つの曲のMIDIデータのトークン化されたデータが格納されている。
+        all_wordsの各要素はリストで、これは1つのMIDIをスライシングした後に、それぞれトークン化し、それを複数MIDIに適用したもの。all_words=[[slice_words[0]], [slice_words[1]], ...], slice_words=[[[token0], [token1], ...], [[token0], [token1], ...], ...]
         
-        # len(all_words)が1曲分のエンベディング平均化時の「分母」となる
-        
+        len(all_words)が1曲分のエンベディング平均化時の「分母」となる
+        '''
+
         return all_words
 
     def __getitem__(self, idx):
