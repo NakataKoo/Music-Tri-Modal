@@ -1,4 +1,4 @@
- model_config: 
+model_config: 
   model_name: muscall
   projection_dim: 512             # dimensionality of the multimodal projection layer
   temperature: null
@@ -33,6 +33,5 @@
     max_position_embeddings: 77   # max number of tokens (seq is truncated if longer)
     attention_dropout: 0.2        # dropout probability for the attention weights
     dropout: 0.2                  # dropout probaility in the feedforward blocks
-  midi:
-    
+  # midi:
   loss: clip                      # one of [clip, weighted_clip]

@@ -37,17 +37,17 @@ class MusCALL(nn.Module):
         self.clap.load_ckpt('/content/Music-Tri-Modal/music_audioset_epoch_15_esc_90.14.pt')
         
         with open("/content/Music-Tri-Modal/muscall/modules/MidiBERT/CP.pkl", 'rb') as f:
-          e2w, w2e = pickle.load(f)
+            e2w, w2e = pickle.load(f)
 
         configuration = BertConfig(max_position_embeddings=512, # max_seq_len
                                 position_embedding_type='relative_key_query',
                                 hidden_size=768 # args.hs
-                           )
+        )
 
         self.midi_head = MidiBert(bertConfig=configuration, e2w=e2w, w2e=w2e)
 
         for param in self.clap.parameters():
-          param.requires_grad = False
+            param.requires_grad = False
 
         projection_dim = config.projection_dim # 最終的な共通のエンベディングの512次元
         audio_dim = 512 # clap audio hidden size
@@ -73,11 +73,16 @@ class MusCALL(nn.Module):
         return text_features
         
     def encode_midi(self, midi):
-        midi_features = self.midibert.forward(midi)
+        midi_features = self.midibert.forward(torch.from_numpy(midi))
+        midi_features_all = torch.zeros(768) # 初期化
         # トークンのベクトルを平均して、シーケンス全体のベクトルを生成
-        # midi_features = midi_features.last_hidden_state[0].mean(dim=0)  # (batch_size, hidden_size)
+        for i in range(len(midi)):
+            midi_features_all = midi_features_all + midi_features.last_hidden_state[i].mean(dim=0) # (batch_size, hidden_size)
+        midi_features_all = midi_features_all / len(midi)
+        
         # 同一のmidiのfeaturesで平均化
-        midi_features = self.midi_projection(midi_features)
+        midi_features_all = self.midi_projection(midi_features_all)
+        return midi_features_all
 
     # 音声とテキストの特徴をエンコードし、対照学習のための損失を計算
     def forward(

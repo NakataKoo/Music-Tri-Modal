@@ -107,5 +107,6 @@ class CP(object):
             
             all_words = all_words + slice_words
             all_ys = all_ys + slice_ys
-
+        
+        all_words = np.array(all_words)
         return all_words, all_ys, midi_ids, not_midis
