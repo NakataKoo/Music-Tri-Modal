@@ -9,7 +9,7 @@ from torch.optim.lr_scheduler import CosineAnnealingLR
 from torch.utils.data import DataLoader, Subset
 from sentence_transformers import SentenceTransformer
 
-from muscall.datasets.audiocaption import AudioCaptionDataset
+from muscall.datasets.audiocaption import AudioCaptionMidiDataset
 from muscall.trainers.base_trainer import BaseTrainer
 from muscall.models.muscall import MusCALL
 from muscall.tasks.retrieval import run_retrieval
@@ -19,15 +19,14 @@ from muscall.utils.audio_utils import get_transform_chain
 class MusCALLTrainer(BaseTrainer):
     def __init__(self, config, logger):
         super().__init__(config, logger)
-        self.bert_config = self.config.model_config.bert # 現状BERTに関する設定は無いのでself.bert_config = None
         self.batch_size = self.config.training.dataloader.batch_size # training.yaml→dataloader→batch_size（バッチサイズ）
 
         self.load() # load_dataset()、build_model()、build_optimizer()、self.logger.save_config()の実行
 
         self.scaler = torch.cuda.amp.GradScaler()
 
-        self.sbert_model = SentenceTransformer("all-MiniLM-L6-v2")
-        self.sbert_model.to(self.device)
+        # self.sbert_model = SentenceTransformer("all-MiniLM-L6-v2")
+        # self.sbert_model.to(self.device)
 
     def load_dataset(self):
         self.logger.write("Loading dataset")
@@ -36,6 +35,9 @@ class MusCALLTrainer(BaseTrainer):
         if dataset_name == "audiocaption" or dataset_name == "musiccaps" or dataset_name == "musicbench":
             self.train_dataset = AudioCaptionDataset(self.config.dataset_config, dataset_type="train") # AudioCaptionDatasetのインスタンスを生成（audiocaption.yamlの内容を引数に指定）
             self.val_dataset = AudioCaptionDataset(self.config.dataset_config, dataset_type="val") # ほぼ同上（val専用）
+        elif dataset_name == "audiocaptionmidi":
+            self.train_dataset = AudioCaptionMidiDataset(self.config.dataset_config, dataset_type="train")
+            self.val_dataset = AudioCaptionMidiDataset(self.config.dataset_config, dataset_type="val")
         else:
             raise ValueError("{} dataset is not supported.".format(dataset_name))
 
@@ -203,8 +205,9 @@ class MusCALLTrainer(BaseTrainer):
             # 混合精度（AMP）を使用して損失を計算（順伝播forwardメソッド）
             with torch.cuda.amp.autocast(enabled=self.config.training.amp):
                 loss = self.model(
-                    input_audio, # 増強された音声データ
-                    text_input_ids, # トークナイズされたテキストデータのID
+                    input_audio,
+                    input_text,
+                    input_midi,
                     original_audio=original_audio, # 元の音声データ（拡張前の音声データ）
                     sentence_sim=sentence_sim,# 文の類似度（オプション：損失関数がweighted_clipの場合）
                 )

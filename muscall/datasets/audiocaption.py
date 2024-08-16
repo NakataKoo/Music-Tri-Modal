@@ -209,7 +209,7 @@ from muscall.datasets.model import CP
 import glob
 import librosa
 
-class AudioCaptionMidi(Dataset):
+class AudioCaptionMidiDataset(Dataset):
     def __init__(self, config, tokenizer=None, dataset_type="train"):
         """Constructs an AudioCaptionMidiDataset dataset.
 

@@ -9,6 +9,6 @@ dataset_config:
     sr: 16000
     crop_length: 30 # 曲の長さ（秒）
     random_crop: true
-    augment: true
+    augment: false
     p_noise: 0.3
     p_pitch_shift: 0.4
