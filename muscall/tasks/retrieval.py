@@ -4,7 +4,7 @@ import torch
 from torch.utils.data import DataLoader, Subset
 
 from muscall.models.muscall import MusCALL
-from muscall.datasets.audiocaption import AudioCaptionDataset
+from muscall.datasets.audiocaption import AudioCaptionMidiDataset
 
 
 @torch.no_grad()
@@ -110,7 +110,7 @@ class Retrieval:
         self.build_model()
 
     def load_dataset(self):
-        dataset = AudioCaptionDataset(self.muscall_config.dataset_config, dataset_type="test")
+        dataset = AudioCaptionMidiDataset(self.muscall_config.dataset_config, dataset_type="test")
         indices = torch.randperm(len(dataset))[: self.test_set_size]
         random_dataset = Subset(dataset, indices)
         self.batch_size = 256

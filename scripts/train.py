@@ -11,7 +11,7 @@ from muscall.utils.utils import (
 )
 from muscall.models.muscall import MusCALL
 from muscall.trainers.muscall_trainer import MusCALLTrainer
-from muscall.datasets.audiocaption import AudioCaptionDataset
+from muscall.datasets.audiocaption import AudioCaptionMidiDataset
 
 
 def parse_args():
@@ -47,7 +47,7 @@ if __name__ == "__main__":
         base_conf = load_conf(params.config_path) # デフォルトではtraining.yamlを読み込む
 
         if params.dataset == "audiocaption":
-            dataset_conf_path = os.path.join(base_conf.env.base_dir, AudioCaptionDataset.config_path()) # "configs/datasets/audiocaption.yaml"のパスを取得
+            dataset_conf_path = os.path.join(base_conf.env.base_dir, AudioCaptionMidiDataset.config_path()) # "configs/datasets/audiocaption.yaml"のパスを取得
         else:
             raise ValueError("{} dataset not supported".format(params.dataset))
 
