@@ -2,7 +2,7 @@ import numpy as np
 import pickle
 import torch
 from torch import nn
-from transformers import CLIPTextModel
+# from transformers import CLIPTextModel
 # import torch.nn.functional as F
 
 from muscall.modules.textual_heads import TextTransformer
@@ -11,8 +11,8 @@ from muscall.modules.audio_backbones import ModifiedResNet
 from muscall.modules.MidiBERT.model import *
 from transformers import BertConfig
 
-from datasets import load_dataset
-from transformers import ClapModel, ClapProcessor
+# from datasets import load_dataset
+# from transformers import ClapModel, ClapProcessor
 import laion_clap
 
 # クロスエントロピー誤差

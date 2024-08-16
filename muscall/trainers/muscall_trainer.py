@@ -7,7 +7,7 @@ import torch
 import torch.optim as optim
 from torch.optim.lr_scheduler import CosineAnnealingLR
 from torch.utils.data import DataLoader, Subset
-from sentence_transformers import SentenceTransformer
+# from sentence_transformers import SentenceTransformer
 
 from muscall.datasets.audiocaption import AudioCaptionMidiDataset
 from muscall.trainers.base_trainer import BaseTrainer
@@ -32,10 +32,8 @@ class MusCALLTrainer(BaseTrainer):
         self.logger.write("Loading dataset")
         dataset_name = self.config.dataset_config.dataset_name # audiocaption.yaml→dataset_config→dataset_nameより、データセット名を取得
 
-        if dataset_name == "audiocaption" or dataset_name == "musiccaps" or dataset_name == "musicbench":
-            self.train_dataset = AudioCaptionDataset(self.config.dataset_config, dataset_type="train") # AudioCaptionDatasetのインスタンスを生成（audiocaption.yamlの内容を引数に指定）
-            self.val_dataset = AudioCaptionDataset(self.config.dataset_config, dataset_type="val") # ほぼ同上（val専用）
-        elif dataset_name == "audiocaptionmidi":
+        # AudioCaptionMidiDatasetのインスタンスを生成（audiocaption.yamlの内容を引数に指定）
+        if dataset_name == "audiocaptionmidi":
             self.train_dataset = AudioCaptionMidiDataset(self.config.dataset_config, dataset_type="train")
             self.val_dataset = AudioCaptionMidiDataset(self.config.dataset_config, dataset_type="val")
         else:
