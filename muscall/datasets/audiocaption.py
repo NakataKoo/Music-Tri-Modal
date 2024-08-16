@@ -29,7 +29,7 @@ class AudioCaptionMidiDataset(Dataset):
         self._dataset_type = dataset_type
         self._data_dir = self.config.data_dir # ${env.data_root}/datasets/${dataset_config.dataset_name}
 
-        self.CP = CP(dict="..\modules\MidiBERT\CP.pkl")
+        self.CP = CP(dict="/content/Music-Tri-Modal/muscall/modules/MidiBERT/CP.pkl")
 
         self.dataset_json = os.path.join(
             self._data_dir, "dataset_{}.json".format(self._dataset_type)
@@ -67,7 +67,8 @@ class AudioCaptionMidiDataset(Dataset):
         #audio = audio.reshape(1, -1)
         
         # 1次元のテンソルに変換
-        audio = torch.tensor(audio, dtype=torch.float)
+        # audio = torch.tensor(audio, dtype=torch.float)
+        audio = torch.from_numpy(audio.astype(np.float32)).clone()
 
         # 音声が短い場合はゼロパディングし、長い場合はトリミング
         if len(audio) < self.num_samples:
@@ -75,10 +76,12 @@ class AudioCaptionMidiDataset(Dataset):
             audio = torch.cat((audio, zeros_needed), dim=0)
         elif len(audio) > self.num_samples:
             audio = audio[:self.num_samples]
+            
         # もしaudioがCUDAテンソルであれば、CPUに移動
         #if audio.is_cuda:
         #    audio = audio.cpu()
         #audio = audio.to('cpu').detach().numpy().copy()
+        
         return audio
     
     # 1つの曲の複数midiデータを取得し、すべてトークン化
@@ -91,7 +94,8 @@ class AudioCaptionMidiDataset(Dataset):
         
         len(all_words)が1曲分のエンベディング平均化時の「分母」となる
         '''
-
+        
+        all_words = torch.from_numpy(all_words.astype(np.float32)).clone()
         return all_words
 
     def __getitem__(self, idx):
@@ -107,7 +111,7 @@ class AudioCaptionMidiDataset(Dataset):
             audio_id,
             input_audio,
             input_text,
-            torch.tensor(input_midi),
+            input_midi,
             idx,
         )
 

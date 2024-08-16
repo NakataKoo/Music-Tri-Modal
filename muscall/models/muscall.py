@@ -32,6 +32,7 @@ class MusCALL(nn.Module):
 
         self.type_loss = config.loss
         self.temperature = config.temperature
+        self.device = torch.device("cuda")
 
         self.clap = laion_clap.CLAP_Module(enable_fusion=False, amodel='HTSAT-base')
         self.clap.load_ckpt('/content/Music-Tri-Modal/music_audioset_epoch_15_esc_90.14.pt')
@@ -44,7 +45,7 @@ class MusCALL(nn.Module):
                                 hidden_size=768 # args.hs
         )
 
-        self.midi_head = MidiBert(bertConfig=configuration, e2w=e2w, w2e=w2e)
+        self.midibert = MidiBert(bertConfig=configuration, e2w=e2w, w2e=w2e)
 
         for param in self.clap.parameters():
             param.requires_grad = False
@@ -63,18 +64,57 @@ class MusCALL(nn.Module):
 
     def encode_audio(self, audio):
         #audio = audio.reshape(1, -1)
+        if isinstance(audio, torch.Tensor):
+            audio = audio.cpu().numpy()  # テンソルをCPUに移動してNumPy配列に変換
         audio_features = self.clap.get_audio_embedding_from_data(audio, use_tensor=False) # オーディオエンコーダで音声エンベディングを抽出
+        
+        # numpy.ndarray から torch.Tensor に変換
+        if isinstance(audio_features, np.ndarray):
+            audio_features = torch.from_numpy(audio_features.astype(np.float32)).clone()
+            # audio_features = torch.tensor(audio_features, dtype=torch.float32, device=self.device)
+        
+        # デバイスに移動
+        audio_features = audio_features.to(self.device)
         audio_features = self.audio_projection(audio_features) # 最終的な共通のエンベディングの次元に変換
         return audio_features
 
     def encode_text(self, text, text_mask):
-        text_features = self.clap.get_text_embedding([text])
+        # textがリストではない場合、リストに変換
+        if not isinstance(text, list):
+            text = [text]
+        text_features = self.clap.get_text_embedding(text)
+
+        # numpy.ndarray から torch.Tensor に変換
+        if isinstance(text_features, np.ndarray):
+            text_features = torch.tensor(text_features, dtype=torch.float32)
+    
+        # デバイスに移動
+        text_features = text_features.to(self.device)
         text_features = self.text_projection(text_features)
         return text_features
         
     def encode_midi(self, midi):
-        midi_features = self.midibert.forward(torch.from_numpy(midi))
-        midi_features_all = torch.zeros(768) # 初期化
+
+        # midiが既にTensorの場合、そのまま使用
+        if isinstance(midi, np.ndarray):
+            midi = torch.from_numpy(midi)
+        
+        midi = midi.to(self.device)  # デバイスに移動
+
+        # LongTensorに変換
+        midi = midi.long()
+
+        # midiデータの形状を確認し、適切な形状に変換
+        if midi.dim() > 2:
+            midi = midi.view(midi.size(0), -1)  # 2次元に整形
+        # midiデータの形状を確認し、1次元の場合、2次元に変換
+        elif midi.dim() == 1:
+            midi = midi.unsqueeze(0)  # 1次元の場合、バッチ次元を追加して2次元に変換
+
+        assert midi.dim() == 2, f"midi tensor shape is incorrect: {midi.shape}"
+
+        midi_features = self.midibert.forward(midi)
+        midi_features_all = torch.zeros(768, device=self.device)  # デバイス上で初期化
         # トークンのベクトルを平均して、シーケンス全体のベクトルを生成
         for i in range(len(midi)):
             midi_features_all = midi_features_all + midi_features.last_hidden_state[i].mean(dim=0) # (batch_size, hidden_size)
