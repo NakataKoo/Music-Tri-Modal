@@ -132,7 +132,7 @@ class MusCALL(nn.Module):
         # 音声とテキストとmidiの特徴をそれぞれエンコード
         audio_features = self.encode_audio(audio)
         text_features = self.encode_text(text, text_mask)
-        midi_fieatures = self.encode_midi(midi)
+        midi_features = self.encode_midi(midi)
 
         # normalise features（各特徴ベクトルをそのノルムで割ることで、単位ベクトルに変換）
         audio_features = audio_features / audio_features.norm(dim=-1, keepdim=True)
