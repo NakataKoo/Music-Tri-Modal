@@ -104,14 +104,7 @@ class MusCALL(nn.Module):
         # LongTensorに変換
         midi = midi.long()
 
-        # midiデータの形状を確認し、適切な形状に変換
-        if midi.dim() > 2:
-            midi = midi.view(midi.size(0), -1)  # 2次元に整形
-        # midiデータの形状を確認し、1次元の場合、2次元に変換
-        elif midi.dim() == 1:
-            midi = midi.unsqueeze(0)  # 1次元の場合、バッチ次元を追加して2次元に変換
-
-        assert midi.dim() == 2, f"midi tensor shape is incorrect: {midi.shape}"
+        assert midi.dim() == 3, f"midi tensor shape is incorrect: {midi.shape}"
 
         midi_features = self.midibert.forward(midi)
         midi_features_all = torch.zeros(768, device=self.device)  # デバイス上で初期化
