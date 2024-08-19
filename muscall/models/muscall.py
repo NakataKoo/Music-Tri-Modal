@@ -62,6 +62,7 @@ class MusCALL(nn.Module):
         if self.temperature is None:
             self.logit_scale = nn.Parameter(torch.ones([]) * np.log(1 / 0.07))
 
+    @torch.no_grad()
     def encode_audio(self, audio):
         #audio = audio.reshape(1, -1)
         if isinstance(audio, torch.Tensor):
@@ -78,6 +79,7 @@ class MusCALL(nn.Module):
         audio_features = self.audio_projection(audio_features) # 最終的な共通のエンベディングの次元に変換
         return audio_features
 
+    @torch.no_grad()
     def encode_text(self, text, text_mask):
         # textがリストではない場合、リストに変換
         if not isinstance(text, list):
@@ -92,13 +94,13 @@ class MusCALL(nn.Module):
         text_features = text_features.to(self.device)
         text_features = self.text_projection(text_features)
         return text_features
-        
+    
     def encode_midi(self, midi_batch):
-
         '''
         midi: torch.Size([batch_size, midi_size, 512, 4])
         midiを個別に処理したい
         '''
+        midi_batch = midi_batch.to(self.device)  # デバイスに移動
 
         embedding_midi = []
         for midi in midi_batch:
@@ -106,8 +108,6 @@ class MusCALL(nn.Module):
             # midiが既にTensorの場合、そのまま使用
             if isinstance(midi, np.ndarray):
                 midi = torch.from_numpy(midi)
-            
-            midi = midi.to(self.device)  # デバイスに移動
 
             # LongTensorに変換
             midi = midi.long()
@@ -124,9 +124,7 @@ class MusCALL(nn.Module):
             # 同一のmidiのfeaturesで平均化
             midi_features_all = self.midi_projection(midi_features_all)
             embedding_midi.append(midi_features_all)
-        
-        embedding_midi = np.array(midi_features_all)
-        embedding_midi = torch.from_numpy(embedding_midi)
+        embedding_midi = torch.stack(embedding_midi, dim=0) # torch.Tensorが入ったlistを二次元のTensorに変換
         return embedding_midi
 
     # 音声とテキストの特徴をエンコードし、対照学習のための損失を計算

@@ -61,6 +61,7 @@ class AudioCaptionMidiDataset(Dataset):
 
         return self.captions[idx]
 
+    @torch.no_grad()
     # 改良（音声データを読み込み、クロップし、テンソルに変換）
     def get_audio(self, idx):
         audio_path = self.audio_paths[idx]
@@ -85,9 +86,13 @@ class AudioCaptionMidiDataset(Dataset):
         
         return audio
     
-    def midi_padding(self, input_midi):
-        
+    @torch.no_grad()
+    def midi_padding(self, input_midi, idx):
+
         print(f"input_midiのshape: {input_midi.shape}") 
+        if input_midi.shape == torch.Size([0]):
+            print(input_midi, self.midi_dir_paths[idx])
+
         # MIDI データの x 次元を最大サイズに揃える
         if input_midi.shape[0] < self.midi_size:
             # パディングして長さを合わせる
@@ -99,6 +104,7 @@ class AudioCaptionMidiDataset(Dataset):
 
         return input_midi
 
+    @torch.no_grad()
     # 1つの曲の複数midiデータを取得し、すべてトークン化
     def get_midi(self, idx):
         files = glob.glob(self.midi_dir_paths[idx]+'/*.mid', recursive=True) # ["path_to_midi0", "path_to_midi1","path_to_midi2", ...]
@@ -111,7 +117,7 @@ class AudioCaptionMidiDataset(Dataset):
         '''
         
         all_words = torch.from_numpy(all_words.astype(np.float32)).clone()
-        all_words = self.midi_padding(all_words)
+        all_words = self.midi_padding(all_words, idx)
         return all_words
 
     def __getitem__(self, idx):
