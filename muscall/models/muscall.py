@@ -5,9 +5,6 @@ from torch import nn
 # from transformers import CLIPTextModel
 # import torch.nn.functional as F
 
-from muscall.modules.textual_heads import TextTransformer
-from muscall.modules.audio_ssl import SimCLRAudio
-from muscall.modules.audio_backbones import ModifiedResNet
 from muscall.modules.MidiBERT.model import *
 from transformers import BertConfig
 

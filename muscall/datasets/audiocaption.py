@@ -5,9 +5,6 @@ import numpy as np
 import torch
 from torch.utils.data.dataset import Dataset
 
-from transformers.models.bert.tokenization_bert import BertTokenizer
-from transformers.models.clip.tokenization_clip import CLIPTokenizer
-
 from muscall.datasets.model import CP
 import glob
 import librosa
