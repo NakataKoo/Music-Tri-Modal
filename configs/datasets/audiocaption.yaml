@@ -12,3 +12,5 @@ dataset_config:
     augment: false
     p_noise: 0.3
     p_pitch_shift: 0.4
+  midi:
+    size_dim0: 100

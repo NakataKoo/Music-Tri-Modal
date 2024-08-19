@@ -15,31 +15,6 @@ from muscall.models.muscall import MusCALL
 from muscall.tasks.retrieval import run_retrieval
 from muscall.utils.audio_utils import get_transform_chain
 
-def custom_collate_fn(batch):
-    # バッチ内のMIDIデータの最大のシーケンス長（x）を取得
-    max_midi_size = max([item[3].shape[0] for item in batch])  # 各 input_midi の x 次元を最大に揃える
-    
-    collated_batch = []
-    
-    for item in batch:
-        audio_id, input_audio, input_text, input_midi, idx = item
-        
-        # MIDI データの x 次元を最大サイズに揃える
-        input_midi = torch.tensor(input_midi, dtype=torch.float)
-        if input_midi.shape[0] < max_midi_size:
-            # パディングして長さを合わせる
-            midi_padding = torch.zeros((max_midi_size - input_midi.shape[0], 512, 4), dtype=input_midi.dtype)
-            input_midi = torch.cat((input_midi, midi_padding), dim=0)
-        
-        collated_batch.append((audio_id, input_audio, input_text, input_midi, idx))
-
-    #for item in batch:
-    #    audio_id, input_audio, input_text, input_midi, idx = item
-    #    print(f"input_midiのshape: {input_midi.shape}")
-    #    print(f"input_midiの内容: {input_midi}")
-
-    return torch.utils.data.dataloader.default_collate(collated_batch)
-
 class MusCALLTrainer(BaseTrainer):
     def __init__(self, config, logger):
         super().__init__(config, logger)
@@ -67,13 +42,11 @@ class MusCALLTrainer(BaseTrainer):
             dataset=self.train_dataset,
             **self.config.training.dataloader,
             drop_last=True,
-            collate_fn=custom_collate_fn  # カスタムcollate_fnを指定
         )
         self.val_loader = DataLoader(
             dataset=self.val_dataset,
             **self.config.training.dataloader,
             drop_last=True,
-            collate_fn=custom_collate_fn  # カスタムcollate_fnを指定
         )
 
         self.logger.write(

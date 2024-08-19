@@ -93,29 +93,41 @@ class MusCALL(nn.Module):
         text_features = self.text_projection(text_features)
         return text_features
         
-    def encode_midi(self, midi):
+    def encode_midi(self, midi_batch):
 
-        # midiが既にTensorの場合、そのまま使用
-        if isinstance(midi, np.ndarray):
-            midi = torch.from_numpy(midi)
+        '''
+        midi: torch.Size([batch_size, midi_size, 512, 4])
+        midiを個別に処理したい
+        '''
+
+        embedding_midi = []
+        for midi in midi_batch:
+
+            # midiが既にTensorの場合、そのまま使用
+            if isinstance(midi, np.ndarray):
+                midi = torch.from_numpy(midi)
+            
+            midi = midi.to(self.device)  # デバイスに移動
+
+            # LongTensorに変換
+            midi = midi.long()
+
+            assert midi.dim() == 3, f"midi tensor shape is incorrect: {midi.shape}"
+
+            midi_features = self.midibert.forward(midi)
+            midi_features_all = torch.zeros(768, device=self.device)  # デバイス上で初期化
+            # トークンのベクトルを平均して、シーケンス全体のベクトルを生成
+            for i in range(len(midi)):
+                midi_features_all = midi_features_all + midi_features.last_hidden_state[i].mean(dim=0) # (batch_size, hidden_size)
+            midi_features_all = midi_features_all / len(midi)
+            
+            # 同一のmidiのfeaturesで平均化
+            midi_features_all = self.midi_projection(midi_features_all)
+            embedding_midi.append(midi_features_all)
         
-        midi = midi.to(self.device)  # デバイスに移動
-
-        # LongTensorに変換
-        midi = midi.long()
-
-        assert midi.dim() == 3, f"midi tensor shape is incorrect: {midi.shape}"
-
-        midi_features = self.midibert.forward(midi)
-        midi_features_all = torch.zeros(768, device=self.device)  # デバイス上で初期化
-        # トークンのベクトルを平均して、シーケンス全体のベクトルを生成
-        for i in range(len(midi)):
-            midi_features_all = midi_features_all + midi_features.last_hidden_state[i].mean(dim=0) # (batch_size, hidden_size)
-        midi_features_all = midi_features_all / len(midi)
-        
-        # 同一のmidiのfeaturesで平均化
-        midi_features_all = self.midi_projection(midi_features_all)
-        return midi_features_all
+        embedding_midi = np.array(midi_features_all)
+        embedding_midi = torch.from_numpy(embedding_midi)
+        return embedding_midi
 
     # 音声とテキストの特徴をエンコードし、対照学習のための損失を計算
     def forward(

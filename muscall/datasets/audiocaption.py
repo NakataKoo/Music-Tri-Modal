@@ -40,6 +40,7 @@ class AudioCaptionMidiDataset(Dataset):
         self.sample_rate = self.config.audio.sr # サンプリングレート
         self.num_samples = self.sample_rate * self.config.audio.crop_length # クロップ長
         self.random_crop = self.config.audio.random_crop # ランダムクロップの有無
+        self.midi_size = self.config.midi.size_dim0 # input_midiのtorch.Size([x, 512, 4])におけるxのサイズ
         self._load()
 
     # JSONファイルからデータを読み込み、音声ID、キャプション、音声パス、midiパスをリストに格納
@@ -84,6 +85,20 @@ class AudioCaptionMidiDataset(Dataset):
         
         return audio
     
+    def midi_padding(self, input_midi):
+        
+        print(f"input_midiのshape: {input_midi.shape}") 
+        # MIDI データの x 次元を最大サイズに揃える
+        if input_midi.shape[0] < self.midi_size:
+            # パディングして長さを合わせる
+            midi_padding = torch.zeros((self.midi_size - input_midi.shape[0], 512, 4), dtype=input_midi.dtype)
+            input_midi = torch.cat((input_midi, midi_padding), dim=0)
+
+        print(f"input_midiのshape: {input_midi.shape}")
+        # print(f"input_midiの内容: {input_midi}")
+
+        return input_midi
+
     # 1つの曲の複数midiデータを取得し、すべてトークン化
     def get_midi(self, idx):
         files = glob.glob(self.midi_dir_paths[idx]+'/*.mid', recursive=True) # ["path_to_midi0", "path_to_midi1","path_to_midi2", ...]
@@ -96,6 +111,7 @@ class AudioCaptionMidiDataset(Dataset):
         '''
         
         all_words = torch.from_numpy(all_words.astype(np.float32)).clone()
+        all_words = self.midi_padding(all_words)
         return all_words
 
     def __getitem__(self, idx):
