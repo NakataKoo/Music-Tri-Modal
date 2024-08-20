@@ -92,19 +92,23 @@ class MusCALL(nn.Module):
         text_features = self.text_projection(text_features)
         return text_features
     
-    def encode_midi(self, midi_batch):
+    def encode_midi(self, midi_batch, first_input_midi_shape):
         '''
         midi: torch.Size([batch_size, midi_size, 512, 4])
+        first_input_midi_shape: torch.Size([batch_size]) (バッチ内の各データの初期midi数が記載)
         midiを個別に処理したい
         '''
         midi_batch = midi_batch.to(self.device)  # デバイスに移動
-
+        first_input_midi_shape.shape
         embedding_midi = []
-        for midi in midi_batch:
+        for midi, midi_shape in zip(midi_batch, first_input_midi_shape):
 
             # midiが既にTensorの場合、そのまま使用
             if isinstance(midi, np.ndarray):
                 midi = torch.from_numpy(midi)
+
+            # 元のmidiサイズに戻す
+            midi = midi[0:midi_shape]
 
             # LongTensorに変換
             midi = midi.long()
@@ -130,6 +134,7 @@ class MusCALL(nn.Module):
         audio, # 拡張後の音声データ（バッチ）
         text, # テキストデータ（バッチ）
         midi,  # midiデータ（バッチ）
+        first_input_midi_shape,
         original_audio=None, # 元音声データ
         sentence_sim=None, # 文の類似度(オプション)
         text_mask=None, #テキストのマスク(オプション)
@@ -139,7 +144,7 @@ class MusCALL(nn.Module):
         # 音声とテキストとmidiの特徴をそれぞれエンコード
         audio_features = self.encode_audio(audio)
         text_features = self.encode_text(text, text_mask)
-        midi_features = self.encode_midi(midi)
+        midi_features = self.encode_midi(midi, first_input_midi_shape)
 
         # normalise features（各特徴ベクトルをそのノルムで割ることで、単位ベクトルに変換）
         audio_features = audio_features / audio_features.norm(dim=-1, keepdim=True)

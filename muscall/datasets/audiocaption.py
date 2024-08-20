@@ -86,7 +86,9 @@ class AudioCaptionMidiDataset(Dataset):
     @torch.no_grad()
     def midi_padding(self, input_midi, idx):
 
+        first_input_midi_shape = input_midi.shape[0]
         print(f"input_midiのshape: {input_midi.shape}") 
+        print(f"midi num: {first_input_midi_shape}")
         if input_midi.shape == torch.Size([0]):
             print(input_midi, self.midi_dir_paths[idx])
 
@@ -97,9 +99,8 @@ class AudioCaptionMidiDataset(Dataset):
             input_midi = torch.cat((input_midi, midi_padding), dim=0)
 
         print(f"input_midiのshape: {input_midi.shape}")
-        # print(f"input_midiの内容: {input_midi}")
 
-        return input_midi
+        return input_midi, first_input_midi_shape
 
     @torch.no_grad()
     # 1つの曲の複数midiデータを取得し、すべてトークン化
@@ -114,15 +115,15 @@ class AudioCaptionMidiDataset(Dataset):
         '''
         
         all_words = torch.from_numpy(all_words.astype(np.float32)).clone()
-        all_words = self.midi_padding(all_words, idx)
-        return all_words
+        all_words, first_input_midi_shape = self.midi_padding(all_words, idx)
+        return all_words, first_input_midi_shape
 
     def __getitem__(self, idx):
         audio_id = torch.tensor(self.audio_ids[idx], dtype=torch.long) # audio_idsは"audio_id"リスト
 
         input_audio = self.get_audio(idx) # 音声データを取得
         input_text = self.get_raw_caption(idx) # キャプションを取得
-        input_midi = self.get_midi(idx) # midiデータを取得
+        input_midi, first_input_midi_shape = self.get_midi(idx) # midiデータを取得
 
         idx = torch.tensor(idx)
 
@@ -131,6 +132,7 @@ class AudioCaptionMidiDataset(Dataset):
             input_audio,
             input_text,
             input_midi,
+            first_input_midi_shape,
             idx,
         )
 

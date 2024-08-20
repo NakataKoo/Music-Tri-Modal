@@ -52,14 +52,13 @@ class CP(object):
         return data
 
     def prepare_data(self, midi_paths, task, max_len):
-        all_words, all_ys, midi_ids, not_midis = [], [], [], []
+        all_words, all_ys = [], []
         id = 0
         for path in tqdm(midi_paths):
             # extract events
             events = self.extract_events(path, task)
             if not events:  # if midi contains nothing
                 print(f'skip {path} because it is empty')
-                not_midis.append(path)
                 continue
             # events to words
             words, ys, midi_id = [], [], []

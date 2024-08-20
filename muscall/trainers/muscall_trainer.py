@@ -177,7 +177,7 @@ class MusCALLTrainer(BaseTrainer):
         for i, batch in enumerate(data_loader):
             batch = tuple(t.to(device=self.device, non_blocking=True) if isinstance(t, torch.Tensor) else t for t in batch)
             # batch = tuple(t.to(device=self.device, non_blocking=True) for t in batch) # data_loaderからバッチを取得し、GPUに転送
-            audio_id, input_audio, input_text, input_midi, data_idx = batch # バッチ内のデータを展開し、それぞれの変数に割り当て(__getitem__メソッドにより取得)
+            audio_id, input_audio, input_text, input_midi, first_input_midi_shape, data_idx = batch # バッチ内のデータを展開し、それぞれの変数に割り当て(__getitem__メソッドにより取得)
 
             # モデルの損失関数がweighted_clipの場合
             if self.config.model_config.loss == "weighted_clip":
@@ -206,6 +206,7 @@ class MusCALLTrainer(BaseTrainer):
                     input_audio,
                     input_text,
                     input_midi,
+                    first_input_midi_shape,
                     original_audio=original_audio, # 元の音声データ（拡張前の音声データ）
                     sentence_sim=sentence_sim,# 文の類似度（オプション：損失関数がweighted_clipの場合）
                 )
