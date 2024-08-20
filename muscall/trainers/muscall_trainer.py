@@ -23,6 +23,8 @@ def custom_collate_fn(batch):
         audio_id, input_audio, input_text, input_midi, first_input_midi_shape, midi_dir_paths, idx = item
         file_path = midi_dir_paths[idx]
         try:
+            if os.path.isdir(file_path):
+                continue  # ディレクトリの場合はスキップ
             miditoolkit.midi.parser.MidiFile(file_path)
             collated_batch.append(( audio_id,
                                     input_audio, 
