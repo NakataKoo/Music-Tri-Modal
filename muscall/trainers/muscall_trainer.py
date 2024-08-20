@@ -1,7 +1,7 @@
 import os
 import time
 import numpy as np
-
+import miditoolkit
 import torch
 
 import torch.optim as optim
@@ -14,6 +14,27 @@ from muscall.trainers.base_trainer import BaseTrainer
 from muscall.models.muscall import MusCALL
 from muscall.tasks.retrieval import run_retrieval
 from muscall.utils.audio_utils import get_transform_chain
+
+def custom_collate_fn(batch):
+
+    collated_batch = []
+    
+    for item in batch:
+        audio_id, input_audio, input_text, input_midi, first_input_midi_shape, midi_dir_paths, idx = item
+        file_path = midi_dir_paths[idx]
+        try:
+            miditoolkit.midi.parser.MidiFile(file_path)
+            collated_batch.append(( audio_id,
+                                    input_audio, 
+                                    input_text, 
+                                    input_midi, 
+                                    first_input_midi_shape, 
+                                    midi_dir_paths, 
+                                    idx))
+        except OSError as e:
+            print(f"Error reading {file_path}: {e}, index: {idx}")
+            continue
+    return torch.utils.data.dataloader.default_collate(collated_batch)
 
 class MusCALLTrainer(BaseTrainer):
     def __init__(self, config, logger):
@@ -177,7 +198,7 @@ class MusCALLTrainer(BaseTrainer):
         for i, batch in enumerate(data_loader):
             batch = tuple(t.to(device=self.device, non_blocking=True) if isinstance(t, torch.Tensor) else t for t in batch)
             # batch = tuple(t.to(device=self.device, non_blocking=True) for t in batch) # data_loaderからバッチを取得し、GPUに転送
-            audio_id, input_audio, input_text, input_midi, first_input_midi_shape, data_idx = batch # バッチ内のデータを展開し、それぞれの変数に割り当て(__getitem__メソッドにより取得)
+            audio_id, input_audio, input_text, input_midi, first_input_midi_shape, midi_dir_paths, data_idx = batch # バッチ内のデータを展開し、それぞれの変数に割り当て(__getitem__メソッドにより取得)
 
             # モデルの損失関数がweighted_clipの場合
             if self.config.model_config.loss == "weighted_clip":

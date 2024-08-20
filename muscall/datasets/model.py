@@ -56,9 +56,9 @@ class CP(object):
         id = 0
         for path in tqdm(midi_paths):
             # extract events
-            events = self.extract_events(path, task)
+            events = self.extract_events(path, task) # もしeventが無ければ, events = None
             if not events:  # if midi contains nothing
-                print(f'skip {path} because it is empty') ### ここにエラーハンドリングが必要かも
+                print(f'skip {path} because it is empty')
                 continue
             # events to words
             words, ys, midi_id = [], [], []
