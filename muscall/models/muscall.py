@@ -32,9 +32,9 @@ class MusCALL(nn.Module):
         self.device = torch.device("cuda")
 
         self.clap = laion_clap.CLAP_Module(enable_fusion=False, amodel='HTSAT-base')
-        self.clap.load_ckpt('/content/Music-Tri-Modal/music_audioset_epoch_15_esc_90.14.pt')
+        self.clap.load_ckpt('/content/drive/MyDrive/Music-Tri-Modal/music_audioset_epoch_15_esc_90.14.pt')
         
-        with open("/content/Music-Tri-Modal/muscall/modules/MidiBERT/CP.pkl", 'rb') as f:
+        with open("/content/drive/MyDrive/Music-Tri-Modal/muscall/modules/MidiBERT/CP.pkl", 'rb') as f:
             e2w, w2e = pickle.load(f)
 
         configuration = BertConfig(max_position_embeddings=512, # max_seq_len
