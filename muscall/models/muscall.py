@@ -109,6 +109,7 @@ class MusCALL(nn.Module):
 
             # 元のmidiサイズに戻す
             midi = midi[0:midi_shape]
+            print(f"fix_midi_shape: {midi.shape}")
 
             # LongTensorに変換
             midi = midi.long()

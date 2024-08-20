@@ -52,13 +52,13 @@ class CP(object):
         return data
 
     def prepare_data(self, midi_paths, task, max_len):
-        all_words, all_ys = [], []
+        all_words = []
         id = 0
         for path in tqdm(midi_paths):
             # extract events
             events = self.extract_events(path, task)
             if not events:  # if midi contains nothing
-                print(f'skip {path} because it is empty')
+                print(f'skip {path} because it is empty') ### ここにエラーハンドリングが必要かも
                 continue
             # events to words
             words, ys, midi_id = [], [], []
@@ -99,13 +99,8 @@ class CP(object):
 
             if (task == 'melody' or task == 'velocity') and len(slice_ys[-1]) < max_len:
                 slice_ys[-1] = self.padding(slice_ys[-1], max_len, ans=True)
-
-            midi_id = [id]*len(slice_words)
-            midi_ids = midi_ids + midi_id
-            id += 1
             
             all_words = all_words + slice_words
-            all_ys = all_ys + slice_ys
         
         all_words = np.array(all_words)
-        return all_words, all_ys, midi_ids, not_midis
+        return all_words

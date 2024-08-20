@@ -106,7 +106,7 @@ class AudioCaptionMidiDataset(Dataset):
     # 1つの曲の複数midiデータを取得し、すべてトークン化
     def get_midi(self, idx):
         files = glob.glob(self.midi_dir_paths[idx]+'/*.mid', recursive=True) # ["path_to_midi0", "path_to_midi1","path_to_midi2", ...]
-        all_words, _, _, _ = self.CP.prepare_data(files, task="", max_len=512) 
+        all_words = self.CP.prepare_data(files, task="", max_len=512) 
         '''
         all_wordsリストに、1つの曲のMIDIデータのトークン化されたデータが格納されている。
         all_wordsの各要素はリストで、これは1つのMIDIをスライシングした後に、それぞれトークン化し、それを複数MIDIに適用したもの。all_words=[[slice_words[0]], [slice_words[1]], ...], slice_words=[[[token0], [token1], ...], [[token0], [token1], ...], ...]
