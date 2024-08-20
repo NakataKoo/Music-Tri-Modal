@@ -7,7 +7,7 @@ training:
   device: cuda
 
   dataloader:
-    batch_size: 64
+    batch_size: 12
     num_workers: 0
     shuffle: True
     pin_memory: True

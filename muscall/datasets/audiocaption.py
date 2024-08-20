@@ -26,7 +26,7 @@ class AudioCaptionMidiDataset(Dataset):
         self._dataset_type = dataset_type
         self._data_dir = self.config.data_dir # ${env.data_root}/datasets/${dataset_config.dataset_name}
 
-        self.CP = CP(dict="/content/Music-Tri-Modal/muscall/modules/MidiBERT/CP.pkl")
+        self.CP = CP(dict="/content/drive/MyDrive/Music-Tri-Modal/muscall/modules/MidiBERT/CP.pkl")
 
         self.dataset_json = os.path.join(
             self._data_dir, "dataset_{}.json".format(self._dataset_type)
