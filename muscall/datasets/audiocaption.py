@@ -10,7 +10,7 @@ import glob
 import librosa
 
 class AudioCaptionMidiDataset(Dataset):
-    def __init__(self, config, tokenizer=None, dataset_type="train", midi_dic):
+    def __init__(self, config, tokenizer=None, dataset_type="train", midi_dic=None):
         """Constructs an AudioCaptionMidiDataset dataset.
 
         Args:
@@ -87,7 +87,7 @@ class AudioCaptionMidiDataset(Dataset):
     def midi_padding(self, input_midi, idx):
 
         first_input_midi_shape = input_midi.shape[0]
-        print(f"input_midiのshape: {input_midi.shape}") 
+        #print(f"input_midiのshape: {input_midi.shape}") 
         print(f"midi num: {first_input_midi_shape}")
         if input_midi.shape == torch.Size([0]):
             print(input_midi, self.midi_dir_paths[idx])
@@ -98,7 +98,7 @@ class AudioCaptionMidiDataset(Dataset):
             midi_padding = torch.zeros((self.midi_size - input_midi.shape[0], 512, 4), dtype=input_midi.dtype)
             input_midi = torch.cat((input_midi, midi_padding), dim=0)
 
-        print(f"input_midiのshape: {input_midi.shape}")
+        #print(f"input_midiのshape: {input_midi.shape}")
 
         return input_midi, first_input_midi_shape
 

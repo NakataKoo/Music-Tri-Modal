@@ -3,6 +3,7 @@ import time
 import numpy as np
 import miditoolkit
 import torch
+import glob
 
 import torch.optim as optim
 from torch.optim.lr_scheduler import CosineAnnealingLR
@@ -21,21 +22,20 @@ def custom_collate_fn(batch):
     
     for item in batch:
         audio_id, input_audio, input_text, input_midi, first_input_midi_shape, midi_dir_paths, idx = item
-        file_path = midi_dir_paths[idx]
-        try:
-            if os.path.isdir(file_path):
-                continue  # ディレクトリの場合はスキップ
-            miditoolkit.midi.parser.MidiFile(file_path)
-            collated_batch.append(( audio_id,
-                                    input_audio, 
-                                    input_text, 
-                                    input_midi, 
-                                    first_input_midi_shape, 
-                                    midi_dir_paths, 
-                                    idx))
-        except OSError as e:
-            print(f"Error reading {file_path}: {e}, index: {idx}")
-            continue
+        files = glob.glob(midi_dir_paths[idx]+'/*.mid', recursive=True) # ["path_to_midi0", "path_to_midi1", ...]
+        for file in files:
+            try:
+                miditoolkit.midi.parser.MidiFile(file)
+                collated_batch.append(( audio_id,
+                                        input_audio, 
+                                        input_text, 
+                                        input_midi, 
+                                        first_input_midi_shape, 
+                                        midi_dir_paths, 
+                                        idx))
+            except OSError as e:
+                print(f"Error reading {file}: {e}, index: {idx}")
+                continue
     return torch.utils.data.dataloader.default_collate(collated_batch)
 
 class MusCALLTrainer(BaseTrainer):
@@ -65,13 +65,13 @@ class MusCALLTrainer(BaseTrainer):
             dataset=self.train_dataset,
             **self.config.training.dataloader,
             drop_last=True,
-            collate_fn=custom_collate_fn
+            # collate_fn=custom_collate_fn
         )
         self.val_loader = DataLoader(
             dataset=self.val_dataset,
             **self.config.training.dataloader,
             drop_last=True,
-            collate_fn=custom_collate_fn
+            # collate_fn=custom_collate_fn
         )
 
         self.logger.write(
