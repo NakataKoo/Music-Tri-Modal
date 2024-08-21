@@ -54,7 +54,7 @@ class CP(object):
     def prepare_data(self, midi_paths, task, max_len):
         all_words = []
         id = 0
-        for path in tqdm(midi_paths):
+        for path in midi_paths: # tqdm
             # extract events
             events = self.extract_events(path, task) # もしeventが無ければ, events = None
             if not events:  # if midi contains nothing

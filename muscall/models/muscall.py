@@ -34,7 +34,10 @@ class MusCALL(nn.Module):
 
         configuration = BertConfig(max_position_embeddings=config.midi.max_seq_len, # 512
                                 position_embedding_type='relative_key_query',
-                                hidden_size=config.midi.hidden_size # 768
+                                hidden_size=config.midi.hidden_size, # 768
+                                num_attention_heads = config.midi.num_attention_heads,
+                                num_hidden_layers = config.midi.num_hidden_layers,
+                                intermediate_size = config.midi.intermediate_size
         )
 
         self.midibert = MidiBert(bertConfig=configuration, e2w=e2w, w2e=w2e)
@@ -45,7 +48,7 @@ class MusCALL(nn.Module):
         projection_dim = config.projection_dim # 最終的な共通のエンベディングの512次元
         audio_dim = config.clap.audio_hidden_size
         text_dim = config.clap.text_hidden_size
-        midi_dim = 768
+        midi_dim = config.midi.hidden_size
 
         self.audio_projection = nn.Linear(audio_dim, projection_dim, bias=False) # audio_dimをprojection_dimへ線形変換
         self.text_projection = nn.Linear(text_dim, projection_dim, bias=False)
@@ -104,7 +107,7 @@ class MusCALL(nn.Module):
 
             # 元のmidiサイズに戻す
             midi = midi[0:midi_shape]
-            print(f"fix_midi_shape: {midi.shape}")
+            # print(f"fix_midi_shape: {midi.shape}")
 
             # LongTensorに変換
             midi = midi.long()

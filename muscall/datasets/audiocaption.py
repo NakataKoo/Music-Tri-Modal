@@ -87,8 +87,8 @@ class AudioCaptionMidiDataset(Dataset):
     def midi_padding(self, input_midi, idx):
 
         first_input_midi_shape = input_midi.shape[0]
-        #print(f"input_midiのshape: {input_midi.shape}") 
-        print(f"midi num: {first_input_midi_shape}")
+        # print(f"input_midiのshape: {input_midi.shape}") 
+        # print(f"midi num: {first_input_midi_shape}")
         if input_midi.shape == torch.Size([0]):
             print(input_midi, self.midi_dir_paths[idx])
 
