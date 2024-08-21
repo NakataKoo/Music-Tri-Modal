@@ -2,14 +2,9 @@ import numpy as np
 import pickle
 import torch
 from torch import nn
-# from transformers import CLIPTextModel
-# import torch.nn.functional as F
 
 from muscall.modules.MidiBERT.model import *
 from transformers import BertConfig
-
-# from datasets import load_dataset
-# from transformers import ClapModel, ClapProcessor
 import laion_clap
 
 # クロスエントロピー誤差
@@ -32,14 +27,14 @@ class MusCALL(nn.Module):
         self.device = torch.device("cuda")
 
         self.clap = laion_clap.CLAP_Module(enable_fusion=False, amodel='HTSAT-base')
-        self.clap.load_ckpt('/content/drive/MyDrive/Music-Tri-Modal/music_audioset_epoch_15_esc_90.14.pt')
+        self.clap.load_ckpt(config.clap.clap_ckpt)
         
-        with open("/content/drive/MyDrive/Music-Tri-Modal/muscall/modules/MidiBERT/CP.pkl", 'rb') as f:
+        with open(config.midi.midi_dic, 'rb') as f:
             e2w, w2e = pickle.load(f)
 
-        configuration = BertConfig(max_position_embeddings=512, # max_seq_len
+        configuration = BertConfig(max_position_embeddings=config.midi.max_seq_len, # 512
                                 position_embedding_type='relative_key_query',
-                                hidden_size=768 # args.hs
+                                hidden_size=config.midi.hidden_size # 768
         )
 
         self.midibert = MidiBert(bertConfig=configuration, e2w=e2w, w2e=w2e)
@@ -48,9 +43,9 @@ class MusCALL(nn.Module):
             param.requires_grad = False
 
         projection_dim = config.projection_dim # 最終的な共通のエンベディングの512次元
-        audio_dim = 512 # clap audio hidden size
-        text_dim = 512 # clap text hidden size
-        midi_dim = 768 # MIDI-BERT hidden size
+        audio_dim = config.clap.audio_hidden_size
+        text_dim = config.clap.text_hidden_size
+        midi_dim = 768
 
         self.audio_projection = nn.Linear(audio_dim, projection_dim, bias=False) # audio_dimをprojection_dimへ線形変換
         self.text_projection = nn.Linear(text_dim, projection_dim, bias=False)
