@@ -7,7 +7,7 @@ source venv/bin/activate
 ```
 
 Then, clone the repository and install the dependencies:
-
+(研究室のA40サーバーの場合)
 ```setup
 git clone https://www.github.com/ilaria-manco/muscall 
 cd muscall 
@@ -41,6 +41,22 @@ dataset_name
 ```
 
 An illustrative example of the dataset is provided in [`data/datasets/audiocaption/`](data/datasets/audiocaption/).
+
+### Midi-Audio Data prepare
+```
+cd /Music-Tri-Modal/data/datasets/audiocaptionmidi/
+
+mkdir midi
+mkdir audio
+
+cd midi
+wget http://hog.ee.columbia.edu/craffel/lmd/lmd_aligned.tar.gz
+tar -zxvf lmd_aligned.tar.gz
+
+cd audio
+wget http://hog.ee.columbia.edu/craffel/lmd/lmd_matched_mp3.tar.gz
+tar -xzvf lmd_matched_mp3.tar.gz
+```
 
 ## Training
 Dataset, model and training configurations are set in the respective `yaml` files in [`configs`](configs). You can also pass some options via the CLI, overwriting the arguments in the config files. For more details on the CLI options, please refer to the [training script](scripts/train.py).

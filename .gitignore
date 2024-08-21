@@ -5,3 +5,5 @@
 .ipynb_checkpoints/
 save/
 **venv
+data/datasets/audiocaptionmidi/audio/
+data/datasets/audiocaptionmidi/midi/
