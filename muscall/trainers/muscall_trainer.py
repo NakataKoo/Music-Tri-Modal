@@ -56,8 +56,8 @@ class MusCALLTrainer(BaseTrainer):
 
         # AudioCaptionMidiDatasetのインスタンスを生成（audiocaption.yamlの内容を引数に指定）
         if dataset_name == "audiocaptionmidi":
-            self.train_dataset = AudioCaptionMidiDataset(self.config.dataset_config, dataset_type="train", self.config.model_config.midi.midi_dic)
-            self.val_dataset = AudioCaptionMidiDataset(self.config.dataset_config, dataset_type="val", self.config.model_config.midi.midi_dic)
+            self.train_dataset = AudioCaptionMidiDataset(self.config.dataset_config, dataset_type="train", midi_dic=self.config.model_config.midi.midi_dic)
+            self.val_dataset = AudioCaptionMidiDataset(self.config.dataset_config, dataset_type="val", midi_dic=self.config.model_config.midi.midi_dic)
         else:
             raise ValueError("{} dataset is not supported.".format(dataset_name))
 

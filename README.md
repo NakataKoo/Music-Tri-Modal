@@ -14,6 +14,13 @@ cd muscall
 pip install -r requirements.txt
 pip install -e .
 pip install torch torchaudio --index-url https://download.pytorch.org/whl/cu121
+pip install laion_clap
+pip install miditoolkit
+```
+
+at Music-Tri-Modal/
+```
+wget https://huggingface.co/lukewys/laion_clap/resolve/main/music_audioset_epoch_15_esc_90.14.pt
 ```
 
 ## Preparing the dataset
