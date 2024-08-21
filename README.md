@@ -13,6 +13,7 @@ git clone https://www.github.com/ilaria-manco/muscall
 cd muscall 
 pip install -r requirements.txt
 pip install -e .
+pip install torch torchaudio --index-url https://download.pytorch.org/whl/cu121
 ```
 
 ## Preparing the dataset
