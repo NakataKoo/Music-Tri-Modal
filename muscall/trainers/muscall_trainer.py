@@ -135,6 +135,8 @@ class MusCALLTrainer(BaseTrainer):
             )
             self.start_epoch = 0
 
+        torch.backends.cudnn.benchmark = True
+
         for epoch in range(self.start_epoch, self.config.training.epochs): # start_epoch=0 ~ max epochs
             epoch_start_time = time.time()
 

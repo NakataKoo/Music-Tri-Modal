@@ -171,8 +171,6 @@ class MusCALL(nn.Module):
         if return_loss:
             loss = clip_loss(logits_per_text_midi) + clip_loss(logits_per_audio_midi)
             return loss
-        #else:
-        #    return logits_per_audio, logits_per_text
 
     @classmethod
     def config_path(cls):

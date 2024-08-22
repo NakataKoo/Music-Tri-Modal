@@ -2,13 +2,13 @@ training:
   # Experiment id to use in logging and checkpoints
   experiment_id: null
   # Maximum number of epochs
-  epochs: 100
+  epochs: 10
   # Device on which the model will be trained. Set 'cpu' to train/infer on CPU
   device: cuda
 
   dataloader:
-    batch_size: 12
-    num_workers: 0
+    batch_size: 6
+    num_workers: 12
     shuffle: True
     pin_memory: True
   
