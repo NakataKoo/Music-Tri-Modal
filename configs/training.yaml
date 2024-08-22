@@ -32,7 +32,9 @@ training:
     criteria: loss
     # Whether the monitored criteria should be minimized for early stopping
     minimize: true
-    
+
+  track_retrieval_metrics: false
+
 # Environment configuration
 env:
   # Base directory of the repo, populated when config is loaded

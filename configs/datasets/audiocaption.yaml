@@ -13,4 +13,4 @@ dataset_config:
     p_noise: 0.3
     p_pitch_shift: 0.4
   midi:
-    size_dim0: 200
+    size_dim0: 250

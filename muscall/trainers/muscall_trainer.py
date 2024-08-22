@@ -8,7 +8,6 @@ import glob
 import torch.optim as optim
 from torch.optim.lr_scheduler import CosineAnnealingLR
 from torch.utils.data import DataLoader, Subset
-# from sentence_transformers import SentenceTransformer
 
 from muscall.datasets.audiocaption import AudioCaptionMidiDataset
 from muscall.trainers.base_trainer import BaseTrainer
@@ -46,9 +45,6 @@ class MusCALLTrainer(BaseTrainer):
         self.load() # load_dataset()、build_model()、build_optimizer()、self.logger.save_config()の実行
 
         self.scaler = torch.cuda.amp.GradScaler()
-
-        # self.sbert_model = SentenceTransformer("all-MiniLM-L6-v2")
-        # self.sbert_model.to(self.device)
 
     def load_dataset(self):
         self.logger.write("Loading dataset")
@@ -120,17 +116,6 @@ class MusCALLTrainer(BaseTrainer):
         )
         return retrieval_metrics["R@10"].item()
 
-    def get_sentence_similarities(self, data_loader, data_idx):
-        raw_captions = [
-            data_loader.dataset.get_raw_caption(idx.item()) for idx in data_idx
-        ]
-        sentence_embeddings = self.sbert_model.encode(
-            raw_captions,
-            convert_to_tensor=True,
-            normalize_embeddings=True,
-        )
-        return sentence_embeddings @ sentence_embeddings.t()
-
     # train.pyによって実行されるメソッド
     def train(self):
         best_r10 = 0 # 最良のR@10スコアを追跡
@@ -156,8 +141,12 @@ class MusCALLTrainer(BaseTrainer):
             train_loss = self.train_epoch(self.train_loader, is_training=True)
             val_loss = self.train_epoch_val(self.val_loader)
 
-            track_retrieval_metrics = True
-            if track_retrieval_metrics:
+            # バッチごとの進捗を表示
+            if epoch % 10 == 0:
+                print(f"Epoch [{epoch + 1}/{self.config.training.epochs}], train loss: {train_loss}, val loss: {val_loss}")
+
+            r10 = 0
+            if self.config.training.track_retrieval_metrics:
                 r10 = self.get_retrieval_metrics() # 検索メトリクスの取得
 
             epoch_time = time.time() - epoch_start_time
@@ -204,11 +193,7 @@ class MusCALLTrainer(BaseTrainer):
             # batch = tuple(t.to(device=self.device, non_blocking=True) for t in batch) # data_loaderからバッチを取得し、GPUに転送
             audio_id, input_audio, input_text, input_midi, first_input_midi_shape, midi_dir_paths, data_idx = batch # バッチ内のデータを展開し、それぞれの変数に割り当て(__getitem__メソッドにより取得)
 
-            # モデルの損失関数がweighted_clipの場合
-            if self.config.model_config.loss == "weighted_clip":
-                sentence_sim = self.get_sentence_similarities(data_loader, data_idx)
-            else:
-                sentence_sim = None
+            sentence_sim = None
 
             original_audio = None
             audio_data_config = self.config.dataset_config.audio
