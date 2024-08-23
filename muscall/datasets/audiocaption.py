@@ -50,7 +50,7 @@ class AudioCaptionMidiDataset(Dataset):
             self.audio_ids = [i["audio_id"] for i in self.samples] # jsonの各オブジェくトの"audio_id"(自然数)をリストに格納
             self.captions = [i["caption"].strip() for i in self.samples] # jsonの各オブジェくトの"caption"をリストに格納
             self.audio_paths = [os.path.join(
-                self.audio_dir, i["audio_path"]) for i in self.samples] # jsonの各オブジェくトの"audio_path"(音声ファイルパス)をリストに格納
+                self.audio_dir, i["audio_path"]+".mp3") for i in self.samples] # jsonの各オブジェくトの"audio_path"(音声ファイルパス)をリストに格納
             self.midi_dir_paths = [os.path.join(self.midi_dir, os.path.splitext(i["audio_path"])[0].replace('lmd_matched_mp3', 'lmd_aligned')) for i in self.samples] # 各楽曲のmidiファイルが格納されたディレクトリのパスをリストに格納
 
     def get_raw_caption(self, idx):
