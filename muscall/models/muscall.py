@@ -37,7 +37,8 @@ class MusCALL(nn.Module):
                                 hidden_size=config.midi.hidden_size, # 768
                                 num_attention_heads = config.midi.num_attention_heads,
                                 num_hidden_layers = config.midi.num_hidden_layers,
-                                intermediate_size = config.midi.intermediate_size
+                                intermediate_size = config.midi.intermediate_size,
+                                vocab_size = config.midi.vocab_size
         )
 
         self.midibert = MidiBert(bertConfig=configuration, e2w=e2w, w2e=w2e)
