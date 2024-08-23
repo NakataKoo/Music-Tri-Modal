@@ -70,23 +70,12 @@ class CP(object):
                     if e.name == 'Pitch':
                         to_class = e.Type
                 words.append(nts) # 生成されたトークンのリストntsをwordsリストに追加
-                if task == 'melody' or task == 'velocity':
-                    ys.append(to_class+1)
             # wordsリストに、MIDIファイル全体のトークン化されたデータが格納されている
 
             # slice to chunks so that max length = max_len (default: 512)
             slice_words, slice_ys = [], []
             for i in range(0, len(words), max_len):
                 slice_words.append(words[i:i+max_len]) # wordsリストの中から、i番目からi+max_len番目までのデータをスライスし、slice_wordsに追加
-                
-                if task == "composer":
-                    name = path.split('/')[-2]
-                    slice_ys.append(Composer[name])
-                elif task == "emotion":
-                    name = path.split('/')[-1].split('_')[0]
-                    slice_ys.append(Emotion[name])
-                else:
-                    slice_ys.append(ys[i:i+max_len])
             
             # padding or drop
             # drop only when the task is 'composer' and the data length < max_len//2
