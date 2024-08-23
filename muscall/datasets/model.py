@@ -3,25 +3,6 @@ import pickle
 from tqdm import tqdm
 import muscall.modules.MidiBERT.utils as utils # import data_creation.prepare_data.utils as utils
 
-Composer = {
-    "Bethel": 0,
-    "Clayderman": 1,
-    "Einaudi": 2,
-    "Hancock": 3,
-    "Hillsong": 4,
-    "Hisaishi": 5,
-    "Ryuichi": 6,
-    "Yiruma": 7,
-    "Padding": 8,
-}
-
-Emotion = {
-    "Q1": 0,
-    "Q2": 1,
-    "Q3": 2,
-    "Q4": 3,
-}
-
 class CP(object):
     def __init__(self, dict):
         # load dictionary
