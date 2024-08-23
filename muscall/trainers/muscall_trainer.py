@@ -56,6 +56,7 @@ def custom_collate_fn(batch):
     for item in batch:
         audio_id, input_audio, input_text, input_midi, first_input_midi_shape, midi_dir_paths, idx = item
         if input_midi.nelement() == 0:
+            print(f"pass: {midi_dir_paths[idx]}")
             continue
         collated_batch.append(( audio_id,
                                 input_audio, 
@@ -64,7 +65,7 @@ def custom_collate_fn(batch):
                                 first_input_midi_shape, 
                                 midi_dir_paths, 
                                 idx))
-    
+
     return torch.utils.data.dataloader.default_collate(collated_batch)
 
 class MusCALLTrainer(BaseTrainer):
