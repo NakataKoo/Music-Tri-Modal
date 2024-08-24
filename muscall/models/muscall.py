@@ -4,7 +4,7 @@ import torch
 from torch import nn
 
 from muscall.modules.MidiBERT.model import *
-from transformers import BertConfig
+from transformers import BertConfig, AlbertConfig, RobertaConfig
 import laion_clap
 
 # クロスエントロピー誤差
@@ -32,16 +32,35 @@ class MusCALL(nn.Module):
         with open(config.midi.midi_dic, 'rb') as f:
             e2w, w2e = pickle.load(f)
 
-        configuration = BertConfig(max_position_embeddings=config.midi.max_seq_len, # 512
-                                position_embedding_type='relative_key_query',
-                                hidden_size=config.midi.hidden_size, # 768
-                                num_attention_heads = config.midi.num_attention_heads,
-                                num_hidden_layers = config.midi.num_hidden_layers,
-                                intermediate_size = config.midi.intermediate_size,
-                                vocab_size = config.midi.vocab_size
-        )
+        if config.midi.model_name == 'bert':
+            configuration = BertConfig(max_position_embeddings=config.midi.max_seq_len, # 512
+                                    position_embedding_type='relative_key_query',
+                                    hidden_size=config.midi.hidden_size, # 768
+                                    num_attention_heads = config.midi.num_attention_heads,
+                                    num_hidden_layers = config.midi.num_hidden_layers,
+                                    intermediate_size = config.midi.intermediate_size,
+                                    vocab_size = config.midi.vocab_size
+            )
+        elif config.midi.model_name == 'albert':
+            configuration = AlbertConfig(max_position_embeddings=config.midi.max_seq_len, # 512
+                                    position_embedding_type='relative_key_query',
+                                    hidden_size=config.midi.hidden_size, # 768
+                                    num_attention_heads = config.midi.num_attention_heads,
+                                    num_hidden_layers = config.midi.num_hidden_layers,
+                                    intermediate_size = config.midi.intermediate_size,
+                                    vocab_size = config.midi.vocab_size
+            )
+        elif config.midi.model_name == 'roberta':
+            configuration = RobertaConfig(max_position_embeddings=config.midi.max_seq_len, # 512
+                                    position_embedding_type='relative_key_query',
+                                    hidden_size=config.midi.hidden_size, # 768
+                                    num_attention_heads = config.midi.num_attention_heads,
+                                    num_hidden_layers = config.midi.num_hidden_layers,
+                                    intermediate_size = config.midi.intermediate_size,
+                                    vocab_size = config.midi.vocab_size
+            )
 
-        self.midibert = MidiBert(bertConfig=configuration, e2w=e2w, w2e=w2e)
+        self.midibert = MidiBert(bertConfig=configuration, e2w=e2w, w2e=w2e, model_name=config.midi.model_name)
 
         for param in self.clap.parameters():
             param.requires_grad = False

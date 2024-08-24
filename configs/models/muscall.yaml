@@ -14,4 +14,5 @@ model_config:
     num_attention_heads: 4
     intermediate_size: 1024
     vocab_size: 1000
+    model_name: 'albert' # or 'bert', 'roberta'
   loss: clip                      # one of [clip, weighted_clip]
