@@ -4,7 +4,7 @@ import random
 
 import torch
 import torch.nn as nn
-from transformers import BertModel, AlbertModel, RobertaModel
+from transformers import BertModel, AlbertModel, RobertaModel, DistilBertModel
 
 class Embeddings(nn.Module):
     def __init__(self, n_token, d_model):
@@ -27,6 +27,8 @@ class MidiBert(nn.Module):
             self.bert = AlbertModel(bertConfig)
         elif model_name == 'roberta':
             self.bert = RobertaModel(bertConfig)
+        elif model_name == 'distilbert':
+            self.bert = DistilBertModel(bertConfig)
         
         bertConfig.d_model = bertConfig.hidden_size
         self.hidden_size = bertConfig.hidden_size

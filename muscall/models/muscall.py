@@ -4,7 +4,7 @@ import torch
 from torch import nn
 
 from muscall.modules.MidiBERT.model import *
-from transformers import BertConfig, AlbertConfig, RobertaConfig
+from transformers import BertConfig, AlbertConfig, RobertaConfig, DistilBertConfig
 import laion_clap
 
 # クロスエントロピー誤差
@@ -52,6 +52,15 @@ class MusCALL(nn.Module):
             )
         elif config.midi.model_name == 'roberta':
             configuration = RobertaConfig(max_position_embeddings=config.midi.max_seq_len, # 512
+                                    position_embedding_type='relative_key_query',
+                                    hidden_size=config.midi.hidden_size, # 768
+                                    num_attention_heads = config.midi.num_attention_heads,
+                                    num_hidden_layers = config.midi.num_hidden_layers,
+                                    intermediate_size = config.midi.intermediate_size,
+                                    vocab_size = config.midi.vocab_size
+            )
+        elif config.midi.model_name == 'distilbert':
+            configuration = DistilBertConfig(max_position_embeddings=config.midi.max_seq_len, # 512
                                     position_embedding_type='relative_key_query',
                                     hidden_size=config.midi.hidden_size, # 768
                                     num_attention_heads = config.midi.num_attention_heads,

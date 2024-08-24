@@ -92,13 +92,13 @@ class MusCALLTrainer(BaseTrainer):
             dataset=self.train_dataset,
             **self.config.training.dataloader,
             drop_last=True,
-            collate_fn=custom_collate_fn
+            #collate_fn=custom_collate_fn
         )
         self.val_loader = DataLoader(
             dataset=self.val_dataset,
             **self.config.training.dataloader,
             drop_last=True,
-            collate_fn=custom_collate_fn
+            #collate_fn=custom_collate_fn
         )
 
         self.logger.write(
