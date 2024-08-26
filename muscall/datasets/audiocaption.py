@@ -33,9 +33,9 @@ class AudioCaptionMidiDataset(Dataset):
         ) # データセットのJSONファイル(root/data/dataset/○○/dataset_○○.json)のパス
 
         # audiocaption.yamlの内容
-        #self.max_seq_length = self.config.text.max_seq_length # 最大シーケンス長
         self.sample_rate = self.config.audio.sr # サンプリングレート
-        self.num_samples = self.sample_rate * self.config.audio.crop_length # クロップ長
+        self.num_samples = self.sample_rate * self.config.audio.crop_length # サンプリング数
+        self.crop_length = self.config.crop_length # 曲の長さ（秒）
         self.random_crop = self.config.audio.random_crop # ランダムクロップの有無
         self.midi_size = self.config.midi.size_dim0 # input_midiのtorch.Size([x, 512, 4])におけるxのサイズ
         self._load()
@@ -62,7 +62,7 @@ class AudioCaptionMidiDataset(Dataset):
     # 改良（音声データを読み込み、クロップ）
     def get_audio(self, idx):
         audio_path = self.audio_paths[idx]
-        audio, sr = librosa.load(audio_path, sr=self.sample_rate, mono=True)
+        audio, sr = librosa.load(audio_path, sr=self.sample_rate, mono=True, duration=self.crop_length, offset=0.1)
         audio = audio.reshape(1, -1)
 
         if audio.shape[1] < self.num_samples:
