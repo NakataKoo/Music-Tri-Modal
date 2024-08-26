@@ -65,11 +65,17 @@ class AudioCaptionMidiDataset(Dataset):
         audio_path = self.audio_paths[idx]
         audio, sr = librosa.load(audio_path, sr=self.sample_rate, mono=True, duration=self.crop_length, offset=self.offset)
         audio = audio.reshape(1, -1)
+        """
+        audioの例
+        array([[ 9.2013743e-06,  3.8011109e-05,  7.4386335e-05, ..., -1.0849992e-02, -1.3824768e-02,  0.0000000e+00]], dtype=float32)
+        """
 
+        # 短い音声に対しパディング
         if audio.shape[1] < self.num_samples:
             x = self.num_samples - audio.shape[1]
             padded_audio = np.pad(audio[0], ((0, x)))
             audio = np.array([padded_audio])
+        # 長い音声に対しクロップ
         elif audio.shape[1] > self.num_samples:
             cropped_audio = audio[0][:self.num_samples]
             audio = np.array([cropped_audio])
