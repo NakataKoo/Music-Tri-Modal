@@ -8,6 +8,7 @@ dataset_config:
   audio:
     sr: 16000
     crop_length: 30 # 曲の長さ（秒）
+    offset: 0.1
     random_crop: true
     augment: false
     p_noise: 0.3

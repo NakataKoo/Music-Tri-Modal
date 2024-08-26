@@ -35,7 +35,8 @@ class AudioCaptionMidiDataset(Dataset):
         # audiocaption.yamlの内容
         self.sample_rate = self.config.audio.sr # サンプリングレート
         self.num_samples = self.sample_rate * self.config.audio.crop_length # サンプリング数
-        self.crop_length = self.config.crop_length # 曲の長さ（秒）
+        self.crop_length = self.config.audio.crop_length # 曲の長さ（秒）
+        self.offset = self.config.audio.offset
         self.random_crop = self.config.audio.random_crop # ランダムクロップの有無
         self.midi_size = self.config.midi.size_dim0 # input_midiのtorch.Size([x, 512, 4])におけるxのサイズ
         self._load()
@@ -62,7 +63,7 @@ class AudioCaptionMidiDataset(Dataset):
     # 改良（音声データを読み込み、クロップ）
     def get_audio(self, idx):
         audio_path = self.audio_paths[idx]
-        audio, sr = librosa.load(audio_path, sr=self.sample_rate, mono=True, duration=self.crop_length, offset=0.1)
+        audio, sr = librosa.load(audio_path, sr=self.sample_rate, mono=True, duration=self.crop_length, offset=self.offset)
         audio = audio.reshape(1, -1)
 
         if audio.shape[1] < self.num_samples:
