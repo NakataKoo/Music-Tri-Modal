@@ -110,7 +110,7 @@ class MusCALL(nn.Module):
            0.0000e+00,  0.0000e+00]]], device='cuda:0')
         """
         if isinstance(audio, torch.Tensor):
-            audio = audio.cpu().numpy()  # テンソルをCPUに移動してNumPy配列に変換
+            audio = audio.to('cpu').detach().numpy().copy()  # テンソルをCPUに移動してNumPy配列に変換
         
         audio_features = []
         for data in audio:

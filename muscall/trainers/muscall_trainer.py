@@ -190,7 +190,7 @@ class MusCALLTrainer(BaseTrainer):
         # データローダーからバッチを取り出し、学習を実行
         for i, batch in enumerate(data_loader):
             batch = tuple(t.to(device=self.device, non_blocking=True) if isinstance(t, torch.Tensor) else t for t in batch)
-            # batch = tuple(t.to(device=self.device, non_blocking=True) for t in batch) # data_loaderからバッチを取得し、GPUに転送
+
             audio_id, input_audio, input_text, input_midi, first_input_midi_shape, midi_dir_paths, data_idx = batch # バッチ内のデータを展開し、それぞれの変数に割り当て(__getitem__メソッドにより取得)
 
             sentence_sim = None
