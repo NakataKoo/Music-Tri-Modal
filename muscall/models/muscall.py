@@ -114,7 +114,15 @@ class MusCALL(nn.Module):
         
         audio_features = []
         for data in audio:
-            audio_feature = self.clap.get_audio_embedding_from_data(data, use_tensor=False) # オーディオエンコーダで音声エンベディングを抽出
+            audio_feature = self.clap.get_audio_embedding_from_data(data, use_tensor=False) # 音声エンベディングを抽出
+
+            # nan 以外の平均値を計算
+            # mean_val = np.nanmean(audio_feature[0])  # nan を無視して平均を計算
+            # nan を平均値に置き換える
+            # audio_feature[0][np.isnan(audio_feature[0])] = mean_val
+
+            # nanを0に置き換える
+            audio_feature[0] = np.nan_to_num(audio_feature[0], nan=0.0)
         
             # numpy.ndarray から torch.Tensor に変換
             if isinstance(audio_feature, np.ndarray):
