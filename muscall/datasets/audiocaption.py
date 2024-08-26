@@ -59,28 +59,23 @@ class AudioCaptionMidiDataset(Dataset):
         return self.captions[idx]
 
     @torch.no_grad()
-    # 改良（音声データを読み込み、クロップし、テンソルに変換）
+    # 改良（音声データを読み込み、クロップ）
     def get_audio(self, idx):
         audio_path = self.audio_paths[idx]
-        audio, sr = librosa.load(audio_path, sr=48000, mono=True)
-        #audio = audio.reshape(1, -1)
-        
-        # 1次元のテンソルに変換
-        # audio = torch.tensor(audio, dtype=torch.float)
-        audio = torch.from_numpy(audio.astype(np.float32)).clone()
+        audio, sr = librosa.load(audio_path, sr=self.sample_rate, mono=True)
+        audio = audio.reshape(1, -1)
 
-        # 音声が短い場合はゼロパディングし、長い場合はトリミング
-        if len(audio) < self.num_samples:
-            zeros_needed = torch.zeros(self.num_samples - len(audio))
-            audio = torch.cat((audio, zeros_needed), dim=0)
-        elif len(audio) > self.num_samples:
-            audio = audio[:self.num_samples]
-            
-        # もしaudioがCUDAテンソルであれば、CPUに移動
-        #if audio.is_cuda:
-        #    audio = audio.cpu()
-        #audio = audio.to('cpu').detach().numpy().copy()
-        
+        if audio.shape[1] < self.num_samples:
+            x = self.num_samples - audio.shape[1]
+            padded_audio = np.pad(audio[0], ((0, x)))
+            audio = np.array([padded_audio])
+        elif audio.shape[1] > self.num_samples:
+            cropped_audio = audio[0][:self.num_samples]
+            audio = np.array([cropped_audio])
+
+        clipped_audio = np.clip(audio[0], -1.0, 1.0)
+        clipped_audio = 2 * (clipped_audio - np.min(clipped_audio)) / (np.max(clipped_audio) - np.min(clipped_audio)) - 1
+        audio = np.array([clipped_audio])
         return audio
     
     @torch.no_grad()

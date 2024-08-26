@@ -9,7 +9,7 @@ import laion_clap
 
 # クロスエントロピー誤差
 def contrastive_loss(logits: torch.Tensor) -> torch.Tensor:
-    labels = torch.arange(len(logits), device=logits.device) # 
+    labels = torch.arange(len(logits), device=logits.device)
     return nn.functional.cross_entropy(logits, labels)
 
 # 誤差関数
@@ -88,19 +88,44 @@ class MusCALL(nn.Module):
 
     @torch.no_grad()
     def encode_audio(self, audio):
-        #audio = audio.reshape(1, -1)
+        """
+        audio: batchで来る, torch.Tensor型
+        (バッチサイズ6の例)
+        tensor([[[ 2.7787e-07,  2.3647e-08,  2.9080e-07,  ...,  0.0000e+00,
+           0.0000e+00,  0.0000e+00]],
+
+        [[ 1.9393e-07,  1.2675e-06,  1.5997e-06,  ...,  0.0000e+00,
+           0.0000e+00,  0.0000e+00]],
+
+        [[ 3.4497e-06,  2.7099e-06,  3.6326e-06,  ...,  0.0000e+00,
+           0.0000e+00,  0.0000e+00]],
+
+        [[ 2.4474e-04,  3.8606e-04,  4.1601e-04,  ...,  0.0000e+00,
+           0.0000e+00,  0.0000e+00]],
+
+        [[ 3.2677e-16, -2.9889e-16,  1.9097e-16,  ...,  0.0000e+00,
+           0.0000e+00,  0.0000e+00]],
+
+        [[-3.3250e-06, -7.9047e-07, -1.9627e-08,  ...,  0.0000e+00,
+           0.0000e+00,  0.0000e+00]]], device='cuda:0')
+        """
         if isinstance(audio, torch.Tensor):
             audio = audio.cpu().numpy()  # テンソルをCPUに移動してNumPy配列に変換
-        audio_features = self.clap.get_audio_embedding_from_data(audio, use_tensor=False) # オーディオエンコーダで音声エンベディングを抽出
         
-        # numpy.ndarray から torch.Tensor に変換
-        if isinstance(audio_features, np.ndarray):
-            audio_features = torch.from_numpy(audio_features.astype(np.float32)).clone()
-            # audio_features = torch.tensor(audio_features, dtype=torch.float32, device=self.device)
+        audio_features = []
+        for data in audio:
+            audio_feature = self.clap.get_audio_embedding_from_data(data, use_tensor=False) # オーディオエンコーダで音声エンベディングを抽出
         
-        # デバイスに移動
-        audio_features = audio_features.to(self.device)
-        audio_features = self.audio_projection(audio_features) # 最終的な共通のエンベディングの次元に変換
+            # numpy.ndarray から torch.Tensor に変換
+            if isinstance(audio_feature, np.ndarray):
+                audio_feature = torch.from_numpy(audio_feature.astype(np.float32)).clone()
+            
+            # デバイスに移動
+            audio_feature = audio_feature.to(self.device)
+            audio_feature = self.audio_projection(audio_feature) # 最終的な共通のエンベディングの次元に変換
+            audio_features.append(audio_feature)
+        audio_features = torch.cat(audio_features, dim=0)
+        print(f"audio_features: {audio_features}")
         return audio_features
 
     @torch.no_grad()
@@ -192,13 +217,10 @@ class MusCALL(nn.Module):
         logits_per_midi_audio = logit_scale * midi_features @ audio_features.t()
         logits_per_audio_midi = logits_per_midi_audio.t()
 
-        #loss = (F.cross_entropy(logits_per_pc_text, self.labels) + \
-        #        F.cross_entropy(logits_per_text_pc, self.labels)) / 2 + \
-        #        (F.cross_entropy(logits_per_pc_image, self.labels) + F.cross_entropy(logits_per_image_pc, self.labels)) / 2
-
         # マルチモーダル損失を計算
         if return_loss:
             loss = clip_loss(logits_per_text_midi) + clip_loss(logits_per_audio_midi)
+            print(f"loss: {loss}")
             return loss
 
     @classmethod

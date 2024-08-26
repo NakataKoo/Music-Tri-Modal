@@ -15,39 +15,6 @@ from muscall.models.muscall import MusCALL
 from muscall.tasks.retrieval import run_retrieval
 from muscall.utils.audio_utils import get_transform_chain
 
-'''
-def custom_collate_fn(batch):
-
-    collated_batch = []
-
-    # バッチ内の全データを走査
-    for item in batch:
-        audio_id, input_audio, input_text, input_midi, first_input_midi_shape, midi_dir_paths, idx = item
-        files = glob.glob(midi_dir_paths[idx]+'/*.mid', recursive=True) # ["path_to_midi0", "path_to_midi1", ...]
-        files_new = []
-        
-        # 1つのmidiディレクトリ内の全midiファイルを走査
-        for file in files:
-            try:
-                miditoolkit.midi.parser.MidiFile(file)
-                files_new.append(file)
-            except OSError as e:
-                print(f"Error reading {file}: {e}, index: {idx}")
-                continue
-        
-        if not files_new:
-            continue
-        collated_batch.append(( audio_id,
-                                input_audio, 
-                                input_text, 
-                                input_midi, 
-                                first_input_midi_shape, 
-                                midi_dir_paths, 
-                                idx))
-    
-    return torch.utils.data.dataloader.default_collate(collated_batch)
-'''
-
 def custom_collate_fn(batch):
 
     collated_batch = []

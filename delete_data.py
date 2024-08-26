@@ -15,6 +15,7 @@ target_directory = "/home_lab/nakata/Music-Tri-Modal/data/datasets/audiocaptionm
 
 # リストAのファイルを削除
 for file_path in not_folders:
+    file_path = "/home_lab/nakata/Music-Tri-Modal/data/datasets/audiocaptionmidi/midi/" + file_path
     # ファイルが存在するか確認
     if os.path.exists(file_path) and file_path.startswith(target_directory):
         try:
