@@ -8,11 +8,20 @@ model_config:
     audio_hidden_size: 512
   midi:
     midi_dic: /home_lab/nakata/Music-Tri-Modal/muscall/modules/MidiBERT/CP.pkl
-    max_seq_len: 512
-    hidden_size: 768
-    num_hidden_layers: 4
-    num_attention_heads: 4
-    intermediate_size: 1024
-    vocab_size: 1000
-    model_name: 'bert' # 'bert', 'albert', 'roberta', 'distilbert'
+    bert:
+      max_seq_len: 512
+      hidden_size: 768
+      num_hidden_layers: 4
+      num_attention_heads: 4
+      intermediate_size: 1024
+      vocab_size: 1000
+    albert:
+      max_seq_len: 512
+      embedding_size: 128
+      hidden_size: 768
+      num_hidden_layers: 4
+      num_attention_heads: 8
+      intermediate_size: 1024
+      vocab_size: 1000
+    model_name: 'albert' # 'bert', 'albert', 'roberta', 'distilbert'
   loss: clip                      # one of [clip, weighted_clip]

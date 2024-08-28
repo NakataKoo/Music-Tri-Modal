@@ -23,22 +23,27 @@ class MidiBert(nn.Module):
         
         if model_name == 'bert':
             self.bert = BertModel(bertConfig)
+            self.hidden_size = bertConfig.hidden_size
+            self.bertConfig = bertConfig
         elif model_name == 'albert':
             self.bert = AlbertModel(bertConfig)
+            self.hidden_size = bertConfig.embedding_size
+            self.bertConfig = bertConfig
         elif model_name == 'roberta':
             self.bert = RobertaModel(bertConfig)
+            self.hidden_size = bertConfig.hidden_size
+            self.bertConfig = bertConfig
         elif model_name == 'distilbert':
             self.bert = DistilBertModel(bertConfig)
-
-        self.hidden_size = bertConfig.hidden_size
-        self.bertConfig = bertConfig
+            self.hidden_size = bertConfig.hidden_size
+            self.bertConfig = bertConfig
 
         # token types: [Bar, Position, Pitch, Duration]
         self.n_tokens = []      # [3,18,88,66]
         self.classes = ['Bar', 'Position', 'Pitch', 'Duration']
         for key in self.classes:
             self.n_tokens.append(len(e2w[key]))
-        self.emb_sizes = [256, 256, 256, 256]
+        self.emb_sizes = [128, 128, 128, 128] # [256, 256, 256, 256]
         self.e2w = e2w
         self.w2e = w2e
 

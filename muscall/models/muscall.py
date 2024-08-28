@@ -33,23 +33,26 @@ class MusCALL(nn.Module):
             e2w, w2e = pickle.load(f)
 
         if config.midi.model_name == 'bert':
-            configuration = BertConfig(max_position_embeddings=config.midi.max_seq_len, # 512
+            configuration = BertConfig(max_position_embeddings=config.midi.bert.max_seq_len, # 512
                                     position_embedding_type='relative_key_query',
-                                    hidden_size=config.midi.hidden_size, # 768
-                                    num_attention_heads = config.midi.num_attention_heads,
-                                    num_hidden_layers = config.midi.num_hidden_layers,
-                                    intermediate_size = config.midi.intermediate_size,
-                                    vocab_size = config.midi.vocab_size
+                                    hidden_size=config.midi.bert.hidden_size, # 768
+                                    num_attention_heads = config.midi.bert.num_attention_heads,
+                                    num_hidden_layers = config.midi.bert.num_hidden_layers,
+                                    intermediate_size = config.midi.bert.intermediate_size,
+                                    vocab_size = config.midi.bert.vocab_size
             )
+            midi_dim = config.midi.bert.hidden_size
         elif config.midi.model_name == 'albert':
-            configuration = AlbertConfig(max_position_embeddings=config.midi.max_seq_len, # 512
+            configuration = AlbertConfig(max_position_embeddings=config.midi.albert.max_seq_len, # 512
                                     position_embedding_type='relative_key_query',
-                                    hidden_size=config.midi.hidden_size, # 768
-                                    num_attention_heads = config.midi.num_attention_heads,
-                                    num_hidden_layers = config.midi.num_hidden_layers,
-                                    intermediate_size = config.midi.intermediate_size,
-                                    vocab_size = config.midi.vocab_size
+                                    embedding_size = config.midi.albert.embedding_size, # 128
+                                    hidden_size=config.midi.albert.hidden_size, # 768
+                                    num_attention_heads = config.midi.albert.num_attention_heads,
+                                    num_hidden_layers = config.midi.albert.num_hidden_layers,
+                                    intermediate_size = config.midi.albert.intermediate_size,
+                                    vocab_size = config.midi.albert.vocab_size
             )
+            midi_dim = config.midi.albert.embedding_size
         elif config.midi.model_name == 'roberta':
             configuration = RobertaConfig(max_position_embeddings=config.midi.max_seq_len, # 512
                                     position_embedding_type='relative_key_query',
@@ -77,7 +80,6 @@ class MusCALL(nn.Module):
         projection_dim = config.projection_dim # 最終的な共通のエンベディングの512次元
         audio_dim = config.clap.audio_hidden_size
         text_dim = config.clap.text_hidden_size
-        midi_dim = config.midi.hidden_size
 
         self.audio_projection = nn.Linear(audio_dim, projection_dim, bias=False) # audio_dimをprojection_dimへ線形変換
         self.text_projection = nn.Linear(text_dim, projection_dim, bias=False)
