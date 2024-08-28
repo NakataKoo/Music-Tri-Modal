@@ -41,7 +41,7 @@ class MusCALL(nn.Module):
                                     intermediate_size = config.midi.bert.intermediate_size,
                                     vocab_size = config.midi.bert.vocab_size
             )
-            midi_dim = config.midi.bert.hidden_size
+            self.midi_dim = config.midi.bert.hidden_size
         elif config.midi.model_name == 'albert':
             configuration = AlbertConfig(max_position_embeddings=config.midi.albert.max_seq_len, # 512
                                     position_embedding_type='relative_key_query',
@@ -52,7 +52,7 @@ class MusCALL(nn.Module):
                                     intermediate_size = config.midi.albert.intermediate_size,
                                     vocab_size = config.midi.albert.vocab_size
             )
-            midi_dim = config.midi.albert.embedding_size
+            self.midi_dim = config.midi.albert.hidden_size
         elif config.midi.model_name == 'roberta':
             configuration = RobertaConfig(max_position_embeddings=config.midi.max_seq_len, # 512
                                     position_embedding_type='relative_key_query',
@@ -77,13 +77,13 @@ class MusCALL(nn.Module):
         for param in self.clap.parameters():
             param.requires_grad = False
 
-        projection_dim = config.projection_dim # 最終的な共通のエンベディングの512次元
-        audio_dim = config.clap.audio_hidden_size
-        text_dim = config.clap.text_hidden_size
+        self.projection_dim = config.projection_dim # 最終的な共通のエンベディングの512次元
+        self.audio_dim = config.clap.audio_hidden_size
+        self.text_dim = config.clap.text_hidden_size
 
-        self.audio_projection = nn.Linear(audio_dim, projection_dim, bias=False) # audio_dimをprojection_dimへ線形変換
-        self.text_projection = nn.Linear(text_dim, projection_dim, bias=False)
-        self.midi_projection = nn.Linear(midi_dim, projection_dim, bias=False)
+        self.audio_projection = nn.Linear(self.audio_dim, self.projection_dim, bias=False) # audio_dimをprojection_dimへ線形変換
+        self.text_projection = nn.Linear(self.text_dim, self.projection_dim, bias=False)
+        self.midi_projection = nn.Linear(self.midi_dim, self.projection_dim, bias=False)
 
         if self.temperature is None:
             self.logit_scale = nn.Parameter(torch.ones([]) * np.log(1 / 0.07))
@@ -178,7 +178,7 @@ class MusCALL(nn.Module):
             assert midi.dim() == 3, f"midi tensor shape is incorrect: {midi.shape}"
 
             midi_features = self.midibert.forward(midi)
-            midi_features_all = torch.zeros(768, device=self.device)  # デバイス上で初期化
+            midi_features_all = torch.zeros(self.midi_dim, device=self.device)  # デバイス上で初期化
             # トークンのベクトルを平均して、シーケンス全体のベクトルを生成
             for i in range(len(midi)):
                 midi_features_all = midi_features_all + midi_features.last_hidden_state[i].mean(dim=0) # (batch_size, hidden_size)

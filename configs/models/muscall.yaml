@@ -20,7 +20,7 @@ model_config:
       embedding_size: 128
       hidden_size: 768
       num_hidden_layers: 4
-      num_attention_heads: 8
+      num_attention_heads: 4
       intermediate_size: 1024
       vocab_size: 1000
     model_name: 'albert' # 'bert', 'albert', 'roberta', 'distilbert'

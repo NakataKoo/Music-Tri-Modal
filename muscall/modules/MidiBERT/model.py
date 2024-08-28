@@ -43,7 +43,7 @@ class MidiBert(nn.Module):
         self.classes = ['Bar', 'Position', 'Pitch', 'Duration']
         for key in self.classes:
             self.n_tokens.append(len(e2w[key]))
-        self.emb_sizes = [128, 128, 128, 128] # [256, 256, 256, 256]
+        self.emb_sizes = [256, 256, 256, 256] # [128, 128, 128, 128]
         self.e2w = e2w
         self.w2e = w2e
 
@@ -73,7 +73,7 @@ class MidiBert(nn.Module):
 
         # feed to bert 
         y = self.bert(inputs_embeds=emb_linear, attention_mask=attn_mask, output_hidden_states=output_hidden_states)
-        #y = y.last_hidden_state         # (batch_size, seq_len, 768)
+        #y = y.last_hidden_state         # (batch_size, seq_len, hidden_size)
         return y
     
     def get_rand_tok(self):
