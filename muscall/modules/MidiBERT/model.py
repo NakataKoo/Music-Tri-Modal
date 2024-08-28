@@ -29,8 +29,7 @@ class MidiBert(nn.Module):
             self.bert = RobertaModel(bertConfig)
         elif model_name == 'distilbert':
             self.bert = DistilBertModel(bertConfig)
-        
-        bertConfig.d_model = bertConfig.hidden_size
+
         self.hidden_size = bertConfig.hidden_size
         self.bertConfig = bertConfig
 
@@ -55,7 +54,8 @@ class MidiBert(nn.Module):
         self.word_emb = nn.ModuleList(self.word_emb)
 
         # linear layer to merge embeddings from different token types 
-        self.in_linear = nn.Linear(np.sum(self.emb_sizes), bertConfig.d_model)
+        # 異なるトークンタイプの情報を融合するための線形層（次元をBERTのhidden_sizeに変換）
+        self.in_linear = nn.Linear(np.sum(self.emb_sizes), self.hidden_size)
 
 
     def forward(self, input_ids, attn_mask=None, output_hidden_states=True):
@@ -63,8 +63,8 @@ class MidiBert(nn.Module):
         embs = []
         for i, key in enumerate(self.classes):
             embs.append(self.word_emb[i](input_ids[..., i]))
-        embs = torch.cat([*embs], dim=-1)
-        emb_linear = self.in_linear(embs)
+        embs = torch.cat([*embs], dim=-1) # 異なるトークンタイプの情報を融合
+        emb_linear = self.in_linear(embs) # 異なるトークンタイプの情報を融合したものを、BERTのhidden_sizeに変換
 
         # feed to bert 
         y = self.bert(inputs_embeds=emb_linear, attention_mask=attn_mask, output_hidden_states=output_hidden_states)
