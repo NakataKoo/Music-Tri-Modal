@@ -7,4 +7,4 @@ save/
 **venv
 data/datasets/audiocaptionmidi/audio/
 data/datasets/audiocaptionmidi/midi/
-music_audioset_epoch_15_esc_90.14.pt
+ckpt/
