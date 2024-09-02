@@ -13,19 +13,22 @@ def get_muscall_features(model, data_loader, device):
 
     all_audio_features = torch.zeros(dataset_size, 512).to(device)
     all_text_features = torch.zeros(dataset_size, 512).to(device)
+    all_midi_features = torch.zeros(dataset_size, 512).to(device)
 
     samples_in_previous_batch = 0
     for i, batch in enumerate(data_loader):
-        batch = tuple(t.to(device=device, non_blocking=True) for t in batch)
-        _, input_audio, text_input_ids, _, _, _ = batch
+        batch = tuple(t.to(device=device, non_blocking=True) if isinstance(t, torch.Tensor) else t for t in batch)
+
+        # バッチ内のデータを展開し、それぞれの変数に割り当て(__getitem__メソッドにより取得)
+        audio_id, input_audio, input_text, input_midi, first_input_midi_shape, midi_dir_paths, data_idx = batch 
 
         audio_features = model.encode_audio(input_audio)
-        text_features = model.encode_text(text_input_ids, None)
+        text_features = model.encode_text(input_text, None)
+        midi_features = model.encode_midi(input_midi, first_input_midi_shape)
 
-        audio_features = audio_features / \
-            audio_features.norm(dim=-1, keepdim=True)
-        text_features = text_features / \
-            text_features.norm(dim=-1, keepdim=True)
+        audio_features = audio_features / audio_features.norm(dim=-1, keepdim=True)
+        text_features = text_features / text_features.norm(dim=-1, keepdim=True)
+        midi_features = midi_features / midi_features.norm(dim=-1, keepdim=True)
 
         samples_in_current_batch = input_audio.size(0)
         start_index = i * samples_in_previous_batch
@@ -34,15 +37,15 @@ def get_muscall_features(model, data_loader, device):
 
         all_audio_features[start_index:end_index] = audio_features
         all_text_features[start_index:end_index] = text_features
+        all_midi_features[start_index:end_index] = midi_features
 
-    return all_audio_features, all_text_features
+    return all_audio_features, all_text_features, all_midi_features
 
 
-def compute_sim_score(audio_features, text_features):
-    logits_per_audio = audio_features @ text_features.t()
-    logits_per_text = logits_per_audio.t()
-
-    return logits_per_text
+def compute_sim_score(features1, features2):
+    logits_per_1 = features1 @ features2.t()
+    logits_per_2 = logits_per_1.t()
+    return logits_per_2
 
 
 def get_ranking(score_matrix, device):
@@ -57,7 +60,6 @@ def get_ranking(score_matrix, device):
         gt_indices[i] = torch.full((num_queries, 1), i)
 
     gt_indices = gt_indices.squeeze(-1).to(device)
-
     return retrieved_indices, gt_indices
 
 
@@ -81,11 +83,16 @@ def compute_metrics(retrieved_indices, gt_indices):
 
     return retrieval_metrics
 
-def run_retrieval(model, data_loader, device):
+def run_retrieval(model, data_loader, device, retrieval_type="midi_audio"):
     """Wrapper function to run all steps for text-audio/audio-text retrieval"""
-    audio_features, text_features = get_muscall_features(
+    audio_features, text_features, midi_features = get_muscall_features(
         model, data_loader, device)
-    score_matrix = compute_sim_score(audio_features, text_features)
+    
+    if retrieval_type == "midi_audio":
+        score_matrix = compute_sim_score(midi_features, audio_features)
+    elif retrieval_type == "midi_text":
+        score_matrix = compute_sim_score(midi_features, text_features)
+
     retrieved_indices, gt_indices = get_ranking(score_matrix, device)
     retrieval_metrics = compute_metrics(retrieved_indices, gt_indices)
 
@@ -113,7 +120,7 @@ class Retrieval:
         dataset = AudioCaptionMidiDataset(self.muscall_config.dataset_config, dataset_type="test")
         indices = torch.randperm(len(dataset))[: self.test_set_size]
         random_dataset = Subset(dataset, indices)
-        self.batch_size = 256
+        self.batch_size = 6
         self.data_loader = DataLoader(
             dataset=random_dataset,
             batch_size=self.batch_size,
@@ -127,14 +134,23 @@ class Retrieval:
         self.model.to(self.device)
         self.model.eval()
 
-    def evaluate(self):
-        audio_features, text_features = get_muscall_features(
-            self.model, self.data_loader, self.device
+    def evaluate(self, retrieval_type):
+        retrieval_metrics_midi_audio = run_retrieval(
+            self.model, 
+            self.data_loader, 
+            self.device, 
+            retrieval_type="midi_audio"
         )
-        score_matrix = compute_sim_score(text_features, audio_features)
+        print(f"midi_audio: {retrieval_metrics_midi_audio}")
 
-        retrieved_indices, gt_indices = get_ranking(score_matrix, self.device)
-        retrieval_metrics = compute_metrics(retrieved_indices, gt_indices)
-        print(retrieval_metrics)
+        retrieval_metrics_midi_text = run_retrieval(
+            self.model, 
+            self.data_loader, 
+            self.device, 
+            retrieval_type="midi_text"
+        )
+        print(f"midi_audio: {retrieval_metrics_midi_text}")
+
+        retrieval_metrics = (retrieval_metrics_midi_audio+retrieval_metrics_midi_text) / 2
 
         return retrieval_metrics

@@ -142,12 +142,11 @@ class MusCALLTrainer(BaseTrainer):
             val_loss = self.train_epoch_val(self.val_loader)
 
             # バッチごとの進捗を表示
-            if epoch % 10 == 0:
-                print(f"Epoch [{epoch + 1}/{self.config.training.epochs}], train loss: {train_loss}, val loss: {val_loss}")
+            print(f"Epoch [{epoch + 1}/{self.config.training.epochs}], train loss: {train_loss}, val loss: {val_loss}")
 
             r10 = 0
             if self.config.training.track_retrieval_metrics:
-                r10 = self.get_retrieval_metrics() # 検索メトリクスの取得
+                r10 = self.evaluate() # 検索メトリクスの取得
 
             epoch_time = time.time() - epoch_start_time
             self.logger.update_training_log(
