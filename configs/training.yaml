@@ -2,7 +2,7 @@ training:
   # Experiment id to use in logging and checkpoints
   experiment_id: null
   # Maximum number of epochs
-  epochs: 10
+  epochs: 100
   # Device on which the model will be trained. Set 'cpu' to train/infer on CPU
   device: cuda
 
