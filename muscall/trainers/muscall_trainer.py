@@ -107,12 +107,22 @@ class MusCALLTrainer(BaseTrainer):
             random_val_subset,
             batch_size=self.batch_size,
         )
-        retrieval_metrics = run_retrieval(
+        retrieval_metrics_midi_audio = run_retrieval(
             model=self.model,
             data_loader=val_subset_loader,
             device=self.device,
+            retrieval_type="midi_audio"
         )
-        return retrieval_metrics["R@10"].item()
+        retrieval_metrics_midi_text = run_retrieval(
+            model=self.model,
+            data_loader=val_subset_loader,
+            device=self.device,
+            retrieval_type="midi_text"
+        )
+
+        retrieval_metrics = (retrieval_metrics_midi_audio["R@10"].item()+retrieval_metrics_midi_text["R@10"].item()) / 2
+
+        return retrieval_metrics
 
     # train.pyによって実行されるメソッド
     def train(self):

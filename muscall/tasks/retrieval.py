@@ -151,6 +151,6 @@ class Retrieval:
         )
         print(f"midi_audio: {retrieval_metrics_midi_text}")
 
-        retrieval_metrics = (retrieval_metrics_midi_audio+retrieval_metrics_midi_text) / 2
+        retrieval_metrics = (retrieval_metrics_midi_audio["R@10"].item()+retrieval_metrics_midi_text["R@10"].item()) / 2
 
         return retrieval_metrics
