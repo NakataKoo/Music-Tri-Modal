@@ -73,7 +73,7 @@ class AudioCaptionMidiDataset(Dataset):
         # 短い音声に対しパディング
         if audio.shape[1] < self.num_samples:
             x = self.num_samples - audio.shape[1]
-            padded_audio = np.pad(audio[0], ((0, x)))
+            padded_audio = np.pad(audio[0], ((0, x)), "mean")
             audio = np.array([padded_audio])
         # 長い音声に対しクロップ
         elif audio.shape[1] > self.num_samples:

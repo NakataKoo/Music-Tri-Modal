@@ -219,7 +219,7 @@ class MusCALLTrainer(BaseTrainer):
                     input_midi,
                     first_input_midi_shape,
                     original_audio=original_audio, # 元の音声データ（拡張前の音声データ）
-                    sentence_sim=sentence_sim,# 文の類似度（オプション：損失関数がweighted_clipの場合）
+                    sentence_sim=sentence_sim,# 文の類似度（オプション:損失関数がweighted_clipの場合）
                 )
             """
             loss = self.model(
