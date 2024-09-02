@@ -18,29 +18,39 @@ pip install laion_clap
 pip install miditoolkit
 ```
 
-at Music-Tri-Modal/
+at Music-Tri-Modal/ckpt/
 ```
 wget https://huggingface.co/lukewys/laion_clap/resolve/main/music_audioset_epoch_15_esc_90.14.pt
 ```
 
 ## Preparing the dataset
-MusCALL is trained on a multimodal dataset of (audio, text) pairs. 
+The Music-Tri-Modal is trained on a multimodal dataset of (audio, text, midi) pairs. 
 
 Annotations should be provided in JSON format and must include the following fields:
 
-```audio_id```:     the unique identifier for each audio track in the dataset
+- ```audio_id```:     the unique identifier for each audio track in the dataset
 
-```caption``` :     a string with the textual description of the audio track 
+- ```caption``` :     a string with the textual description of the audio track 
 
-```audio_path```:   path to the audio track, relative to the root audio directory
+- ```audio_path```:   path to the audio track, relative to the root audio directory
 
 One JSON file per split must be provided and stored in the [`data/datasets`](data/datasets/) directory, following this structure:
 
 ```
 dataset_name
 ├── audio            
-│   ├── track_1.npy
-│   ├── track_2.npy
+│   ├── track_1.mp3
+│   ├── track_2.mp3
+|   └── ...
+├── midi
+|   ├── track_1/
+|   |   ├── track_1_1.mid
+|   |   ├── track_1_2.mid
+|   |   └── ...   
+|   ├── track_2/
+|   |   ├── track_2_1.mid
+|   |   ├── track_2_2.mid
+|   |   └── ...   
 |   └── ...
 ├── dataset_train.json    
 ├── dataset_val.json    
