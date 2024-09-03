@@ -1,9 +1,6 @@
 import os
 import argparse
 from omegaconf import OmegaConf
-
-from muscall.tasks.retrieval import Retrieval
-from muscall.tasks.classification import Zeroshot
 from muscall.utils.utils import get_root_dir
 
 
@@ -53,8 +50,10 @@ if __name__ == "__main__":
     os.environ["CUDA_VISIBLE_DEVICES"] = params.device_num
 
     if params.task == "retrieval":
+        from muscall.tasks.retrieval import Retrieval
         evaluation = Retrieval(muscall_config, params.test_set_size)
     elif params.task == "zeroshot":
+        from muscall.tasks.classification import Zeroshot
         evaluation = Zeroshot(muscall_config, params.dataset_name)
     else:
         raise ValueError("{} task not supported".format(params.task))

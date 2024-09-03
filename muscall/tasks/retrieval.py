@@ -23,7 +23,7 @@ def get_muscall_features(model, data_loader, device):
         audio_id, input_audio, input_text, input_midi, first_input_midi_shape, midi_dir_paths, data_idx = batch 
 
         audio_features = model.encode_audio(input_audio)
-        text_features = model.encode_text(input_text, None)
+        text_features = model.encode_text(text=input_text, text_mask=None)
         midi_features = model.encode_midi(input_midi, first_input_midi_shape)
 
         audio_features = audio_features / audio_features.norm(dim=-1, keepdim=True)
@@ -107,7 +107,8 @@ class Retrieval:
         self.path_to_model = os.path.join(
             self.muscall_config.env.experiments_dir,
             self.muscall_config.env.experiment_id,
-            "best_model.pth.tar",
+            #"best_model.pth.tar",
+            "checkpoint.pth.tar"
         )
         print("path to model", self.path_to_model)
 
@@ -117,7 +118,7 @@ class Retrieval:
         self.build_model()
 
     def load_dataset(self):
-        dataset = AudioCaptionMidiDataset(self.muscall_config.dataset_config, dataset_type="test")
+        dataset = AudioCaptionMidiDataset(self.muscall_config.dataset_config, dataset_type="test", midi_dic=self.muscall_config.model_config.midi.midi_dic)
         indices = torch.randperm(len(dataset))[: self.test_set_size]
         random_dataset = Subset(dataset, indices)
         self.batch_size = 6
@@ -134,7 +135,7 @@ class Retrieval:
         self.model.to(self.device)
         self.model.eval()
 
-    def evaluate(self, retrieval_type):
+    def evaluate(self):
         retrieval_metrics_midi_audio = run_retrieval(
             self.model, 
             self.data_loader, 

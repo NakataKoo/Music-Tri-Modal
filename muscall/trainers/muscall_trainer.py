@@ -113,12 +113,15 @@ class MusCALLTrainer(BaseTrainer):
             device=self.device,
             retrieval_type="midi_audio"
         )
+        print(f"midi_audio: {retrieval_metrics_midi_audio}")
+
         retrieval_metrics_midi_text = run_retrieval(
             model=self.model,
             data_loader=val_subset_loader,
             device=self.device,
             retrieval_type="midi_text"
         )
+        print(f"midi_text: {retrieval_metrics_midi_text}")
 
         retrieval_metrics = (retrieval_metrics_midi_audio["R@10"].item()+retrieval_metrics_midi_text["R@10"].item()) / 2
 
@@ -156,7 +159,7 @@ class MusCALLTrainer(BaseTrainer):
 
             r10 = 0
             if self.config.training.track_retrieval_metrics:
-                r10 = self.evaluate() # 検索メトリクスの取得
+                r10 = self.get_retrieval_metrics() # 検索メトリクスの取得
 
             epoch_time = time.time() - epoch_start_time
             self.logger.update_training_log(

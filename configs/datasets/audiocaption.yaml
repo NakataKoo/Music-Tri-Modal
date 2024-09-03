@@ -5,7 +5,7 @@ dataset_config:
   text:
   audio:
     sr: 16000
-    crop_length: 60 # 曲の長さ（秒）
+    crop_length: 30 # 曲の長さ（秒）
     offset: 0.1
     random_crop: true
     augment: false

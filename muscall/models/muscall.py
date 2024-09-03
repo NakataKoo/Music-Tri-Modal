@@ -139,6 +139,9 @@ class MusCALL(nn.Module):
 
     @torch.no_grad()
     def encode_text(self, text, text_mask):
+        # もしタプルだったら、リストに変換
+        if isinstance(text, tuple):
+            text = list(text)
         # textがリストではない場合、リストに変換
         if not isinstance(text, list):
             text = [text]
