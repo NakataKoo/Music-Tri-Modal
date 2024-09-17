@@ -158,12 +158,11 @@ class MusCALL(nn.Module):
     
     def encode_midi(self, midi_batch, first_input_midi_shape):
         '''
-        midi: torch.Size([batch_size, midi_size, 512, 4])
+        midi_batch: torch.Size([batch_size, midi_size, 512, 4])
         first_input_midi_shape: torch.Size([batch_size]) (バッチ内の各データの初期midi数が記載)
         midiを個別に処理したい
         '''
         midi_batch = midi_batch.to(self.device)  # デバイスに移動
-        first_input_midi_shape.shape
         embedding_midi = []
         for midi, midi_shape in zip(midi_batch, first_input_midi_shape):
 
