@@ -46,7 +46,7 @@ class Pianist8(Dataset):
         # print(f"input_midiのshape: {input_midi.shape}") 
         # print(f"midi num: {first_input_midi_shape}")
         if input_midi.shape == torch.Size([0]):
-            print(input_midi, self.midi_dir_paths[idx])
+            print(input_midi, self.midi_paths[idx])
 
         # MIDI データの x 次元を最大サイズに揃える
         if input_midi.shape[0] < self.midi_size:
@@ -89,5 +89,5 @@ class Pianist8(Dataset):
         return len(self.samples)
 
     @classmethod
-    def config_path(cls):
-        return "configs/datasets/audiocaption.yaml"
+    def num_classes(cls):
+        return 4
