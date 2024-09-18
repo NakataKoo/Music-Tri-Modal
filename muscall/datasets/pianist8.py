@@ -23,7 +23,7 @@ class Pianist8(Dataset):
         self.dataset_json = os.path.join(self._data_dir, "dataset_{}.json".format(self._dataset_type))
 
         # audiocaption.yamlの内容
-        self.midi_size = self.config.model_config.midi.size_dim0 # input_midiのtorch.Size([x, 512, 4])におけるxのサイズ
+        self.midi_size = self.config.dataset_config.midi.size_dim0 # input_midiのtorch.Size([x, 512, 4])におけるxのサイズ
         self._load()
 
     # JSONファイルからデータを読み込み、音声ID、キャプション、音声パス、midiパスをリストに格納
@@ -43,8 +43,6 @@ class Pianist8(Dataset):
     def midi_padding(self, input_midi, idx):
 
         first_input_midi_shape = input_midi.shape[0]
-        # print(f"input_midiのshape: {input_midi.shape}") 
-        # print(f"midi num: {first_input_midi_shape}")
         if input_midi.shape == torch.Size([0]):
             print(input_midi, self.midi_paths[idx])
 
@@ -61,7 +59,8 @@ class Pianist8(Dataset):
     @torch.no_grad()
     # 1つの曲の複数midiデータを取得し、すべてトークン化
     def get_midi(self, idx):
-        all_words = self.CP.prepare_data(self.midi_paths[idx], task="", max_len=512) 
+        #print(self.midi_paths[idx])
+        all_words = self.CP.prepare_data([self.midi_paths[idx]], task="", max_len=512) 
         '''
         all_wordsリストに、1つの曲のMIDIデータのトークン化されたデータが格納されている。
         all_wordsの各要素はリストで、これは1つのMIDIをスライシングした後に、それぞれトークン化し、それを複数MIDIに適用したもの。all_words=[[slice_words[0]], [slice_words[1]], ...], slice_words=[[[token0], [token1], ..., [token512]], [[token0], [token1], ..., [token512]], ...]
