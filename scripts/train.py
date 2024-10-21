@@ -32,7 +32,7 @@ def parse_args():
     parser.add_argument(
         "--dataset", type=str, help="name of the dataset", default="audiocaption"
     )
-    parser.add_argument("--device_num", type=str, default="0, 1")
+    parser.add_argument("--devices", type=str, default="0, 1")
 
     args = parser.parse_args()
 
@@ -61,7 +61,7 @@ if __name__ == "__main__":
         )
 
     logger = Logger(config)
-    os.environ["CUDA_VISIBLE_DEVICES"] = params.device_num
+    os.environ["CUDA_VISIBLE_DEVICES"] = params.devices
 
     trainer = MusCALLTrainer(config, logger)
     print("# of trainable parameters:", trainer.count_parameters()) # 学習パラメータ数の表示
