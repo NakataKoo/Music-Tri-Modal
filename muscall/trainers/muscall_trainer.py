@@ -83,6 +83,9 @@ class MusCALLTrainer(BaseTrainer):
 
         self.print_parameters() # 全学習パラメータ表示
 
+        if torch.cuda.device_count() > 1:
+            print("Use %d GPUS" % torch.cuda.device_count())
+            self.model = torch.nn.DataParallel(self.model)
         self.model.to(self.device)
 
     def build_optimizer(self):
@@ -137,7 +140,7 @@ class MusCALLTrainer(BaseTrainer):
                     self.logger.experiment_id
                 )
             )
-            self.load_ckp(self.logger.checkpoint_path) # チェックポイントからの再開
+            self.load_ckpt(self.logger.checkpoint_path) # チェックポイントからの再開
         else: # 学習の新規開始
             self.logger.write(
                 "Started training experiment with id {}".format(
@@ -183,7 +186,7 @@ class MusCALLTrainer(BaseTrainer):
             # save checkpoint in appropriate path (new or best) (最良のモデルと最新のモデルを保存)
             self.logger.save_checkpoint(state=checkpoint, is_best=is_best)
 
-    def load_ckp(self, checkpoint_path):
+    def load_ckpt(self, checkpoint_path):
         checkpoint = torch.load(checkpoint_path)
         self.model.load_state_dict(checkpoint["state_dict"])
         self.optimizer.load_state_dict(checkpoint["optimizer"])

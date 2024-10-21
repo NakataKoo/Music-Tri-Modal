@@ -32,7 +32,7 @@ def parse_args():
     parser.add_argument(
         "--dataset", type=str, help="name of the dataset", default="audiocaption"
     )
-    parser.add_argument("--device_num", type=str, default="0")
+    parser.add_argument("--device_num", type=str, default="0, 1")
 
     args = parser.parse_args()
 
