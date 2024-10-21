@@ -3,17 +3,19 @@ model_config:
   projection_dim: 512             # dimensionality of the multimodal projection layer
   temperature: null
   clap:
-    clap_ckpt: /home_lab/nakata/Music-Tri-Modal/ckpt/music_audioset_epoch_15_esc_90.14.pt
+    clap_ckpt: /home/Nakata/Music-Tri-Modal/ckpt/music_audioset_epoch_15_esc_90.14.pt
     text_hidden_size: 512
     audio_hidden_size: 512
   midi:
-    midi_dic: /home_lab/nakata/Music-Tri-Modal/muscall/modules/MidiBERT/CP.pkl
+    midi_dic: /home/Nakata/Music-Tri-Modal/muscall/modules/MidiBERT/CP.pkl
+    load_ckpt: True
+    ckpt: /home/Nakata/Music-Tri-Modal/ckpt/model_best_bert_HL6_loss03.ckpt
     bert:
       max_seq_len: 512
       hidden_size: 768
-      num_hidden_layers: 4
-      num_attention_heads: 4
-      intermediate_size: 1024
+      num_hidden_layers: 6
+      num_attention_heads: 12
+      intermediate_size: 3072
       vocab_size: 800
     albert:
       max_seq_len: 512
@@ -23,5 +25,5 @@ model_config:
       num_attention_heads: 3
       intermediate_size: 768
       vocab_size: 800
-    model_name: 'albert' # 'bert', 'albert', 'roberta', 'distilbert'
+    model_name: 'bert' # 'bert', 'albert', 'roberta', 'distilbert'
   loss: clip                      # one of [clip, weighted_clip]

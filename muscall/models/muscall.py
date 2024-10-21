@@ -74,6 +74,16 @@ class MusCALL(nn.Module):
 
         self.midibert = MidiBert(bertConfig=configuration, e2w=e2w, w2e=w2e, model_name=config.midi.model_name)
 
+        stdict_o = None
+        print("Load Checkpoint?: "+str(config.midi.load_ckpt))
+        print(config.midi.ckpt)
+        if config.midi.load_ckpt:
+            print("\nLoad Check point to restart")
+            cpt = torch.load(config.midi.ckpt)
+            stdict_m = cpt['state_dict']
+            stdict_o = cpt['optimizer']
+            self.midibert.load_state_dict(stdict_m, strict=False)
+
         for param in self.clap.parameters():
             param.requires_grad = False
 

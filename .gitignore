@@ -8,3 +8,4 @@ save/
 data/datasets/audiocaptionmidi/audio/
 data/datasets/audiocaptionmidi/midi/
 ckpt/
+core
