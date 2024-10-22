@@ -10,7 +10,7 @@ training:
     batch_size: 2
     num_workers: 1
     shuffle: True
-    pin_memory: True
+    pin_memory: False
   
   optimizer:
     name: AdamW
