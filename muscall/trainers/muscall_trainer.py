@@ -78,7 +78,7 @@ class MusCALLTrainer(BaseTrainer):
         model_name = self.config.model_config.model_name # muscall.yaml→model_config→model_nameより、モデル名を取得
 
         if model_name == "muscall":
-            self.model = MusCALL(self.config.model_config)
+            self.model = MusCALL(self.config.model_config).to(self.device)
         else:
             raise ValueError("{} model is not supported.".format(model_name))
 
@@ -86,8 +86,10 @@ class MusCALLTrainer(BaseTrainer):
 
         if torch.cuda.device_count() > 1:
             print("Use %d GPUS" % torch.cuda.device_count())
-            self.model = torch.nn.DataParallel(self.model)
-        self.model.to(self.device)
+            self.model = torch.nn.DataParallel(self.model, device_ids=[0, 1])
+    
+        # DataParallelでラップされた場合に元のモデルにアクセスしやすくするための対策
+        #self.model = self.model.module if isinstance(self.model, torch.nn.DataParallel) else self.model
 
     def build_optimizer(self):
         self.logger.write("Building optimizer")

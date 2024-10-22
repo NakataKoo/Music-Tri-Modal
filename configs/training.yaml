@@ -10,7 +10,7 @@ training:
     batch_size: 2
     num_workers: 1
     shuffle: True
-    pin_memory: false
+    pin_memory: False
   
   optimizer:
     name: AdamW
@@ -21,7 +21,7 @@ training:
       weight_decay: 0.2
   
   # Whether to use mixed precision training instead of full precision (FP32)
-  amp: false
+  amp: true
   # Early stopping configs
   early_stop:
     # Whether to use early stopping, (Default: false)

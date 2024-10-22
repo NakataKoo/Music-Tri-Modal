@@ -26,7 +26,7 @@ class MusCALL(nn.Module):
         self.temperature = config.temperature
         self.device = torch.device("cuda")
 
-        self.clap = laion_clap.CLAP_Module(enable_fusion=False, amodel='HTSAT-base')
+        self.clap = laion_clap.CLAP_Module(enable_fusion=False, amodel='HTSAT-base', device=self.device)
         self.clap.load_ckpt(config.clap.clap_ckpt)
         
         with open(config.midi.midi_dic, 'rb') as f:
@@ -125,7 +125,6 @@ class MusCALL(nn.Module):
         """
         if isinstance(audio, torch.Tensor):
             audio = audio.to('cpu').detach().numpy().copy()  # テンソルをCPUに移動してNumPy配列に変換
-        
         audio_features = []
         for data in audio:
             audio_feature = self.clap.get_audio_embedding_from_data(data, use_tensor=False) # 音声エンベディングを抽出
