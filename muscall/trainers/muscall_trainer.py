@@ -233,8 +233,8 @@ class MusCALLTrainer(BaseTrainer):
 
             # Cast operations to mixed precision
             # 混合精度（AMP）を使用して損失を計算（順伝播forwardメソッド）
-            """"
-            with torch.cuda.amp.autocast(enabled=self.config.training.amp):
+
+            with torch.amp.autocast("cuda", enabled=self.config.training.amp):
                 loss = self.model(
                     input_audio,
                     input_text,
@@ -243,7 +243,7 @@ class MusCALLTrainer(BaseTrainer):
                     original_audio=original_audio, # 元の音声データ（拡張前の音声データ）
                     sentence_sim=sentence_sim,# 文の類似度（オプション:損失関数がweighted_clipの場合）
                 )
-            """
+
             loss = self.model(
                     input_audio,
                     input_text,
