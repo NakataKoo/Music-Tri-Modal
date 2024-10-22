@@ -123,11 +123,11 @@ class MusCALL(nn.Module):
         [[-3.3250e-06, -7.9047e-07, -1.9627e-08,  ...,  0.0000e+00,
            0.0000e+00,  0.0000e+00]]], device='cuda:0')
         """
-        if isinstance(audio, torch.Tensor):
-            audio = audio.to('cpu').detach().numpy().copy()  # テンソルをCPUに移動してNumPy配列に変換
+        #if isinstance(audio, torch.Tensor):
+            #audio = audio.to('cpu').detach().numpy().copy()  # テンソルをCPUに移動してNumPy配列に変換
         audio_features = []
         for data in audio:
-            audio_feature = self.clap.get_audio_embedding_from_data(data, use_tensor=False) # 音声エンベディングを抽出
+            audio_feature = self.clap.get_audio_embedding_from_data(data, use_tensor=True) # 音声エンベディングを抽出
             # nan 以外の平均値を計算
             # mean_val = np.nanmean(audio_feature[0])  # nan を無視して平均を計算
             # nan を平均値に置き換える
@@ -156,7 +156,7 @@ class MusCALL(nn.Module):
         # textがリストではない場合、リストに変換
         if not isinstance(text, list):
             text = [text]
-        text_features = self.clap.get_text_embedding(text)
+        text_features = self.clap.get_text_embedding(text, use_tensor=True)
 
         # numpy.ndarray から torch.Tensor に変換
         if isinstance(text_features, np.ndarray):
@@ -243,7 +243,7 @@ class MusCALL(nn.Module):
         # マルチモーダル損失を計算
         if return_loss:
             loss = clip_loss(logits_per_text_midi) + clip_loss(logits_per_audio_midi)
-            #print(f"loss: {loss}")
+            print(f"loss: {loss}")
             return loss
 
     @classmethod
