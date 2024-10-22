@@ -39,7 +39,8 @@ class MusCALL(nn.Module):
                                     num_attention_heads = config.midi.bert.num_attention_heads,
                                     num_hidden_layers = config.midi.bert.num_hidden_layers,
                                     intermediate_size = config.midi.bert.intermediate_size,
-                                    vocab_size = config.midi.bert.vocab_size
+                                    vocab_size = config.midi.bert.vocab_size,
+                                    attn_implementation="eager"
             )
             self.midi_dim = config.midi.bert.hidden_size
         elif config.midi.model_name == 'albert':
@@ -50,7 +51,8 @@ class MusCALL(nn.Module):
                                     num_attention_heads = config.midi.albert.num_attention_heads,
                                     num_hidden_layers = config.midi.albert.num_hidden_layers,
                                     intermediate_size = config.midi.albert.intermediate_size,
-                                    vocab_size = config.midi.albert.vocab_size
+                                    vocab_size = config.midi.albert.vocab_size,
+                                    attn_implementation="eager"
             )
             self.midi_dim = config.midi.albert.hidden_size
         elif config.midi.model_name == 'roberta':
@@ -79,7 +81,7 @@ class MusCALL(nn.Module):
         print(config.midi.ckpt)
         if config.midi.load_ckpt:
             print("\nLoad Check point to restart")
-            cpt = torch.load(config.midi.ckpt)
+            cpt = torch.load(config.midi.ckpt, weights_only=True)
             stdict_m = cpt['state_dict']
             stdict_o = cpt['optimizer']
             self.midibert.load_state_dict(stdict_m, strict=False)
@@ -242,7 +244,7 @@ class MusCALL(nn.Module):
         # マルチモーダル損失を計算
         if return_loss:
             loss = clip_loss(logits_per_text_midi) + clip_loss(logits_per_audio_midi)
-            print(f"loss: {loss}")
+            #print(f"loss: {loss}")
             return loss
 
     @classmethod

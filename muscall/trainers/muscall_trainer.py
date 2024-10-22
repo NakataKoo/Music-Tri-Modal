@@ -4,6 +4,7 @@ import numpy as np
 import miditoolkit
 import torch
 import glob
+import tqdm
 
 import torch.optim as optim
 from torch.optim.lr_scheduler import CosineAnnealingLR
@@ -42,7 +43,7 @@ class MusCALLTrainer(BaseTrainer):
 
         self.load() # load_dataset()、build_model()、build_optimizer()、self.logger.save_config()の実行
 
-        self.scaler = torch.cuda.amp.GradScaler()
+        self.scaler = torch.amp.GradScaler()
 
     def load_dataset(self):
         self.logger.write("Loading dataset")
@@ -160,6 +161,8 @@ class MusCALLTrainer(BaseTrainer):
             # バッチごとの進捗を表示
             print(f"Epoch [{epoch + 1}/{self.config.training.epochs}], train loss: {train_loss}, val loss: {val_loss}")
 
+            torch.cuda.empty_cache()
+
             r10 = 0
             if self.config.training.track_retrieval_metrics:
                 r10 = self.get_retrieval_metrics() # 検索メトリクスの取得
@@ -187,7 +190,7 @@ class MusCALLTrainer(BaseTrainer):
             self.logger.save_checkpoint(state=checkpoint, is_best=is_best)
 
     def load_ckpt(self, checkpoint_path):
-        checkpoint = torch.load(checkpoint_path)
+        checkpoint = torch.load(checkpoint_path, weights_only=True)
         self.model.load_state_dict(checkpoint["state_dict"])
         self.optimizer.load_state_dict(checkpoint["optimizer"])
         self.start_epoch = checkpoint["epoch"]
@@ -202,8 +205,10 @@ class MusCALLTrainer(BaseTrainer):
         else:
             self.model.eval()
 
+        pbar = tqdm.tqdm(data_loader, disable=False, leave=True)
+
         # データローダーからバッチを取り出し、学習を実行
-        for i, batch in enumerate(data_loader):
+        for i, batch in enumerate(pbar):
             batch = tuple(t.to(device=self.device, non_blocking=True) if isinstance(t, torch.Tensor) else t for t in batch)
 
             audio_id, input_audio, input_text, input_midi, first_input_midi_shape, midi_dir_paths, data_idx = batch # バッチ内のデータを展開し、それぞれの変数に割り当て(__getitem__メソッドにより取得)
@@ -273,4 +278,5 @@ class MusCALLTrainer(BaseTrainer):
     def train_epoch_val(self, data_loader):
         with torch.no_grad():
             loss = self.train_epoch(data_loader, is_training=False)
+            torch.cuda.empty_cache()
         return loss
