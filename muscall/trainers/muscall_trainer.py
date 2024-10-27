@@ -10,6 +10,9 @@ import torch.optim as optim
 from torch.optim.lr_scheduler import CosineAnnealingLR
 from torch.utils.data import DataLoader, Subset
 
+from pytorch_memlab import profile
+from pytorch_memlab import MemReporter
+
 from muscall.datasets.audiocaption import AudioCaptionMidiDataset
 from muscall.trainers.base_trainer import BaseTrainer
 from muscall.models.muscall import MusCALL
@@ -82,7 +85,7 @@ class MusCALLTrainer(BaseTrainer):
         else:
             raise ValueError("{} model is not supported.".format(model_name))
 
-        self.print_parameters() # 全学習パラメータ表示
+        # self.print_parameters() # 全学習パラメータ表示
 
         if torch.cuda.device_count() > 1:
             print("Use %d GPUS" % torch.cuda.device_count())
@@ -90,6 +93,9 @@ class MusCALLTrainer(BaseTrainer):
     
         # DataParallelでラップされた場合に元のモデルにアクセスしやすくするための対策
         #self.model = self.model.module if isinstance(self.model, torch.nn.DataParallel) else self.model
+
+        self.reporter = MemReporter(self.model)
+        # self.reporter.report()
 
     def build_optimizer(self):
         self.logger.write("Building optimizer")
@@ -191,6 +197,8 @@ class MusCALLTrainer(BaseTrainer):
             # save checkpoint in appropriate path (new or best) (最良のモデルと最新のモデルを保存)
             self.logger.save_checkpoint(state=checkpoint, is_best=is_best)
 
+            # self.reporter.report()
+
     def load_ckpt(self, checkpoint_path):
         checkpoint = torch.load(checkpoint_path, weights_only=True)
         self.model.load_state_dict(checkpoint["state_dict"])
@@ -273,6 +281,8 @@ class MusCALLTrainer(BaseTrainer):
                 self.optimizer.zero_grad()
 
             running_loss += loss.item() # 各バッチの損失を蓄積
+            del loss
+            torch.cuda.empty_cache()
             n_batches += 1 # バッチ数をカウント
 
         return running_loss / n_batches
@@ -280,5 +290,4 @@ class MusCALLTrainer(BaseTrainer):
     def train_epoch_val(self, data_loader):
         with torch.no_grad():
             loss = self.train_epoch(data_loader, is_training=False)
-            torch.cuda.empty_cache()
         return loss

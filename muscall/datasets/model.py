@@ -2,6 +2,8 @@ import numpy as np
 import pickle
 from tqdm import tqdm
 import muscall.datasets.utils as utils # import data_creation.prepare_data.utils as utils
+from pytorch_memlab import profile
+import torch
 
 class CP(object):
     def __init__(self, dict):
@@ -72,5 +74,6 @@ class CP(object):
             
             all_words = all_words + slice_words
         
-        all_words = np.array(all_words)
+        # all_words = np.array(all_words)
+        all_words = torch.tensor(all_words)
         return all_words

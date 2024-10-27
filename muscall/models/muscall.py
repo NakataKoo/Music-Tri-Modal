@@ -2,6 +2,7 @@ import numpy as np
 import pickle
 import torch
 from torch import nn
+from pytorch_memlab import profile
 
 from muscall.modules.MidiBERT.model import *
 from transformers import BertConfig, AlbertConfig, RobertaConfig, DistilBertConfig
@@ -27,60 +28,57 @@ class MusCALL(nn.Module):
         self.device = torch.device("cuda")
 
         self.clap = laion_clap.CLAP_Module(enable_fusion=False, amodel='HTSAT-base', device=self.device)
-        self.clap.load_ckpt(config.clap.clap_ckpt)
+        self.clap.load_ckpt(config.clap.clap_ckpt, verbose=False)
         
         with open(config.midi.midi_dic, 'rb') as f:
             e2w, w2e = pickle.load(f)
 
         if config.midi.model_name == 'bert':
-            configuration = BertConfig(max_position_embeddings=config.midi.bert.max_seq_len, # 512
+            print("Build BERT\n")
+            configuration = BertConfig(max_position_embeddings=512,
                                     position_embedding_type='relative_key_query',
-                                    hidden_size=config.midi.bert.hidden_size, # 768
-                                    num_attention_heads = config.midi.bert.num_attention_heads,
-                                    num_hidden_layers = config.midi.bert.num_hidden_layers,
-                                    intermediate_size = config.midi.bert.intermediate_size,
-                                    vocab_size = config.midi.bert.vocab_size,
+                                    hidden_size=768,
+                                    num_hidden_layers = 6,
                                     attn_implementation="eager"
             )
-            self.midi_dim = config.midi.bert.hidden_size
+            self.midi_dim = configuration.hidden_size
         elif config.midi.model_name == 'albert':
-            configuration = AlbertConfig(max_position_embeddings=config.midi.albert.max_seq_len, # 512
+            print("Build ALBERT\n")
+            configuration = AlbertConfig(attention_probs_dropout_prob=0.1,
+                                    hidden_dropout_prob=0.1,
+                                    embedding_size=128,
+                                    hidden_size=768,
+                                    initializer_range=0.02,
+                                    intermediate_size=3072,
+                                    max_position_embeddings=512,
+                                    num_attention_heads=12,
+                                    num_hidden_layers=12,
+                                    num_hidden_groups=1,
+                                    net_structure_type=0,
+                                    gap_size=0,
+                                    num_memory_blocks=0,
+                                    inner_group_num=1,
+                                    down_scale_factor=1,
+                                    type_vocab_size=2,
+                                    vocab_size=800,
                                     position_embedding_type='relative_key_query',
-                                    embedding_size = config.midi.albert.embedding_size, # 128
-                                    hidden_size=config.midi.albert.hidden_size, # 768
-                                    num_attention_heads = config.midi.albert.num_attention_heads,
-                                    num_hidden_layers = config.midi.albert.num_hidden_layers,
-                                    intermediate_size = config.midi.albert.intermediate_size,
-                                    vocab_size = config.midi.albert.vocab_size,
                                     attn_implementation="eager"
             )
-            self.midi_dim = config.midi.albert.hidden_size
-        elif config.midi.model_name == 'roberta':
-            configuration = RobertaConfig(max_position_embeddings=config.midi.max_seq_len, # 512
-                                    position_embedding_type='relative_key_query',
-                                    hidden_size=config.midi.hidden_size, # 768
-                                    num_attention_heads = config.midi.num_attention_heads,
-                                    num_hidden_layers = config.midi.num_hidden_layers,
-                                    intermediate_size = config.midi.intermediate_size,
-                                    vocab_size = config.midi.vocab_size
-            )
+            self.midi_dim = configuration.hidden_size
         elif config.midi.model_name == 'distilbert':
-            configuration = DistilBertConfig(max_position_embeddings=config.midi.max_seq_len, # 512
-                                    position_embedding_type='relative_key_query',
-                                    hidden_size=config.midi.hidden_size, # 768
-                                    num_attention_heads = config.midi.num_attention_heads,
-                                    num_hidden_layers = config.midi.num_hidden_layers,
-                                    intermediate_size = config.midi.intermediate_size,
-                                    vocab_size = config.midi.vocab_size
+            print("Build DistilBERT\n")
+            configuration = DistilBertConfig(max_position_embeddings=512,
+                                    dim = 768,
+                                    vocab_size = 800
             )
-
+            self.midi_dim = configuration.dim
         self.midibert = MidiBert(bertConfig=configuration, e2w=e2w, w2e=w2e, model_name=config.midi.model_name)
 
         stdict_o = None
         print("Load Checkpoint?: "+str(config.midi.load_ckpt))
-        print(config.midi.ckpt)
         if config.midi.load_ckpt:
-            print("\nLoad Check point to restart")
+            print("\nLoad Check point to restart\n")
+            print(config.midi.ckpt)
             cpt = torch.load(config.midi.ckpt, weights_only=True)
             stdict_m = cpt['state_dict']
             stdict_o = cpt['optimizer']
@@ -104,27 +102,8 @@ class MusCALL(nn.Module):
     def encode_audio(self, audio):
         """
         audio: batchで来る, torch.Tensor型
-        (バッチサイズ6の例)
-        tensor([[[ 2.7787e-07,  2.3647e-08,  2.9080e-07,  ...,  0.0000e+00,
-           0.0000e+00,  0.0000e+00]],
-
-        [[ 1.9393e-07,  1.2675e-06,  1.5997e-06,  ...,  0.0000e+00,
-           0.0000e+00,  0.0000e+00]],
-
-        [[ 3.4497e-06,  2.7099e-06,  3.6326e-06,  ...,  0.0000e+00,
-           0.0000e+00,  0.0000e+00]],
-
-        [[ 2.4474e-04,  3.8606e-04,  4.1601e-04,  ...,  0.0000e+00,
-           0.0000e+00,  0.0000e+00]],
-
-        [[ 3.2677e-16, -2.9889e-16,  1.9097e-16,  ...,  0.0000e+00,
-           0.0000e+00,  0.0000e+00]],
-
-        [[-3.3250e-06, -7.9047e-07, -1.9627e-08,  ...,  0.0000e+00,
-           0.0000e+00,  0.0000e+00]]], device='cuda:0')
         """
-        #if isinstance(audio, torch.Tensor):
-            #audio = audio.to('cpu').detach().numpy().copy()  # テンソルをCPUに移動してNumPy配列に変換
+
         audio_features = []
         for data in audio:
             audio_feature = self.clap.get_audio_embedding_from_data(data, use_tensor=True) # 音声エンベディングを抽出
@@ -157,10 +136,6 @@ class MusCALL(nn.Module):
         if not isinstance(text, list):
             text = [text]
         text_features = self.clap.get_text_embedding(text, use_tensor=True)
-
-        # numpy.ndarray から torch.Tensor に変換
-        if isinstance(text_features, np.ndarray):
-            text_features = torch.tensor(text_features, dtype=torch.float32)
     
         # デバイスに移動
         text_features = text_features.to(self.device)
@@ -173,24 +148,13 @@ class MusCALL(nn.Module):
         first_input_midi_shape: torch.Size([batch_size]) (バッチ内の各データの初期midi数が記載)
         midiを個別に処理したい
         '''
-        midi_batch = midi_batch.to(self.device)  # デバイスに移動
         embedding_midi = []
         for midi, midi_shape in zip(midi_batch, first_input_midi_shape):
 
-            # midiが既にTensorの場合、そのまま使用
-            if isinstance(midi, np.ndarray):
-                midi = torch.from_numpy(midi)
-
             # 元のmidiサイズに戻す
             midi = midi[0:midi_shape]
-            # print(f"fix_midi_shape: {midi.shape}")
 
-            # LongTensorに変換
-            midi = midi.long()
-
-            assert midi.dim() == 3, f"midi tensor shape is incorrect: {midi.shape}"
-
-            midi_features = self.midibert.forward(midi)
+            midi_features = self.midibert.forward(midi) # 最もGPUを消費
             midi_features_all = torch.zeros(self.midi_dim, device=self.device)  # デバイス上で初期化
             # トークンのベクトルを平均して、シーケンス全体のベクトルを生成
             for i in range(len(midi)):
@@ -200,6 +164,11 @@ class MusCALL(nn.Module):
             # 同一のmidiのfeaturesで平均化
             midi_features_all = self.midi_projection(midi_features_all)
             embedding_midi.append(midi_features_all)
+            
+            del midi_features_all
+            del midi
+            torch.cuda.empty_cache()
+
         embedding_midi = torch.stack(embedding_midi, dim=0) # torch.Tensorが入ったlistを二次元のTensorに変換
         return embedding_midi
 

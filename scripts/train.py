@@ -9,6 +9,7 @@ from muscall.utils.utils import (
     get_root_dir,
     update_conf_with_cli_params,
 )
+
 from muscall.models.muscall import MusCALL
 from muscall.trainers.muscall_trainer import MusCALLTrainer
 from muscall.datasets.audiocaption import AudioCaptionMidiDataset
@@ -32,7 +33,6 @@ def parse_args():
     parser.add_argument(
         "--dataset", type=str, help="name of the dataset", default="audiocaption"
     )
-    parser.add_argument("--devices", type=str, default="0, 1")
 
     args = parser.parse_args()
 
@@ -61,7 +61,6 @@ if __name__ == "__main__":
         )
 
     logger = Logger(config)
-    os.environ["CUDA_VISIBLE_DEVICES"] = params.devices
 
     trainer = MusCALLTrainer(config, logger)
     print("# of trainable parameters:", trainer.count_parameters()) # 学習パラメータ数の表示

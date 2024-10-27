@@ -8,9 +8,9 @@ training:
 
   dataloader:
     batch_size: 2
-    num_workers: 1
+    num_workers: 0
     shuffle: True
-    pin_memory: False
+    pin_memory: False # TrueかつマルチGPUだとNCCLエラー(共有メモリ不足)が発生
   
   optimizer:
     name: AdamW

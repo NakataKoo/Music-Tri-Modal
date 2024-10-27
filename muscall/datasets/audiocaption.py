@@ -4,6 +4,7 @@ import numpy as np
 
 import torch
 from torch.utils.data.dataset import Dataset
+from pytorch_memlab import profile
 
 from muscall.datasets.model import CP
 import glob
@@ -59,7 +60,6 @@ class AudioCaptionMidiDataset(Dataset):
 
         return self.captions[idx]
 
-    @torch.no_grad()
     # 改良（音声データを読み込み、クロップ）
     def get_audio(self, idx):
         audio_path = self.audio_paths[idx]
@@ -86,7 +86,6 @@ class AudioCaptionMidiDataset(Dataset):
         audio = torch.from_numpy(audio.astype(np.float32)).clone()
         return audio
     
-    @torch.no_grad()
     def midi_padding(self, input_midi, idx):
 
         first_input_midi_shape = input_midi.shape[0]
@@ -105,19 +104,19 @@ class AudioCaptionMidiDataset(Dataset):
 
         return input_midi, first_input_midi_shape
 
-    @torch.no_grad()
     # 1つの曲の複数midiデータを取得し、すべてトークン化
     def get_midi(self, idx):
         files = glob.glob(self.midi_dir_paths[idx]+'/*.mid', recursive=True) # ["path_to_midi0", "path_to_midi1","path_to_midi2", ...]
         all_words = self.CP.prepare_data(files, task="", max_len=512) 
         '''
         all_wordsリストに、1つの曲のMIDIデータのトークン化されたデータが格納されている。
-        all_wordsの各要素はリストで、これは1つのMIDIをスライシングした後に、それぞれトークン化し、それを複数MIDIに適用したもの。all_words=[[slice_words[0]], [slice_words[1]], ...], slice_words=[[[token0], [token1], ...], [[token0], [token1], ...], ...]
+        all_wordsの各要素はリストで、これは1つのMIDIをスライシングした後に、それぞれトークン化し、
+        それを複数MIDIに適用したもの。all_words=[[slice_words[0]], [slice_words[1]], ...], slice_words=[[[token0], [token1], ...], [[token0], [token1], ...], ...]
         
         len(all_words)が1曲分のエンベディング平均化時の「分母」となる
         '''
         
-        all_words = torch.from_numpy(all_words.astype(np.float32)).clone()
+        # all_words = torch.from_numpy(all_words.astype(np.float32)).clone()
         all_words, first_input_midi_shape = self.midi_padding(all_words, idx)
         return all_words, first_input_midi_shape
 
