@@ -39,7 +39,8 @@ class MusCALL(nn.Module):
                                     position_embedding_type='relative_key_query',
                                     hidden_size=768,
                                     num_hidden_layers = 6,
-                                    attn_implementation="eager"
+                                    attn_implementation="eager",
+                                    vocab_size = 800
             )
             self.midi_dim = configuration.hidden_size
         elif config.midi.model_name == 'albert':
@@ -167,7 +168,6 @@ class MusCALL(nn.Module):
             
             del midi_features_all
             del midi
-            torch.cuda.empty_cache()
 
         embedding_midi = torch.stack(embedding_midi, dim=0) # torch.Tensorが入ったlistを二次元のTensorに変換
         return embedding_midi

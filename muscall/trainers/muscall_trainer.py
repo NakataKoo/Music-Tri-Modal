@@ -19,26 +19,6 @@ from muscall.models.muscall import MusCALL
 from muscall.tasks.retrieval import run_retrieval
 from muscall.utils.audio_utils import get_transform_chain
 
-def custom_collate_fn(batch):
-
-    collated_batch = []
-
-    # バッチ内の全データを走査
-    for item in batch:
-        audio_id, input_audio, input_text, input_midi, first_input_midi_shape, midi_dir_paths, idx = item
-        if input_midi.nelement() == 0:
-            print(f"pass: {midi_dir_paths[idx]}")
-            continue
-        collated_batch.append(( audio_id,
-                                input_audio, 
-                                input_text, 
-                                input_midi, 
-                                first_input_midi_shape, 
-                                midi_dir_paths, 
-                                idx))
-
-    return torch.utils.data.dataloader.default_collate(collated_batch)
-
 class MusCALLTrainer(BaseTrainer):
     def __init__(self, config, logger):
         super().__init__(config, logger)
@@ -63,13 +43,11 @@ class MusCALLTrainer(BaseTrainer):
             dataset=self.train_dataset,
             **self.config.training.dataloader,
             drop_last=True,
-            #collate_fn=custom_collate_fn
         )
         self.val_loader = DataLoader(
             dataset=self.val_dataset,
             **self.config.training.dataloader,
             drop_last=True,
-            #collate_fn=custom_collate_fn
         )
 
         self.logger.write(
@@ -282,7 +260,6 @@ class MusCALLTrainer(BaseTrainer):
 
             running_loss += loss.item() # 各バッチの損失を蓄積
             del loss
-            torch.cuda.empty_cache()
             n_batches += 1 # バッチ数をカウント
 
         return running_loss / n_batches

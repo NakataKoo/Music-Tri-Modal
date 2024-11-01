@@ -53,7 +53,7 @@ class AudioCaptionMidiDataset(Dataset):
             self.captions = [i["caption"].strip() for i in self.samples] # jsonの各オブジェくトの"caption"をリストに格納
             self.audio_paths = [os.path.join(
                 self.audio_dir, i["audio_path"]+".mp3") for i in self.samples] # jsonの各オブジェくトの"audio_path"(音声ファイルパス)をリストに格納
-            self.midi_dir_paths = [os.path.join(self.midi_dir, os.path.splitext(i["audio_path"])[0].replace('lmd_matched_mp3', 'lmd_aligned')) for i in self.samples] # 各楽曲のmidiファイルが格納されたディレクトリのパスをリストに格納
+            self.midi_dir_paths = [os.path.join(self.midi_dir, os.path.splitext(i["audio_path"])[0].replace('lmd_matched_mp3', 'audio2midi')) for i in self.samples] # 各楽曲のmidiファイルが格納されたディレクトリのパスをリストに格納
 
     def get_raw_caption(self, idx):
         """Get raw caption text"""
@@ -87,26 +87,33 @@ class AudioCaptionMidiDataset(Dataset):
         return audio
     
     def midi_padding(self, input_midi, idx):
+        """
+        input_midi: (midi_size, 512, 4)
+        512 → max token
+        4 → Bar, Position, Pitch, Duration
+        """
 
         first_input_midi_shape = input_midi.shape[0]
-        # print(f"input_midiのshape: {input_midi.shape}") 
-        # print(f"midi num: {first_input_midi_shape}")
         if input_midi.shape == torch.Size([0]):
             print(input_midi, self.midi_dir_paths[idx])
 
-        # MIDI データの x 次元を最大サイズに揃える
+        # パディング
         if input_midi.shape[0] < self.midi_size:
-            # パディングして長さを合わせる
-            midi_padding = torch.zeros((self.midi_size - input_midi.shape[0], 512, 4), dtype=input_midi.dtype)
-            input_midi = torch.cat((input_midi, midi_padding), dim=0)
+            x = self.midi_size - input_midi.shape[0]
+            # 最初の次元にパディングを追加する
+            # (0, 0) は 512 と 4 次元にはパディングを追加しないことを意味します
+            input_midi = torch.nn.functional.pad(input_midi, (0, 0, 0, 0, 0, x))
 
-        #print(f"input_midiのshape: {input_midi.shape}")
+        # クロップ
+        elif input_midi.shape[0] > self.midi_size:
+            input_midi = input_midi[:self.midi_size, :, :]
 
         return input_midi, first_input_midi_shape
 
     # 1つの曲の複数midiデータを取得し、すべてトークン化
     def get_midi(self, idx):
-        files = glob.glob(self.midi_dir_paths[idx]+'/*.mid', recursive=True) # ["path_to_midi0", "path_to_midi1","path_to_midi2", ...]
+        #files = glob.glob(self.midi_dir_paths[idx]+'/*.mid', recursive=True) # ["path_to_midi0", "path_to_midi1","path_to_midi2", ...]
+        files = [self.midi_dir_paths[idx]+".mid"]
         all_words = self.CP.prepare_data(files, task="", max_len=512) 
         '''
         all_wordsリストに、1つの曲のMIDIデータのトークン化されたデータが格納されている。
@@ -115,8 +122,6 @@ class AudioCaptionMidiDataset(Dataset):
         
         len(all_words)が1曲分のエンベディング平均化時の「分母」となる
         '''
-        
-        # all_words = torch.from_numpy(all_words.astype(np.float32)).clone()
         all_words, first_input_midi_shape = self.midi_padding(all_words, idx)
         return all_words, first_input_midi_shape
 

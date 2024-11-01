@@ -8,7 +8,7 @@ model_config:
     audio_hidden_size: 512
   midi:
     midi_dic: /home/Nakata/Music-Tri-Modal/muscall/modules/MidiBERT/CP.pkl
-    load_ckpt: False
+    load_ckpt: True
     ckpt: /home/Nakata/Music-Tri-Modal/ckpt/model_best_bert_HL6_loss03.ckpt
-    model_name: 'distilbert' # 'bert', 'albert', 'distilbert'
+    model_name: 'bert' # 'bert', 'albert', 'distilbert'  ALBERTだとRuntimeError: CUDA driver error: invalid argument発声
   loss: clip                      # one of [clip, weighted_clip]

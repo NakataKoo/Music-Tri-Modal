@@ -7,7 +7,7 @@ training:
   device: cuda
 
   dataloader:
-    batch_size: 2
+    batch_size: 6
     num_workers: 0
     shuffle: True
     pin_memory: False # TrueかつマルチGPUだとNCCLエラー(共有メモリ不足)が発生
