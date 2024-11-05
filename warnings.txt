@@ -1,62 +1,0 @@
-/home/Nakata/miniconda3/envs/venv/lib/python3.9/site-packages/torch_audiomentations/utils/io.py:27: UserWarning: torchaudio._backend.set_audio_backend has been deprecated. With dispatcher enabled, this function is no-op. You can remove the function call.
-  torchaudio.set_audio_backend("soundfile")
-/home/Nakata/miniconda3/envs/venv/lib/python3.9/site-packages/torch/functional.py:534: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at ../aten/src/ATen/native/TensorShape.cpp:3595.)
-  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]
-Some weights of RobertaModel were not initialized from the model checkpoint at roberta-base and are newly initialized: ['roberta.pooler.dense.bias', 'roberta.pooler.dense.weight']
-You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
-/home/Nakata/miniconda3/envs/venv/lib/python3.9/site-packages/laion_clap/clap_module/factory.py:54: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
-  checkpoint = torch.load(checkpoint_path, map_location=map_location)
-/home/Nakata/Music-Tri-Modal/muscall/trainers/muscall_trainer.py:46: FutureWarning: `torch.cuda.amp.GradScaler(args...)` is deprecated. Please use `torch.amp.GradScaler('cuda', args...)` instead.
-  self.scaler = torch.cuda.amp.GradScaler()
-  0%|          | 0/6809 [00:00<?, ?it/s]BertSdpaSelfAttention is used but `torch.nn.functional.scaled_dot_product_attention` does not support non-absolute `position_embedding_type` or `output_attentions=True` or `head_mask`. Falling back to the manual attention implementation, but specifying the manual implementation will be required from Transformers version v5.0.0 onwards. This warning can be removed using the argument `attn_implementation="eager"` when loading the model.
-  0%|          | 1/6809 [00:06<13:09:44,  6.96s/it]  0%|          | 2/6809 [00:07<5:40:03,  3.00s/it]   0%|          | 3/6809 [00:07<3:14:34,  1.72s/it]  0%|          | 4/6809 [00:08<2:49:18,  1.49s/it]  0%|          | 5/6809 [00:10<3:26:41,  1.82s/it]  0%|          | 6/6809 [00:11<2:50:37,  1.50s/it]  0%|          | 7/6809 [00:12<2:34:17,  1.36s/it]  0%|          | 8/6809 [00:13<2:24:24,  1.27s/it]  0%|          | 9/6809 [00:16<3:11:55,  1.69s/it]  0%|          | 10/6809 [00:18<3:21:20,  1.78s/it]  0%|          | 11/6809 [00:19<2:43:21,  1.44s/it]  0%|          | 12/6809 [00:20<2:46:42,  1.47s/it]  0%|          | 13/6809 [00:23<3:21:04,  1.78s/it]  0%|          | 14/6809 [00:23<2:39:42,  1.41s/it]  0%|          | 15/6809 [00:25<2:32:11,  1.34s/it]  0%|          | 16/6809 [00:30<5:09:40,  2.74s/it]  0%|          | 17/6809 [00:31<3:46:21,  2.00s/it]  0%|          | 18/6809 [00:32<3:05:11,  1.64s/it]  0%|          | 19/6809 [00:34<3:18:03,  1.75s/it]  0%|          | 20/6809 [00:35<2:55:21,  1.55s/it]  0%|          | 21/6809 [00:37<3:37:51,  1.93s/it]  0%|          | 22/6809 [00:38<3:04:29,  1.63s/it]  0%|          | 23/6809 [00:42<4:04:08,  2.16s/it]  0%|          | 24/6809 [00:43<3:22:49,  1.79s/it]  0%|          | 25/6809 [00:44<3:08:07,  1.66s/it]  0%|          | 26/6809 [00:45<2:52:43,  1.53s/it]  0%|          | 26/6809 [00:49<3:36:25,  1.91s/it]
-Traceback (most recent call last):
-  File "/home/Nakata/Music-Tri-Modal/scripts/train.py", line 69, in <module>
-    trainer.train() # モデル学習開始
-  File "/home/Nakata/Music-Tri-Modal/muscall/trainers/muscall_trainer.py", line 158, in train
-    train_loss = self.train_epoch(self.train_loader, is_training=True)
-  File "/home/Nakata/Music-Tri-Modal/muscall/trainers/muscall_trainer.py", line 245, in train_epoch
-    loss = self.model(
-  File "/home/Nakata/miniconda3/envs/venv/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
-    return self._call_impl(*args, **kwargs)
-  File "/home/Nakata/miniconda3/envs/venv/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
-    return forward_call(*args, **kwargs)
-  File "/home/Nakata/Music-Tri-Modal/muscall/models/muscall.py", line 222, in forward
-    midi_features = self.encode_midi(midi, first_input_midi_shape)
-  File "/home/Nakata/Music-Tri-Modal/muscall/models/muscall.py", line 193, in encode_midi
-    midi_features = self.midibert.forward(midi)
-  File "/home/Nakata/Music-Tri-Modal/muscall/modules/MidiBERT/model.py", line 75, in forward
-    y = self.bert(inputs_embeds=emb_linear, attention_mask=attn_mask, output_hidden_states=output_hidden_states)
-  File "/home/Nakata/miniconda3/envs/venv/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
-    return self._call_impl(*args, **kwargs)
-  File "/home/Nakata/miniconda3/envs/venv/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
-    return forward_call(*args, **kwargs)
-  File "/home/Nakata/miniconda3/envs/venv/lib/python3.9/site-packages/transformers/models/bert/modeling_bert.py", line 1142, in forward
-    encoder_outputs = self.encoder(
-  File "/home/Nakata/miniconda3/envs/venv/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
-    return self._call_impl(*args, **kwargs)
-  File "/home/Nakata/miniconda3/envs/venv/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
-    return forward_call(*args, **kwargs)
-  File "/home/Nakata/miniconda3/envs/venv/lib/python3.9/site-packages/transformers/models/bert/modeling_bert.py", line 695, in forward
-    layer_outputs = layer_module(
-  File "/home/Nakata/miniconda3/envs/venv/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
-    return self._call_impl(*args, **kwargs)
-  File "/home/Nakata/miniconda3/envs/venv/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
-    return forward_call(*args, **kwargs)
-  File "/home/Nakata/miniconda3/envs/venv/lib/python3.9/site-packages/transformers/models/bert/modeling_bert.py", line 585, in forward
-    self_attention_outputs = self.attention(
-  File "/home/Nakata/miniconda3/envs/venv/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
-    return self._call_impl(*args, **kwargs)
-  File "/home/Nakata/miniconda3/envs/venv/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
-    return forward_call(*args, **kwargs)
-  File "/home/Nakata/miniconda3/envs/venv/lib/python3.9/site-packages/transformers/models/bert/modeling_bert.py", line 515, in forward
-    self_outputs = self.self(
-  File "/home/Nakata/miniconda3/envs/venv/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
-    return self._call_impl(*args, **kwargs)
-  File "/home/Nakata/miniconda3/envs/venv/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
-    return forward_call(*args, **kwargs)
-  File "/home/Nakata/miniconda3/envs/venv/lib/python3.9/site-packages/transformers/models/bert/modeling_bert.py", line 383, in forward
-    return super().forward(
-  File "/home/Nakata/miniconda3/envs/venv/lib/python3.9/site-packages/transformers/models/bert/modeling_bert.py", line 326, in forward
-    attention_scores = attention_scores + relative_position_scores_query + relative_position_scores_key
-RuntimeError: CUDA driver error: invalid argument

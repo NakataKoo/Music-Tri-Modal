@@ -7,5 +7,6 @@ save/
 **venv
 data/datasets/audiocaptionmidi/audio/
 data/datasets/audiocaptionmidi/midi/
+data/datasets/audiocaptionmidi/basic-pitch-output/
 ckpt/
 core

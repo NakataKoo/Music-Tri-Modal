@@ -1,53 +1,0 @@
-Some weights of RobertaModel were not initialized from the model checkpoint at roberta-base and are newly initialized: ['roberta.pooler.dense.bias', 'roberta.pooler.dense.weight']
-You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
-  0%|          | 0/6809 [00:00<?, ?it/s]  0%|          | 1/6809 [00:07<14:02:46,  7.43s/it]  0%|          | 2/6809 [00:07<6:08:43,  3.25s/it]   0%|          | 3/6809 [00:08<3:35:23,  1.90s/it]  0%|          | 4/6809 [00:11<4:35:39,  2.43s/it]  0%|          | 5/6809 [00:12<3:56:53,  2.09s/it]  0%|          | 5/6809 [00:19<7:17:10,  3.86s/it]
-Traceback (most recent call last):
-  File "/home/Nakata/Music-Tri-Modal/scripts/train.py", line 69, in <module>
-    trainer.train() # モデル学習開始
-  File "/home/Nakata/Music-Tri-Modal/muscall/trainers/muscall_trainer.py", line 166, in train
-    train_loss = self.train_epoch(self.train_loader, is_training=True)
-  File "/home/Nakata/Music-Tri-Modal/muscall/trainers/muscall_trainer.py", line 246, in train_epoch
-    loss = self.model(
-  File "/home/Nakata/miniconda3/envs/venv/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
-    return self._call_impl(*args, **kwargs)
-  File "/home/Nakata/miniconda3/envs/venv/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
-    return forward_call(*args, **kwargs)
-  File "/home/Nakata/Music-Tri-Modal/muscall/models/muscall.py", line 222, in forward
-    midi_features = self.encode_midi(midi, first_input_midi_shape)
-  File "/home/Nakata/Music-Tri-Modal/muscall/models/muscall.py", line 193, in encode_midi
-    midi_features = self.midibert.forward(midi)
-  File "/home/Nakata/Music-Tri-Modal/muscall/modules/MidiBERT/model.py", line 75, in forward
-    y = self.bert(inputs_embeds=emb_linear, attention_mask=attn_mask, output_hidden_states=output_hidden_states)
-  File "/home/Nakata/miniconda3/envs/venv/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
-    return self._call_impl(*args, **kwargs)
-  File "/home/Nakata/miniconda3/envs/venv/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
-    return forward_call(*args, **kwargs)
-  File "/home/Nakata/miniconda3/envs/venv/lib/python3.9/site-packages/transformers/models/bert/modeling_bert.py", line 1142, in forward
-    encoder_outputs = self.encoder(
-  File "/home/Nakata/miniconda3/envs/venv/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
-    return self._call_impl(*args, **kwargs)
-  File "/home/Nakata/miniconda3/envs/venv/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
-    return forward_call(*args, **kwargs)
-  File "/home/Nakata/miniconda3/envs/venv/lib/python3.9/site-packages/transformers/models/bert/modeling_bert.py", line 695, in forward
-    layer_outputs = layer_module(
-  File "/home/Nakata/miniconda3/envs/venv/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
-    return self._call_impl(*args, **kwargs)
-  File "/home/Nakata/miniconda3/envs/venv/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
-    return forward_call(*args, **kwargs)
-  File "/home/Nakata/miniconda3/envs/venv/lib/python3.9/site-packages/transformers/models/bert/modeling_bert.py", line 585, in forward
-    self_attention_outputs = self.attention(
-  File "/home/Nakata/miniconda3/envs/venv/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
-    return self._call_impl(*args, **kwargs)
-  File "/home/Nakata/miniconda3/envs/venv/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
-    return forward_call(*args, **kwargs)
-  File "/home/Nakata/miniconda3/envs/venv/lib/python3.9/site-packages/transformers/models/bert/modeling_bert.py", line 515, in forward
-    self_outputs = self.self(
-  File "/home/Nakata/miniconda3/envs/venv/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
-    return self._call_impl(*args, **kwargs)
-  File "/home/Nakata/miniconda3/envs/venv/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
-    return forward_call(*args, **kwargs)
-  File "/home/Nakata/miniconda3/envs/venv/lib/python3.9/site-packages/transformers/models/bert/modeling_bert.py", line 325, in forward
-    relative_position_scores_key = torch.einsum("bhrd,lrd->bhlr", key_layer, positional_embedding)
-  File "/home/Nakata/miniconda3/envs/venv/lib/python3.9/site-packages/torch/functional.py", line 407, in einsum
-    return _VF.einsum(equation, operands)  # type: ignore[attr-defined]
-RuntimeError: CUDA driver error: invalid argument

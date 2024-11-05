@@ -107,15 +107,10 @@ class MusCALL(nn.Module):
 
         audio_features = []
         for data in audio:
+            
+            data = torch.nan_to_num(data, nan=0.0) # nanを0に変換
             audio_feature = self.clap.get_audio_embedding_from_data(data, use_tensor=True) # 音声エンベディングを抽出
-            # nan 以外の平均値を計算
-            # mean_val = np.nanmean(audio_feature[0])  # nan を無視して平均を計算
-            # nan を平均値に置き換える
-            # audio_feature[0][np.isnan(audio_feature[0])] = mean_val
-
-            # nanを0に置き換える
-            # audio_feature[0] = np.nan_to_num(audio_feature[0], nan=0.0)
-        
+            
             # numpy.ndarray から torch.Tensor に変換
             if isinstance(audio_feature, np.ndarray):
                 audio_feature = torch.from_numpy(audio_feature.astype(np.float32)).clone()
@@ -125,7 +120,6 @@ class MusCALL(nn.Module):
             audio_feature = self.audio_projection(audio_feature) # 最終的な共通のエンベディングの次元に変換
             audio_features.append(audio_feature)
         audio_features = torch.cat(audio_features, dim=0)
-        # print(f"audio_features: {audio_features}")
         return audio_features
 
     @torch.no_grad()
@@ -193,8 +187,8 @@ class MusCALL(nn.Module):
         # normalise features（各特徴ベクトルをそのノルムで割ることで、単位ベクトルに変換）
         epsilon = 1e-6
         audio_features = audio_features / (audio_features.norm(dim=-1, keepdim=True) + epsilon)
-        text_features = text_features / text_features.norm(dim=-1, keepdim=True)
-        midi_features = midi_features / midi_features.norm(dim=-1, keepdim=True)
+        text_features = text_features / (text_features.norm(dim=-1, keepdim=True) + epsilon)
+        midi_features = midi_features / (midi_features.norm(dim=-1, keepdim=True) + epsilon)
 
         # ロジットの計算
         # ロジットスケール（温度パラメータ）を計算。温度が未設定の場合、学習されたlogit_scaleを使用
