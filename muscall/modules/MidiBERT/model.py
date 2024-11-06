@@ -4,7 +4,7 @@ import random
 
 import torch
 import torch.nn as nn
-from transformers import BertModel, AlbertModel, RobertaModel, DistilBertModel
+from transformers import BertModel, AlbertModel, DistilBertModel #RobertaModel,
 
 class Embeddings(nn.Module):
     def __init__(self, n_token, d_model):

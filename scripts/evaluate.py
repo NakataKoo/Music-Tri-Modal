@@ -27,6 +27,7 @@ def parse_args():
         "--dataset_name",
         type=str,
         help="name of dataset for zeroshot classification",
+        default="pianist8",
     )
     parser.add_argument(
         "--device_num",

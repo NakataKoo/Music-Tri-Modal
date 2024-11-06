@@ -5,7 +5,7 @@ from torch import nn
 from pytorch_memlab import profile
 
 from muscall.modules.MidiBERT.model import *
-from transformers import BertConfig, AlbertConfig, RobertaConfig, DistilBertConfig
+from transformers import BertConfig, AlbertConfig, DistilBertConfig #RobertaConfig,
 import laion_clap
 
 # クロスエントロピー誤差
@@ -20,7 +20,7 @@ def clip_loss(similarity: torch.Tensor, sentence_sim=None, type_loss="clip") -> 
     return (loss1 + loss2) / 2.0
 
 class MusCALL(nn.Module):
-    def __init__(self, config):
+    def __init__(self, config, is_train=True):
         super().__init__()
 
         self.type_loss = config.loss
@@ -77,7 +77,7 @@ class MusCALL(nn.Module):
 
         stdict_o = None
         print("Load Checkpoint?: "+str(config.midi.load_ckpt))
-        if config.midi.load_ckpt:
+        if config.midi.load_ckpt and is_train:
             print("\nLoad Check point to restart\n")
             print(config.midi.ckpt)
             cpt = torch.load(config.midi.ckpt, weights_only=True)

@@ -5,6 +5,7 @@ import miditoolkit
 import torch
 import glob
 import tqdm
+import random
 
 import torch.optim as optim
 from torch.optim.lr_scheduler import CosineAnnealingLR
@@ -12,6 +13,22 @@ from torch.utils.data import DataLoader, Subset
 
 from pytorch_memlab import profile
 from pytorch_memlab import MemReporter
+
+# parserなどで指定
+seed = 0
+
+random.seed(seed)
+np.random.seed(seed)
+torch.manual_seed(seed)
+torch.backends.cudnn.deterministic = True
+
+def seed_worker(worker_id):
+    worker_seed = torch.initial_seed() % 2**32
+    np.random.seed(worker_seed)
+    random.seed(worker_seed)
+
+g = torch.Generator()
+g.manual_seed(seed)
 
 from muscall.datasets.audiocaption import AudioCaptionMidiDataset
 from muscall.trainers.base_trainer import BaseTrainer
@@ -43,11 +60,15 @@ class MusCALLTrainer(BaseTrainer):
             dataset=self.train_dataset,
             **self.config.training.dataloader,
             drop_last=True,
+            worker_init_fn=seed_worker,
+            generator=g,
         )
         self.val_loader = DataLoader(
             dataset=self.val_dataset,
             **self.config.training.dataloader,
             drop_last=True,
+            worker_init_fn=seed_worker,
+            generator=g,
         )
 
         self.logger.write(
@@ -59,7 +80,7 @@ class MusCALLTrainer(BaseTrainer):
         model_name = self.config.model_config.model_name # muscall.yaml→model_config→model_nameより、モデル名を取得
 
         if model_name == "muscall":
-            self.model = MusCALL(self.config.model_config).to(self.device)
+            self.model = MusCALL(self.config.model_config, is_train=True).to(self.device)
         else:
             raise ValueError("{} model is not supported.".format(model_name))
 

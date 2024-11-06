@@ -74,6 +74,6 @@ class CP(object):
             
             all_words = all_words + slice_words
         
-        # all_words = np.array(all_words)
-        all_words = torch.tensor(all_words)
+        all_words = np.array(all_words)
+        # all_words = torch.tensor(all_words)
         return all_words

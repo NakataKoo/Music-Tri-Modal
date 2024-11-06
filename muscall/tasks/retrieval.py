@@ -1,6 +1,25 @@
 import os
-
+import random
+import numpy as np
 import torch
+
+# parserなどで指定
+seed = 0
+
+random.seed(seed)
+np.random.seed(seed)
+torch.manual_seed(seed)
+torch.backends.cudnn.benchmark = False
+torch.backends.cudnn.deterministic = True
+
+def seed_worker(worker_id):
+    worker_seed = torch.initial_seed() % 2**32
+    np.random.seed(worker_seed)
+    random.seed(worker_seed)
+
+g = torch.Generator()
+g.manual_seed(seed)
+
 from torch.utils.data import DataLoader, Subset
 
 from muscall.models.muscall import MusCALL
@@ -107,8 +126,8 @@ class Retrieval:
         self.path_to_model = os.path.join(
             self.muscall_config.env.experiments_dir,
             self.muscall_config.env.experiment_id,
-            #"best_model.pth.tar",
-            "checkpoint.pth.tar"
+            "best_model.pth.tar",
+            #"checkpoint.pth.tar"
         )
         print("path to model", self.path_to_model)
 
@@ -126,10 +145,12 @@ class Retrieval:
             dataset=random_dataset,
             batch_size=self.batch_size,
             drop_last=False,
+            worker_init_fn=seed_worker,
+            generator=g,
         )
 
     def build_model(self):
-        self.model = MusCALL(self.muscall_config.model_config)
+        self.model = MusCALL(self.muscall_config.model_config, is_train=False)
         self.checkpoint = torch.load(self.path_to_model)
         self.model.load_state_dict(self.checkpoint["state_dict"])
         self.model.to(self.device)
@@ -150,8 +171,10 @@ class Retrieval:
             self.device, 
             retrieval_type="midi_text"
         )
-        print(f"midi_audio: {retrieval_metrics_midi_text}")
+        print(f"midi_text: {retrieval_metrics_midi_text}")
 
         retrieval_metrics = (retrieval_metrics_midi_audio["R@10"].item()+retrieval_metrics_midi_text["R@10"].item()) / 2
+
+        print(f"Average R@10: {retrieval_metrics}")
 
         return retrieval_metrics

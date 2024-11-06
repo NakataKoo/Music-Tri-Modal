@@ -49,11 +49,11 @@ class AudioCaptionMidiDataset(Dataset):
             self.audio_dir = os.path.join(self._data_dir, "audio") # ${env.data_root}/datasets/${dataset_config.dataset_name}/audio
             self.midi_dir = os.path.join(self._data_dir, "midi") # ${env.data_root}/datasets/${dataset_config.dataset_name}/midi
 
-            self.audio_ids = [i["audio_id"] for i in self.samples] # jsonの各オブジェくトの"audio_id"(自然数)をリストに格納
-            self.captions = [i["caption"].strip() for i in self.samples] # jsonの各オブジェくトの"caption"をリストに格納
+            self.audio_ids = [i["audio_id"] for i in self.samples]
+            self.captions = [i["caption"].strip() for i in self.samples]
             self.audio_paths = [os.path.join(
-                self.audio_dir, i["audio_path"]+".mp3") for i in self.samples] # jsonの各オブジェくトの"audio_path"(音声ファイルパス)をリストに格納
-            self.midi_dir_paths = [os.path.join(self.midi_dir, os.path.splitext(i["audio_path"])[0].replace('lmd_matched_mp3', 'audio2midi')) for i in self.samples] # 各楽曲のmidiファイルが格納されたディレクトリのパスをリストに格納
+                self.audio_dir, i["audio_path"]+".npy") for i in self.samples]
+            self.midi_dir_paths = [os.path.join(self.midi_dir, os.path.splitext(i["audio_path"])[0].replace('lmd_matched_mp3', 'audio2midi')) for i in self.samples]
 
     def get_raw_caption(self, idx):
         """Get raw caption text"""
@@ -62,13 +62,8 @@ class AudioCaptionMidiDataset(Dataset):
 
     # 改良（音声データを読み込み、クロップ）
     def get_audio(self, idx):
-        audio_path = self.audio_paths[idx]
-        audio, sr = librosa.load(audio_path, sr=self.sample_rate, mono=True, duration=self.crop_length, offset=self.offset)
-        audio = audio.reshape(1, -1)
-        """
-        audioの例
-        array([[ 9.2013743e-06,  3.8011109e-05,  7.4386335e-05, ..., -1.0849992e-02, -1.3824768e-02,  0.0000000e+00]], dtype=float32)
-        """
+
+        audio = np.load(self.audio_paths[idx])
 
         # 短い音声に対しパディング
         if audio.shape[1] < self.num_samples:
@@ -113,8 +108,8 @@ class AudioCaptionMidiDataset(Dataset):
     # 1つの曲の複数midiデータを取得し、すべてトークン化
     def get_midi(self, idx):
         #files = glob.glob(self.midi_dir_paths[idx]+'/*.mid', recursive=True) # ["path_to_midi0", "path_to_midi1","path_to_midi2", ...]
-        files = [self.midi_dir_paths[idx]+".mid"]
-        all_words = self.CP.prepare_data(files, task="", max_len=512) 
+        #files = [self.midi_dir_paths[idx]+".mid"]
+        #all_words = self.CP.prepare_data(files, task="", max_len=512) 
         '''
         all_wordsリストに、1つの曲のMIDIデータのトークン化されたデータが格納されている。
         all_wordsの各要素はリストで、これは1つのMIDIをスライシングした後に、それぞれトークン化し、
@@ -122,6 +117,8 @@ class AudioCaptionMidiDataset(Dataset):
         
         len(all_words)が1曲分のエンベディング平均化時の「分母」となる
         '''
+        all_words = [self.midi_dir_paths[idx]+".npy"]
+        all_words = torch.from_numpy(all_words.astype(np.float32)).clone()
         all_words, first_input_midi_shape = self.midi_padding(all_words, idx)
         return all_words, first_input_midi_shape
 

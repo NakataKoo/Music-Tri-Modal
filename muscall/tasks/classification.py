@@ -31,9 +31,9 @@ def get_metrics(predictions, ground_truth, dataset_name):
         )
     elif dataset_name == "pianist8":
         predictions = torch.argmax(predictions, dim=1)
-        print(predictions)
+        #print(predictions)
         ground_truth = ground_truth[:, 0]
-        print(ground_truth)
+        #print(ground_truth)
         results["accuracy"] = metrics.accuracy_score(ground_truth, predictions)
 
     return results
@@ -97,8 +97,8 @@ class Zeroshot:
         self.path_to_model = os.path.join(
             self.muscall_config.env.experiments_dir,
             self.muscall_config.env.experiment_id,
-            #"best_model.pth.tar",
-            "checkpoint.pth.tar"
+            "best_model.pth.tar",
+            #"checkpoint.pth.tar"
         )
         print("path to model", self.path_to_model)
 
@@ -116,7 +116,7 @@ class Zeroshot:
         self.test_loader = DataLoader(dataset=test_dataset, batch_size=1)
 
     def build_model(self):
-        self.model = MusCALL(self.muscall_config.model_config)
+        self.model = MusCALL(self.muscall_config.model_config, is_train=False)
         self.checkpoint = torch.load(self.path_to_model)
         self.model.load_state_dict(self.checkpoint["state_dict"])
         self.model.to(self.device)
