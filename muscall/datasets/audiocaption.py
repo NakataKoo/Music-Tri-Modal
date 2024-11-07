@@ -65,6 +65,7 @@ class AudioCaptionMidiDataset(Dataset):
 
         audio = np.load(self.audio_paths[idx])
 
+        """
         # 短い音声に対しパディング
         if audio.shape[1] < self.num_samples:
             x = self.num_samples - audio.shape[1]
@@ -74,10 +75,11 @@ class AudioCaptionMidiDataset(Dataset):
         elif audio.shape[1] > self.num_samples:
             cropped_audio = audio[0][:self.num_samples]
             audio = np.array([cropped_audio])
-
+        
         clipped_audio = np.clip(audio[0], -1.0, 1.0)
         clipped_audio = 2 * (clipped_audio - np.min(clipped_audio)) / (np.max(clipped_audio) - np.min(clipped_audio)) - 1
         audio = np.array([clipped_audio])
+        """
         audio = torch.from_numpy(audio.astype(np.float32)).clone()
         return audio
     
@@ -117,7 +119,7 @@ class AudioCaptionMidiDataset(Dataset):
         
         len(all_words)が1曲分のエンベディング平均化時の「分母」となる
         '''
-        all_words = [self.midi_dir_paths[idx]+".npy"]
+        all_words = np.load(self.midi_dir_paths[idx]+".npy")
         all_words = torch.from_numpy(all_words.astype(np.float32)).clone()
         all_words, first_input_midi_shape = self.midi_padding(all_words, idx)
         return all_words, first_input_midi_shape

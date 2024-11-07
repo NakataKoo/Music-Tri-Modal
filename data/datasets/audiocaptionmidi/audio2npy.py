@@ -6,13 +6,32 @@ from tqdm import tqdm
 from concurrent.futures import ThreadPoolExecutor
 
 def save_audio_as_npy(audio_path):
+    sample_rate = 16000
+    duration = 45
+
     try:
         # 出力パスを生成
         npy_file_path = audio_path.replace('.mp3', '.npy')
         
         # オーディオデータを読み込み
-        audio, sr = librosa.load(audio_path, sr=48000, mono=True, duration=45, offset=0.1)
+        audio, sr = librosa.load(audio_path, sr=sample_rate, mono=True, duration=duration, offset=0.1)
         audio = audio.reshape(1, -1)
+
+        num_samples = sample_rate * duration
+
+        # 短い音声に対しパディング
+        if audio.shape[1] < num_samples:
+            x = num_samples - audio.shape[1]
+            padded_audio = np.pad(audio[0], ((0, x)), "mean")
+            audio = np.array([padded_audio])
+        # 長い音声に対しクロップ
+        elif audio.shape[1] > num_samples:
+            cropped_audio = audio[0][:num_samples]
+            audio = np.array([cropped_audio])
+
+        clipped_audio = np.clip(audio[0], -1.0, 1.0)
+        clipped_audio = 2 * (clipped_audio - np.min(clipped_audio)) / (np.max(clipped_audio) - np.min(clipped_audio)) - 1
+        audio = np.array([clipped_audio])
         
         # npyファイルとして保存
         np.save(npy_file_path, audio)

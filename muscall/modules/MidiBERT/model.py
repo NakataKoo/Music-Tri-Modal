@@ -66,7 +66,7 @@ class MidiBert(nn.Module):
         # convert input_ids into embeddings and merge them through linear layer
         embs = []
         for i, key in enumerate(self.classes):
-            embs.append(self.word_emb[i](input_ids[..., i]))
+            embs.append(self.word_emb[i](input_ids[..., i].long()))
         embs = torch.cat([*embs], dim=-1) # 異なるトークンタイプの情報を融合
         emb_linear = self.in_linear(embs) # 異なるトークンタイプの情報を融合したものを、BERTのhidden_sizeに変換
 
