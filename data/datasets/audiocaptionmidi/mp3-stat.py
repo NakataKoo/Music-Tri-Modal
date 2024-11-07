@@ -84,6 +84,9 @@ def get_mp3_durations(directory, threshold):
             for duration, path in above_threshold:
                 print(f"Duration: {duration:.2f} seconds - File: {path}")
                 pass
+            for duration, path in above_threshold:
+                print(f"\"{path}\"")
+                pass
     else:
         print("No MP3 files found in the specified directory.")
 

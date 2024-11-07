@@ -3,12 +3,13 @@ import numpy as np
 
 sample_rate = 16000
 duration = 45
-audio_path = ""
+audio_path = "/home/Nakata/Music-Tri-Modal/data/datasets/audiocaptionmidi/audio/lmd_matched_mp3/A/A/A/TRAAAGR128F425B14B.mp3"
 
 audio, sr = librosa.load(audio_path, sr=sample_rate, mono=True, duration=duration, offset=0.1)
 audio = audio.reshape(1, -1)
 
 print(audio)
+print(audio.shape)
 
 num_samples = sample_rate * duration
 
@@ -23,9 +24,11 @@ elif audio.shape[1] > num_samples:
     audio = np.array([cropped_audio])
 
 print(audio)
+print(audio.shape)
 
 clipped_audio = np.clip(audio[0], -1.0, 1.0)
 clipped_audio = 2 * (clipped_audio - np.min(clipped_audio)) / (np.max(clipped_audio) - np.min(clipped_audio)) - 1
 audio = np.array([clipped_audio])
 
 print(audio)
+print(audio.shape)
