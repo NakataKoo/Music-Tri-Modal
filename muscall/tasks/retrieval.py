@@ -30,7 +30,7 @@ from muscall.datasets.audiocaption import AudioCaptionMidiDataset
 def get_muscall_features(model, data_loader, device):
     dataset_size = data_loader.dataset.__len__()
 
-    all_audio_features = torch.zeros(dataset_size, 512).to(device)
+    #all_audio_features = torch.zeros(dataset_size, 512).to(device)
     all_text_features = torch.zeros(dataset_size, 512).to(device)
     all_midi_features = torch.zeros(dataset_size, 512).to(device)
 
@@ -41,11 +41,11 @@ def get_muscall_features(model, data_loader, device):
         # バッチ内のデータを展開し、それぞれの変数に割り当て(__getitem__メソッドにより取得)
         audio_id, input_audio, input_text, input_midi, first_input_midi_shape, midi_dir_paths, data_idx = batch 
 
-        audio_features = model.encode_audio(input_audio)
+        #audio_features = model.encode_audio(input_audio)
         text_features = model.encode_text(text=input_text, text_mask=None)
         midi_features = model.encode_midi(input_midi, first_input_midi_shape)
 
-        audio_features = audio_features / audio_features.norm(dim=-1, keepdim=True)
+        #audio_features = audio_features / audio_features.norm(dim=-1, keepdim=True)
         text_features = text_features / text_features.norm(dim=-1, keepdim=True)
         midi_features = midi_features / midi_features.norm(dim=-1, keepdim=True)
 
@@ -54,11 +54,12 @@ def get_muscall_features(model, data_loader, device):
         end_index = start_index + samples_in_current_batch
         samples_in_previous_batch = samples_in_current_batch
 
-        all_audio_features[start_index:end_index] = audio_features
+        #all_audio_features[start_index:end_index] = audio_features
         all_text_features[start_index:end_index] = text_features
         all_midi_features[start_index:end_index] = midi_features
 
-    return all_audio_features, all_text_features, all_midi_features
+    #return all_audio_features, all_text_features, all_midi_features
+    return all_text_features, all_midi_features
 
 
 def compute_sim_score(features1, features2):

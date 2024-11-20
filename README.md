@@ -24,6 +24,9 @@ wget https://huggingface.co/lukewys/laion_clap/resolve/main/music_audioset_epoch
 ```
 
 ## Preparing the dataset
+
+### MIDI-Text-Audio Pair ver
+
 The Music-Tri-Modal is trained on a multimodal dataset of (audio, text, midi) pairs. 
 
 Annotations should be provided in JSON format and must include the following fields:
@@ -59,7 +62,6 @@ dataset_name
 
 An illustrative example of the dataset is provided in [`data/datasets/audiocaption/`](data/datasets/audiocaption/).
 
-### MIDI-Audio Data prepare
 ```
 cd /Music-Tri-Modal/data/datasets/audiocaptionmidi/
 
@@ -75,7 +77,39 @@ wget http://hog.ee.columbia.edu/craffel/lmd/lmd_matched_mp3.tar.gz
 tar -xzvf lmd_matched_mp3.tar.gz
 ```
 
-### MIDI-Text Data prepare
+### MIDI-Text Pair ver
+
+The Music-Tri-Modal is trained on a multimodal dataset of (audio, text, midi) pairs. 
+
+Annotations should be provided in JSON format and must include the following fields:
+
+- ```audio_id```:     the unique identifier for each audio track in the dataset
+
+- ```caption``` :     a string with the textual description of the audio track 
+
+- ```audio_path```:   path to the audio track, relative to the root audio directory
+
+One JSON file per split must be provided and stored in the [`data/datasets`](data/datasets/) directory, following this structure:
+
+```
+dataset_name
+├── lmd_full
+|   ├── 0/
+|   |   ├── track_1_1.mid
+|   |   ├── track_1_2.mid
+|   |   └── ...   
+|   ├── 1/
+|   |   ├── track_2_1.mid
+|   |   ├── track_2_2.mid
+|   |   └── ...   
+|   └── ...
+├── dataset_train.json    
+├── dataset_val.json    
+└── dataset_test.json
+```
+
+An illustrative example of the dataset is provided in [`data/datasets/audiocaption/`](data/datasets/audiocaption/).
+
 ```
 wget https://huggingface.co/datasets/amaai-lab/MidiCaps/resolve/main/train.json
 wget https://huggingface.co/datasets/amaai-lab/MidiCaps/resolve/main/midicaps.tar.gz

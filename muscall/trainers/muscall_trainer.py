@@ -118,6 +118,8 @@ class MusCALLTrainer(BaseTrainer):
             random_val_subset,
             batch_size=self.batch_size,
         )
+
+        """
         retrieval_metrics_midi_audio = run_retrieval(
             model=self.model,
             data_loader=val_subset_loader,
@@ -125,6 +127,7 @@ class MusCALLTrainer(BaseTrainer):
             retrieval_type="midi_audio"
         )
         print(f"midi_audio: {retrieval_metrics_midi_audio}")
+        """
 
         retrieval_metrics_midi_text = run_retrieval(
             model=self.model,
@@ -134,7 +137,8 @@ class MusCALLTrainer(BaseTrainer):
         )
         print(f"midi_text: {retrieval_metrics_midi_text}")
 
-        retrieval_metrics = (retrieval_metrics_midi_audio["R@10"].item()+retrieval_metrics_midi_text["R@10"].item()) / 2
+        #retrieval_metrics = (retrieval_metrics_midi_audio["R@10"].item()+retrieval_metrics_midi_text["R@10"].item()) / 2
+        retrieval_metrics = retrieval_metrics_midi_text["R@10"].item()
 
         return retrieval_metrics
 

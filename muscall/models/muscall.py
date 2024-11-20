@@ -91,10 +91,10 @@ class MusCALL(nn.Module):
             param.requires_grad = False
 
         self.projection_dim = config.projection_dim # 最終的な共通のエンベディングの512次元
-        self.audio_dim = config.clap.audio_hidden_size
+        #self.audio_dim = config.clap.audio_hidden_size
         self.text_dim = config.clap.text_hidden_size
 
-        self.audio_projection = nn.Linear(self.audio_dim, self.projection_dim, bias=False) # audio_dimをprojection_dimへ線形変換
+        #self.audio_projection = nn.Linear(self.audio_dim, self.projection_dim, bias=False) # audio_dimをprojection_dimへ線形変換
         self.text_projection = nn.Linear(self.text_dim, self.projection_dim, bias=False)
         self.midi_projection = nn.Linear(self.midi_dim, self.projection_dim, bias=False)
 
@@ -182,13 +182,13 @@ class MusCALL(nn.Module):
     ):
 
         # 音声とテキストとmidiの特徴をそれぞれエンコード
-        audio_features = self.encode_audio(audio)
+        #audio_features = self.encode_audio(audio)
         text_features = self.encode_text(text, text_mask)
         midi_features = self.encode_midi(midi, first_input_midi_shape)
 
         # normalise features（各特徴ベクトルをそのノルムで割ることで、単位ベクトルに変換）
         epsilon = 1e-6
-        audio_features = audio_features / (audio_features.norm(dim=-1, keepdim=True) + epsilon)
+        #audio_features = audio_features / (audio_features.norm(dim=-1, keepdim=True) + epsilon)
         text_features = text_features / (text_features.norm(dim=-1, keepdim=True) + epsilon)
         midi_features = midi_features / (midi_features.norm(dim=-1, keepdim=True) + epsilon)
 
@@ -202,12 +202,12 @@ class MusCALL(nn.Module):
 
         logits_per_midi_text = logit_scale * midi_features @ text_features.t()
         logits_per_text_midi = logits_per_midi_text.t()
-        logits_per_midi_audio = logit_scale * midi_features @ audio_features.t()
-        logits_per_audio_midi = logits_per_midi_audio.t()
+        #logits_per_midi_audio = logit_scale * midi_features @ audio_features.t()
+        #logits_per_audio_midi = logits_per_midi_audio.t()
 
         # マルチモーダル損失を計算
         if return_loss:
-            loss = clip_loss(logits_per_text_midi) + clip_loss(logits_per_audio_midi)
+            loss = clip_loss(logits_per_text_midi) #+ clip_loss(logits_per_audio_midi)
             print(f"loss: {loss}")
             return loss
 

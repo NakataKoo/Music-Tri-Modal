@@ -12,13 +12,7 @@ import librosa
 
 class AudioCaptionMidiDataset(Dataset):
     def __init__(self, config, tokenizer=None, dataset_type="train", midi_dic=None):
-        """Constructs an AudioCaptionMidiDataset dataset.
 
-        Args:
-        - config: (dict-like object) dataset config
-        - tokenizer: (tokenizer object) default is BertTokenizer from transformers library
-        - dataset_type: (String) "train", "test" or "val"
-        """
         super().__init__()
         if config is None:
             config = {}
@@ -29,9 +23,8 @@ class AudioCaptionMidiDataset(Dataset):
 
         self.CP = CP(dict=midi_dic)
 
-        self.dataset_json = os.path.join(
-            self._data_dir, "dataset_{}.json".format(self._dataset_type)
-        ) # データセットのJSONファイル(root/data/dataset/○○/dataset_○○.json)のパス
+        # データセットのJSONファイル(root/data/dataset/○○/dataset_○○.json)のパス
+        self.dataset_json = os.path.join(self._data_dir, "dataset_{}.json".format(self._dataset_type))
 
         # audiocaption.yamlの内容
         self.sample_rate = self.config.audio.sr # サンプリングレート
@@ -46,21 +39,18 @@ class AudioCaptionMidiDataset(Dataset):
     def _load(self):
         with open(self.dataset_json) as f:
             self.samples = json.load(f) # jsonをPythonオブジェクトとして読み込み
-            self.audio_dir = os.path.join(self._data_dir, "audio") # ${env.data_root}/datasets/${dataset_config.dataset_name}/audio
-            self.midi_dir = os.path.join(self._data_dir, "midi") # ${env.data_root}/datasets/${dataset_config.dataset_name}/midi
+            #self.audio_dir = os.path.join(self._data_dir, "audio") # ${env.data_root}/datasets/${dataset_config.dataset_name}/audio
+            #self.midi_dir = os.path.join(self._data_dir, "midi") # ${env.data_root}/datasets/${dataset_config.dataset_name}/midi
 
             self.audio_ids = [i["audio_id"] for i in self.samples]
             self.captions = [i["caption"].strip() for i in self.samples]
-            self.audio_paths = [os.path.join(
-                self.audio_dir, i["audio_path"]+".npy") for i in self.samples]
-            self.midi_dir_paths = [os.path.join(self.midi_dir, os.path.splitext(i["audio_path"])[0].replace('lmd_matched_mp3', 'audio2midi')) for i in self.samples]
+            # self.audio_paths = [os.path.join(self.audio_dir, i["audio_path"]) for i in self.samples]
+            self.midi_dir_paths = [os.path.join(self._data_dir, os.path.splitext(i["audio_path"])[0].replace(".mid", ".npy")) for i in self.samples]
 
     def get_raw_caption(self, idx):
         """Get raw caption text"""
-
         return self.captions[idx]
 
-    # 改良（音声データを読み込み、クロップ）
     def get_audio(self, idx):
 
         audio = np.load(self.audio_paths[idx])
@@ -119,15 +109,16 @@ class AudioCaptionMidiDataset(Dataset):
         
         len(all_words)が1曲分のエンベディング平均化時の「分母」となる
         '''
-        all_words = np.load(self.midi_dir_paths[idx]+".npy")
+        all_words = np.load(self.midi_dir_paths[idx])
         all_words = torch.from_numpy(all_words.astype(np.float32)).clone()
         all_words, first_input_midi_shape = self.midi_padding(all_words, idx)
         return all_words, first_input_midi_shape
 
     def __getitem__(self, idx):
-        audio_id = torch.tensor(self.audio_ids[idx], dtype=torch.long) # audio_idsは"audio_id"リスト
+        audio_id = torch.tensor(self.audio_ids[idx], dtype=torch.long) # "audio_id"
 
-        input_audio = self.get_audio(idx) # 音声データを取得
+        #input_audio = self.get_audio(idx) # 音声データを取得
+        input_audio = "" # 音声データを使わない
         input_text = self.get_raw_caption(idx) # キャプションを取得
         input_midi, first_input_midi_shape = self.get_midi(idx) # midiデータを取得
 
