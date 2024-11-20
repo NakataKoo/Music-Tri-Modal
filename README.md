@@ -59,7 +59,7 @@ dataset_name
 
 An illustrative example of the dataset is provided in [`data/datasets/audiocaption/`](data/datasets/audiocaption/).
 
-### Midi-Audio Data prepare
+### MIDI-Audio Data prepare
 ```
 cd /Music-Tri-Modal/data/datasets/audiocaptionmidi/
 
@@ -73,6 +73,56 @@ tar -zxvf lmd_aligned.tar.gz
 cd audio
 wget http://hog.ee.columbia.edu/craffel/lmd/lmd_matched_mp3.tar.gz
 tar -xzvf lmd_matched_mp3.tar.gz
+```
+
+### MIDI-Text Data prepare
+```
+wget https://huggingface.co/datasets/amaai-lab/MidiCaps/resolve/main/train.json
+wget https://huggingface.co/datasets/amaai-lab/MidiCaps/resolve/main/midicaps.tar.gz
+tar -zxvf midicaps.tar.gz
+```
+
+```python
+import json
+import os
+import pandas as pd
+
+with open("train.json", 'r', encoding='utf-8') as file:
+    data = file.readlines()
+
+midi_files = []
+for i in range(len(data)):
+    midi_files.append(json.loads(data[i])["location"])
+
+captions = []
+for i, midi_file in enumerate(midi_files):
+    if os.path.exists(midi_file):
+        captions.append(json.loads(data[i])["caption"])
+    else:
+        continue
+
+# データフレームの作成
+df = pd.DataFrame({
+    'midi_file': midi_files,
+    'caption': captions
+})
+
+# JSON形式の変換処理
+json_data = []
+for index, row in df.iterrows():
+    json_data.append({
+        "audio_id": index,  # 自然数の昇順
+        "caption": row['caption'],  # CSVのcaption列
+        "audio_path": row['midi_file']  # CSVのmidi_file列
+    })
+
+# JSONデータをファイルに保存
+json_file_path = 'dataset_all.json'  # 出力するJSONファイルのパス
+with open(json_file_path, 'w', encoding='utf-8') as f:
+    json.dump(json_data, f, ensure_ascii=False, indent=4)
+
+print(f"JSONデータが{json_file_path}に保存されました。")
+
 ```
 
 ## Training
