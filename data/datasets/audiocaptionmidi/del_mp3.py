@@ -537,6 +537,7 @@ file_paths = file_paths+["/home/Nakata/Music-Tri-Modal/data/datasets/audiocaptio
 
 # ファイルが存在するか確認し、存在すれば削除する
 for file_path in file_paths:
+    file_path = file_path.replace(".mp3", ".npy")
     if os.path.exists(file_path):
         os.remove(file_path)
         print(f"{file_path} を削除しました。")

@@ -17,6 +17,7 @@ def save_audio_as_npy(audio_path):
         audio, sr = librosa.load(audio_path, sr=sample_rate, mono=True, duration=duration, offset=0.1)
         audio = audio.reshape(1, -1)
 
+        """
         num_samples = sample_rate * duration
 
         # 短い音声に対しパディング
@@ -32,7 +33,7 @@ def save_audio_as_npy(audio_path):
         clipped_audio = np.clip(audio[0], -1.0, 1.0)
         clipped_audio = 2 * (clipped_audio - np.min(clipped_audio)) / (np.max(clipped_audio) - np.min(clipped_audio)) - 1
         audio = np.array([clipped_audio])
-        
+        """
         # npyファイルとして保存
         np.save(npy_file_path, audio)
         

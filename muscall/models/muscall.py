@@ -40,7 +40,9 @@ class MusCALL(nn.Module):
                                     hidden_size=768,
                                     num_hidden_layers = 6,
                                     attn_implementation="eager",
-                                    vocab_size = 800
+                                    vocab_size = 800,
+                                    hidden_dropout_prob=0.3,
+                                    attention_probs_dropout_prob=0.3,
             )
             self.midi_dim = configuration.hidden_size
         elif config.midi.model_name == 'albert':

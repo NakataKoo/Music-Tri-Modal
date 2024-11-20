@@ -18,7 +18,7 @@ training:
       lr: 5e-5
       eps: 1e-6
       betas: [0.9, 0.98]
-      weight_decay: 0.2
+      weight_decay: 0.3
   
   # Whether to use mixed precision training instead of full precision (FP32)
   amp: false

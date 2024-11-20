@@ -4,7 +4,7 @@ dataset_config:
   # Caption configs
   text:
   audio:
-    sr: 48000
+    sr: 16000
     crop_length: 45 # 曲の長さ（秒）
     offset: 0.1
     random_crop: true

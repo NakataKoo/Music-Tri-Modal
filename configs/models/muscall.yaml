@@ -1,6 +1,6 @@
 model_config: 
   model_name: muscall
-  projection_dim: 512             # dimensionality of the multimodal projection layer
+  projection_dim: 512 # dimensionality of the multimodal projection layer
   temperature: null
   clap:
     clap_ckpt: /home/Nakata/Music-Tri-Modal/ckpt/music_audioset_epoch_15_esc_90.14.pt
@@ -9,6 +9,6 @@ model_config:
   midi:
     midi_dic: /home/Nakata/Music-Tri-Modal/muscall/modules/MidiBERT/CP.pkl
     load_ckpt: True
-    ckpt: /home/Nakata/Music-Tri-Modal/ckpt/model_best_bert_HL6_loss03.ckpt
-    model_name: 'bert' # 'bert', 'albert', 'distilbert'  ALBERTだとRuntimeError: CUDA driver error: invalid argument発声
-  loss: clip                      # one of [clip, weighted_clip]
+    ckpt: /home/Nakata/Music-Tri-Modal/ckpt/model_best_distilbert_loss03.ckpt
+    model_name: 'distilbert' # 'bert', 'albert', 'distilbert'  ALBERTだとRuntimeError: CUDA driver error: invalid argument発声
+  loss: clip # one of [clip, weighted_clip]

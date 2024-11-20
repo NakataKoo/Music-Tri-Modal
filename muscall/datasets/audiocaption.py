@@ -65,7 +65,7 @@ class AudioCaptionMidiDataset(Dataset):
 
         audio = np.load(self.audio_paths[idx])
 
-        """
+        
         # 短い音声に対しパディング
         if audio.shape[1] < self.num_samples:
             x = self.num_samples - audio.shape[1]
@@ -79,7 +79,7 @@ class AudioCaptionMidiDataset(Dataset):
         clipped_audio = np.clip(audio[0], -1.0, 1.0)
         clipped_audio = 2 * (clipped_audio - np.min(clipped_audio)) / (np.max(clipped_audio) - np.min(clipped_audio)) - 1
         audio = np.array([clipped_audio])
-        """
+        
         audio = torch.from_numpy(audio.astype(np.float32)).clone()
         return audio
     
