@@ -109,7 +109,7 @@ class AudioCaptionMidiDataset(Dataset):
         
         len(all_words)が1曲分のエンベディング平均化時の「分母」となる
         '''
-        all_words = np.load(self.midi_dir_paths[idx])
+        all_words = np.load(self.midi_dir_paths[idx]+".npy")
         all_words = torch.from_numpy(all_words.astype(np.float32)).clone()
         all_words, first_input_midi_shape = self.midi_padding(all_words, idx)
         return all_words, first_input_midi_shape
