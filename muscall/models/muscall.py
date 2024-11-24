@@ -148,23 +148,13 @@ class MusCALL(nn.Module):
         embedding_midi = []
         for midi, midi_shape in zip(midi_batch, first_input_midi_shape):
 
-            # 元のmidiサイズに戻す
-            midi = midi[0:midi_shape]
-
             midi_features = self.midibert.forward(midi) # 最もGPUを消費
-            midi_features_all = torch.zeros(self.midi_dim, device=self.device)  # デバイス上で初期化
-            # トークンのベクトルを平均して、シーケンス全体のベクトルを生成
-            for i in range(len(midi)):
-                midi_features_all = midi_features_all + midi_features.last_hidden_state[i].mean(dim=0) # (batch_size, hidden_size)
-            midi_features_all = midi_features_all / len(midi)
+            midi_features_all = midi_features.last_hidden_state.mean(dim=1).mean(dim=0)
             
             # 同一のmidiのfeaturesで平均化
             midi_features_all = self.midi_projection(midi_features_all)
             embedding_midi.append(midi_features_all)
             
-            del midi_features_all
-            del midi
-
         embedding_midi = torch.stack(embedding_midi, dim=0) # torch.Tensorが入ったlistを二次元のTensorに変換
         return embedding_midi
 

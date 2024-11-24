@@ -49,7 +49,7 @@ def get_muscall_features(model, data_loader, device):
         text_features = text_features / text_features.norm(dim=-1, keepdim=True)
         midi_features = midi_features / midi_features.norm(dim=-1, keepdim=True)
 
-        samples_in_current_batch = input_audio.size(0)
+        samples_in_current_batch = input_text.size(0)
         start_index = i * samples_in_previous_batch
         end_index = start_index + samples_in_current_batch
         samples_in_previous_batch = samples_in_current_batch
