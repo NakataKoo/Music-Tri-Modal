@@ -33,7 +33,7 @@ training:
     # Whether the monitored criteria should be minimized for early stopping
     minimize: true
 
-  track_retrieval_metrics: true
+  track_retrieval_metrics: false
 
 # Environment configuration
 env:
