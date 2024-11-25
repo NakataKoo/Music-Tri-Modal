@@ -103,14 +103,14 @@ def compute_metrics(retrieved_indices, gt_indices):
 
     return retrieval_metrics
 
-def run_retrieval(model, data_loader, device, retrieval_type="midi_audio"):
+def run_retrieval(model, data_loader, device, retrieval_type="midi_text"):
     """Wrapper function to run all steps for text-audio/audio-text retrieval"""
-    audio_features, text_features, midi_features = get_muscall_features(
+    text_features, midi_features = get_muscall_features(
         model, data_loader, device)
     
-    if retrieval_type == "midi_audio":
-        score_matrix = compute_sim_score(midi_features, audio_features)
-    elif retrieval_type == "midi_text":
+    #if retrieval_type == "midi_audio":
+    #    score_matrix = compute_sim_score(midi_features, audio_features)
+    if retrieval_type == "midi_text":
         score_matrix = compute_sim_score(midi_features, text_features)
 
     retrieved_indices, gt_indices = get_ranking(score_matrix, device)
@@ -158,6 +158,10 @@ class Retrieval:
         self.model.eval()
 
     def evaluate(self):
+
+        """
+        MAESTROデータセットでのMIDI-Audioの検索タスクの実装追加
+        """
         retrieval_metrics_midi_audio = run_retrieval(
             self.model, 
             self.data_loader, 
