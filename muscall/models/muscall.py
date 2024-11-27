@@ -106,8 +106,7 @@ class MusCALL(nn.Module):
         """
         audio: batchで来る, torch.Tensor型
         """
-        
-        """
+
         audio_features = []
         for data in audio:
             
@@ -120,25 +119,9 @@ class MusCALL(nn.Module):
             
             # デバイスに移動
             audio_feature = audio_feature.to(self.device)
-            audio_feature = self.audio_projection(audio_feature) # 最終的な共通のエンベディングの次元に変換
+            #audio_feature = self.audio_projection(audio_feature) # 最終的な共通のエンベディングの次元に変換
             audio_features.append(audio_feature)
         audio_features = torch.cat(audio_features, dim=0)
-        """
-        audio_features = []
-        for data in audio:
-            
-            data = torch.nan_to_num(data, nan=0.0) # nanを0に変換
-            audio_feature = self.clap.get_audio_embedding_from_data(data, use_tensor=True) # 音声エンベディングを抽出
-            
-            # numpy.ndarray から torch.Tensor に変換
-            if isinstance(audio_feature, np.ndarray):
-                audio_feature = torch.from_numpy(audio_feature.astype(np.float32)).clone()
-            
-            # デバイスに移動
-            audio_feature = audio_feature.to(self.device)
-            audio_features.append(audio_feature)
-        audio_features = torch.cat(audio_features, dim=0)
-        return audio_features
 
     @torch.no_grad()
     def encode_text(self, text, text_mask):
