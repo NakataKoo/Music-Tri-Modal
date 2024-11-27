@@ -8,7 +8,7 @@ training:
 
   dataloader:
     batch_size: 12
-    num_workers: 0
+    num_workers: 4
     shuffle: True
     pin_memory: True # TrueかつマルチGPUだとNCCLエラー(共有メモリ不足)が発生
   
