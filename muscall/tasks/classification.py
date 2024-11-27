@@ -5,16 +5,17 @@ from sklearn import metrics
 import torch
 from torch.utils.data import DataLoader
 from muscall.models.muscall import MusCALL
-from muscall.datasets.pianist8 import Pianist8
 from sklearn.preprocessing import LabelEncoder
 
 def prepare_labels(labels, prompt=None):
     text_prompts = []
     for i, label in enumerate(labels):
-        if prompt is None:
-            text_to_tokenize = label
+        if prompt == "pianist8":
+            text_to_tokenize = "This piece of music is composed by {}.".format(label)
+        elif prompt == "vgmidi":
+            text_to_tokenize = "This piece of music is composed by {}.".format(label)
         else:
-            text_to_tokenize = "A {} track".format(label)
+            text_to_tokenize = label
         text_prompts.append(text_to_tokenize)
     return text_prompts
 
@@ -31,6 +32,8 @@ def encode_labels(labels, dataset_name):
     labels_new = []
     if dataset_name == "pianist8":
         tags = ["Bethel", "Clayderman", "Einaudi", "Hancock","Hillsong", "Hisaishi", "Ryuichi", "Yiruma"]
+    elif dataset_name == "vgmidi":
+        tags = ["Joy", "Anger", "Sadness", "Calmness"]
     for l in labels:
         labels_new.append(tags.index(l))
     return torch.tensor(labels_new)
@@ -98,9 +101,13 @@ class Zeroshot:
         data_root = os.path.join(self.muscall_config.env.data_root, "datasets", self.dataset_name)
 
         if self.dataset_name == "pianist8":
-            # バッチサイズ6で行う
+            from muscall.datasets.pianist8 import Pianist8
             test_dataset = Pianist8(config=self.muscall_config, dataset_type="test", midi_dic=self.muscall_config.model_config.midi.midi_dic, data_root=data_root)
             self.tags = ["Bethel", "Clayderman", "Einaudi", "Hancock","Hillsong", "Hisaishi", "Ryuichi", "Yiruma"]
+        elif self.dataset_name == "vgmidi":
+            from muscall.datasets.vgmidi import VGMIDI
+            test_dataset = VGMIDI(config=self.muscall_config, dataset_type="test", midi_dic=self.muscall_config.model_config.midi.midi_dic, data_root=data_root)
+            self.tags = ["Joy", "Anger", "Sadness", "Calmness"]
         self.test_loader = DataLoader(dataset=test_dataset, batch_size=1)
 
     def build_model(self):
@@ -111,7 +118,7 @@ class Zeroshot:
         self.model.eval()
 
     def evaluate(self):
-        text_prompts = prepare_labels(labels=self.tags)
+        text_prompts = prepare_labels(labels=self.tags, prompt=self.dataset_name)
         score_matrix, ground_truth = compute_muscall_similarity_score(self.model, self.test_loader, self.device, text_prompts=text_prompts, dataset_name=self.dataset_name)
         metrics = get_metrics(score_matrix.cpu(), ground_truth.cpu(), self.dataset_name)
         print(metrics)

@@ -8,7 +8,7 @@ from torch.utils.data.dataset import Dataset
 from muscall.datasets.model import CP
 import glob
 
-class Pianist8(Dataset):
+class VGMIDI(Dataset):
     def __init__(self, config, dataset_type="test", midi_dic=None, data_root=None):
         super().__init__()
         if config is None:
@@ -23,7 +23,7 @@ class Pianist8(Dataset):
         self.dataset_json = os.path.join(self._data_dir, "dataset_{}.json".format(self._dataset_type))
 
         # audiocaption.yamlの内容
-        self.midi_size = self.config.dataset_config.midi.size_dim0 # input_midiのtorch.Size([x, 512, 4])におけるxのサイズ
+        self.midi_size = 8 # input_midiのtorch.Size([x, 512, 4])におけるxのサイズ
         self._load()
 
     # JSONファイルからデータを読み込み、音声ID、キャプション、音声パス、midiパスをリストに格納
@@ -41,11 +41,6 @@ class Pianist8(Dataset):
     
     @torch.no_grad()
     def midi_padding(self, input_midi, idx):
-        """
-        input_midi: (midi_size, 512, 4)
-        512 → max token
-        4 → Bar, Position, Pitch, Duration
-        """
 
         first_input_midi_shape = input_midi.shape[0]
         if input_midi.shape == torch.Size([0]):
@@ -54,8 +49,6 @@ class Pianist8(Dataset):
         # パディング
         if input_midi.shape[0] < self.midi_size:
             x = self.midi_size - input_midi.shape[0]
-            # 最初の次元にパディングを追加する
-            # (0, 0) は 512 と 4 次元にはパディングを追加しないことを意味します
             input_midi = torch.nn.functional.pad(input_midi, (0, 0, 0, 0, 0, x))
 
         # クロップ
@@ -72,6 +65,7 @@ class Pianist8(Dataset):
         return all_words, first_input_midi_shape
 
     def __getitem__(self, idx):
+
         label = self.get_label(idx) # クラスラベルを取得
         input_midi, first_input_midi_shape = self.get_midi(idx) # midiデータを取得
         idx = torch.tensor(idx)
@@ -87,4 +81,4 @@ class Pianist8(Dataset):
 
     @classmethod
     def num_classes(cls):
-        return 8
+        return 4

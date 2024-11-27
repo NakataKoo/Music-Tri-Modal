@@ -1,0 +1,1022 @@
+[
+    {
+        "audio_id": 8013,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Banjo-Kazooie_N64_Banjo-Kazooie_Boggys Igloo Happy_0.mid"
+    },
+    {
+        "audio_id": 8073,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/Banjo-Kazooie_N64_Banjo-Kazooie_Boggys Igloo Sad_0.mid"
+    },
+    {
+        "audio_id": 8029,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Banjo-Kazooie_N64_Banjo-Kazooie_Bubblegloop Swamp_0.mid"
+    },
+    {
+        "audio_id": 8022,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Banjo-Kazooie_N64_Banjo-Kazooie_Click Clock Wood_0.mid"
+    },
+    {
+        "audio_id": 8066,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/Banjo-Kazooie_N64_Banjo-Kazooie_Ending_0.mid"
+    },
+    {
+        "audio_id": 8079,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Banjo-Kazooie_N64_Banjo-Kazooie_Freezeezy Peak_0.mid"
+    },
+    {
+        "audio_id": 8091,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Banjo-Kazooie_N64_Banjo-Kazooie_Gobis Valley_0.mid"
+    },
+    {
+        "audio_id": 8093,
+        "class": "Anger",
+        "midi_file": "labelled/phrases/Banjo-Kazooie_N64_Banjo-Kazooie_Mad Monster Mansion_0.mid"
+    },
+    {
+        "audio_id": 8019,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Banjo-Kazooie_N64_Banjo-Kazooie_Motzhand_0.mid"
+    },
+    {
+        "audio_id": 8051,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Banjo-Kazooie_N64_Banjo-Kazooie_Mumbos Mountain_0.mid"
+    },
+    {
+        "audio_id": 8129,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Banjo-Kazooie_N64_Banjo-Kazooie_Rusty Bucket Bay Aquatic_0.mid"
+    },
+    {
+        "audio_id": 8170,
+        "class": "Anger",
+        "midi_file": "labelled/phrases/Banjo-Kazooie_N64_Banjo-Tooie_Cauldron Keep_0.mid"
+    },
+    {
+        "audio_id": 8099,
+        "class": "Anger",
+        "midi_file": "labelled/phrases/Banjo-Kazooie_N64_Banjo-Tooie_Chilly Willy Chilli Billi_0.mid"
+    },
+    {
+        "audio_id": 8172,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Banjo-Kazooie_N64_Banjo-Tooie_End Credits_0.mid"
+    },
+    {
+        "audio_id": 8112,
+        "class": "Anger",
+        "midi_file": "labelled/phrases/Banjo-Kazooie_N64_Banjo-Tooie_Here Comes Trouble_0.mid"
+    },
+    {
+        "audio_id": 8198,
+        "class": "Sadness",
+        "midi_file": "labelled/phrases/Banjo-Kazooie_N64_Banjo-Tooie_Isle O Hags Cauldron Keep_0.mid"
+    },
+    {
+        "audio_id": 8150,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Banjo-Kazooie_N64_Banjo-Tooie_Isle O Hags_0.mid"
+    },
+    {
+        "audio_id": 8102,
+        "class": "Sadness",
+        "midi_file": "labelled/phrases/Banjo-Kazooie_N64_Banjo-Tooie_Spiral Mountain_0.mid"
+    },
+    {
+        "audio_id": 8108,
+        "class": "Anger",
+        "midi_file": "labelled/phrases/Banjo-Kazooie_N64_Banjo-Tooie_Terry_0.mid"
+    },
+    {
+        "audio_id": 8182,
+        "class": "Sadness",
+        "midi_file": "labelled/phrases/Banjo-Kazooie_N64_Banjo-Tooie_Witchy World_0.mid"
+    },
+    {
+        "audio_id": 8137,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Battle of Olympus_NES_Battle of Olympus_3 Magic Hearts_0.mid"
+    },
+    {
+        "audio_id": 8106,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Battle of Olympus_NES_Battle of Olympus_A Brave Warrior_0.mid"
+    },
+    {
+        "audio_id": 8105,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Battle of Olympus_NES_Battle of Olympus_A Prayer to Zeus_0.mid"
+    },
+    {
+        "audio_id": 8194,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Battle of Olympus_NES_Battle of Olympus_Athene Sonata_0.mid"
+    },
+    {
+        "audio_id": 8189,
+        "class": "Sadness",
+        "midi_file": "labelled/phrases/Battle of Olympus_NES_Battle of Olympus_Olympus No Tatakai_0.mid"
+    },
+    {
+        "audio_id": 8189,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/Battle of Olympus_NES_Battle of Olympus_Olympus No Tatakai_1.mid"
+    },
+    {
+        "audio_id": 8097,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/Battle of Olympus_NES_Battle of Olympus_Orpheus Journey Arranged_0.mid"
+    },
+    {
+        "audio_id": 8180,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/Battle of Olympus_NES_Battle of Olympus_The Story of a Lost Love_0.mid"
+    },
+    {
+        "audio_id": 8155,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/Chrono_SNES_Chrono Trigger_600 AD_0.mid"
+    },
+    {
+        "audio_id": 8178,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Chrono_SNES_Chrono Trigger_Chrono Trigger_0.mid"
+    },
+    {
+        "audio_id": 8168,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/Chrono_SNES_Chrono Trigger_Corridors of Time_0.mid"
+    },
+    {
+        "audio_id": 8195,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Chrono_SNES_Chrono Trigger_Maguss Theme_0.mid"
+    },
+    {
+        "audio_id": 8136,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Chrono_SNES_Chrono Trigger_Millenial Fair_0.mid"
+    },
+    {
+        "audio_id": 8175,
+        "class": "Anger",
+        "midi_file": "labelled/phrases/Chrono_SNES_Chrono Trigger_Ocean Palace_0.mid"
+    },
+    {
+        "audio_id": 8100,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/Chrono_SNES_Chrono Trigger_Secret of the Forest_0.mid"
+    },
+    {
+        "audio_id": 8160,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Chrono_SNES_Chrono Trigger_Silent Light_0.mid"
+    },
+    {
+        "audio_id": 8148,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/Chrono_SNES_Chrono Trigger_Wings That Cross Time_0.mid"
+    },
+    {
+        "audio_id": 8069,
+        "class": "Sadness",
+        "midi_file": "labelled/phrases/Donkey Kong_SNES_Donkey Kong Country 2 Diddy's Kong Quest_Bayou Boogie_0.mid"
+    },
+    {
+        "audio_id": 8081,
+        "class": "Anger",
+        "midi_file": "labelled/phrases/Donkey Kong_SNES_Donkey Kong Country 2 Diddy's Kong Quest_Hot Head Bop_0.mid"
+    },
+    {
+        "audio_id": 8086,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Donkey Kong_SNES_Donkey Kong Country 2 Diddy's Kong Quest_Jib Jig_0.mid"
+    },
+    {
+        "audio_id": 8083,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Donkey Kong_SNES_Donkey Kong Country 2 Diddy's Kong Quest_Snakey Chantey_0.mid"
+    },
+    {
+        "audio_id": 8115,
+        "class": "Anger",
+        "midi_file": "labelled/phrases/Dragon Quest_NES_Dragon Quest_Battle Theme_0.mid"
+    },
+    {
+        "audio_id": 8095,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/Dragon Quest_NES_Dragon Quest_Castle Theme_0.mid"
+    },
+    {
+        "audio_id": 8161,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Dragon Quest_NES_Dragon Quest_Cave Theme_0.mid"
+    },
+    {
+        "audio_id": 8141,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Dragon Quest_NES_Dragon Quest_Final Battle_0.mid"
+    },
+    {
+        "audio_id": 8192,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/Dragon Quest_NES_Dragon Quest_Overworld Theme_0.mid"
+    },
+    {
+        "audio_id": 8188,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Dragon Quest_NES_Dragon Quest_Title Screen_0.mid"
+    },
+    {
+        "audio_id": 8151,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Dragon Quest_NES_Dragon Quest_Town Theme_0.mid"
+    },
+    {
+        "audio_id": 8043,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Final Fantasy_PS1_Final Fantasy VII_A High Wind Takes to the Skies_0.mid"
+    },
+    {
+        "audio_id": 8037,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/Final Fantasy_PS1_Final Fantasy VII_Aeriths Theme_0.mid"
+    },
+    {
+        "audio_id": 8190,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Final Fantasy_PS1_Final Fantasy VII_Ahead On Our Way Remix_0.mid"
+    },
+    {
+        "audio_id": 8077,
+        "class": "Sadness",
+        "midi_file": "labelled/phrases/Final Fantasy_PS1_Final Fantasy VII_Anxious Heart_0.mid"
+    },
+    {
+        "audio_id": 8008,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Final Fantasy_PS1_Final Fantasy VII_Battle Theme_0.mid"
+    },
+    {
+        "audio_id": 8113,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Final Fantasy_PS1_Final Fantasy VII_Cait Siths Theme_0.mid"
+    },
+    {
+        "audio_id": 8044,
+        "class": "Sadness",
+        "midi_file": "labelled/phrases/Final Fantasy_PS1_Final Fantasy VII_Chasing The Black Caped Man_0.mid"
+    },
+    {
+        "audio_id": 8085,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Final Fantasy_PS1_Final Fantasy VII_Cinco de Chocobo_0.mid"
+    },
+    {
+        "audio_id": 8001,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/Final Fantasy_PS1_Final Fantasy VII_Continue_0.mid"
+    },
+    {
+        "audio_id": 8103,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Final Fantasy_PS1_Final Fantasy VII_Cosmo Canyon_0.mid"
+    },
+    {
+        "audio_id": 8045,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/Final Fantasy_PS1_Final Fantasy VII_Costa Del Sol_0.mid"
+    },
+    {
+        "audio_id": 8007,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Final Fantasy_PS1_Final Fantasy VII_Electric de Chocobo_0.mid"
+    },
+    {
+        "audio_id": 8082,
+        "class": "Anger",
+        "midi_file": "labelled/phrases/Final Fantasy_PS1_Final Fantasy VII_Fortress of the Condor_0.mid"
+    },
+    {
+        "audio_id": 8059,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Final Fantasy_PS1_Final Fantasy VII_Gold Saucer_0.mid"
+    },
+    {
+        "audio_id": 8092,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/Final Fantasy_PS1_Final Fantasy VII_Great Warrior_0.mid"
+    },
+    {
+        "audio_id": 8004,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/Final Fantasy_PS1_Final Fantasy VII_Holding My Thoughts in My Heart_0.mid"
+    },
+    {
+        "audio_id": 8048,
+        "class": "Anger",
+        "midi_file": "labelled/phrases/Final Fantasy_PS1_Final Fantasy VII_Its Difficult To Stand On Both Feet Isnt It_0.mid"
+    },
+    {
+        "audio_id": 8197,
+        "class": "Anger",
+        "midi_file": "labelled/phrases/Final Fantasy_PS1_Final Fantasy VII_JENOVA_0.mid"
+    },
+    {
+        "audio_id": 8030,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Final Fantasy_PS1_Final Fantasy VII_Jenova Absolute_0.mid"
+    },
+    {
+        "audio_id": 8063,
+        "class": "Sadness",
+        "midi_file": "labelled/phrases/Final Fantasy_PS1_Final Fantasy VII_Judgement Day_0.mid"
+    },
+    {
+        "audio_id": 8028,
+        "class": "Sadness",
+        "midi_file": "labelled/phrases/Final Fantasy_PS1_Final Fantasy VII_Life Stream_0.mid"
+    },
+    {
+        "audio_id": 8000,
+        "class": "Sadness",
+        "midi_file": "labelled/phrases/Final Fantasy_PS1_Final Fantasy VII_Lurking In The Darkness_0.mid"
+    },
+    {
+        "audio_id": 8006,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/Final Fantasy_PS1_Final Fantasy VII_Main Theme_0.mid"
+    },
+    {
+        "audio_id": 8039,
+        "class": "Sadness",
+        "midi_file": "labelled/phrases/Final Fantasy_PS1_Final Fantasy VII_Mark of the Traitor_0.mid"
+    },
+    {
+        "audio_id": 8036,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/Final Fantasy_PS1_Final Fantasy VII_Mining Town_0.mid"
+    },
+    {
+        "audio_id": 8017,
+        "class": "Sadness",
+        "midi_file": "labelled/phrases/Final Fantasy_PS1_Final Fantasy VII_On That Day 5 Years Ago_0.mid"
+    },
+    {
+        "audio_id": 8110,
+        "class": "Anger",
+        "midi_file": "labelled/phrases/Final Fantasy_PS1_Final Fantasy VII_One Winged Angel Reborn Arrangement_0.mid"
+    },
+    {
+        "audio_id": 8199,
+        "class": "Anger",
+        "midi_file": "labelled/phrases/Final Fantasy_PS1_Final Fantasy VII_One Winged Angel_0.mid"
+    },
+    {
+        "audio_id": 8002,
+        "class": "Anger",
+        "midi_file": "labelled/phrases/Final Fantasy_PS1_Final Fantasy VII_Oppressed People_0.mid"
+    },
+    {
+        "audio_id": 8072,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/Final Fantasy_PS1_Final Fantasy VII_Overworld_0.mid"
+    },
+    {
+        "audio_id": 8089,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Final Fantasy_PS1_Final Fantasy VII_Rufuss Welcoming Ceremony_0.mid"
+    },
+    {
+        "audio_id": 8026,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/Final Fantasy_PS1_Final Fantasy VII_Sandy Badlands_0.mid"
+    },
+    {
+        "audio_id": 8088,
+        "class": "Anger",
+        "midi_file": "labelled/phrases/Final Fantasy_PS1_Final Fantasy VII_The Nightmare Begins_0.mid"
+    },
+    {
+        "audio_id": 8055,
+        "class": "Anger",
+        "midi_file": "labelled/phrases/Final Fantasy_PS1_Final Fantasy VII_Those Chosen By the Planet_0.mid"
+    },
+    {
+        "audio_id": 8041,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/Final Fantasy_PS1_Final Fantasy VII_Tifa_0.mid"
+    },
+    {
+        "audio_id": 8025,
+        "class": "Sadness",
+        "midi_file": "labelled/phrases/Final Fantasy_PS1_Final Fantasy VII_Trail of Blood_0.mid"
+    },
+    {
+        "audio_id": 8056,
+        "class": "Anger",
+        "midi_file": "labelled/phrases/Final Fantasy_PS1_Final Fantasy VII_Vincents Theme_0.mid"
+    },
+    {
+        "audio_id": 8057,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Final Fantasy_PS1_Final Fantasy VII_Waltz de Chocobo_0.mid"
+    },
+    {
+        "audio_id": 8042,
+        "class": "Anger",
+        "midi_file": "labelled/phrases/Final Fantasy_PS1_Final Fantasy VII_Weapon Raid_0.mid"
+    },
+    {
+        "audio_id": 8054,
+        "class": "Sadness",
+        "midi_file": "labelled/phrases/Final Fantasy_PS1_Final Fantasy VII_Who Are You_0.mid"
+    },
+    {
+        "audio_id": 8185,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Indiana Jones_PC_Indiana Jones and the Fate of Atlantis_Crossing_0.mid"
+    },
+    {
+        "audio_id": 8122,
+        "class": "Sadness",
+        "midi_file": "labelled/phrases/Indiana Jones_PC_Indiana Jones and the Last Crusade_The Holy Grail_0.mid"
+    },
+    {
+        "audio_id": 8119,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Indiana Jones_PC_Indiana Jones and the Last Crusade_Venice_0.mid"
+    },
+    {
+        "audio_id": 8196,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Indiana Jones_PC_Indiana Jones and the Last Crusade_Zeppelin_0.mid"
+    },
+    {
+        "audio_id": 8132,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/Mana_SNES_Secret of Mana_A Wish_0.mid"
+    },
+    {
+        "audio_id": 8186,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/Mana_SNES_Secret of Mana_Close Your Eye lids_0.mid"
+    },
+    {
+        "audio_id": 8116,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Mana_SNES_Secret of Mana_Danger_0.mid"
+    },
+    {
+        "audio_id": 8162,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/Mana_SNES_Secret of Mana_Kind Memories_0.mid"
+    },
+    {
+        "audio_id": 8147,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Mana_SNES_Secret of Mana_Meridian Dance_0.mid"
+    },
+    {
+        "audio_id": 8142,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/Mana_SNES_Secret of Mana_Rose and Ghost_0.mid"
+    },
+    {
+        "audio_id": 8193,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/Mana_SNES_Secret of Mana_Spirit of the Night_0.mid"
+    },
+    {
+        "audio_id": 8131,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Mana_SNES_Secret of Mana_Tell A Strange Tale_0.mid"
+    },
+    {
+        "audio_id": 8111,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Mana_SNES_Secret of Mana_The Holy Intruder_0.mid"
+    },
+    {
+        "audio_id": 8016,
+        "class": "Sadness",
+        "midi_file": "labelled/phrases/Other_N64_GoldenEye 007_Caverns_0.mid"
+    },
+    {
+        "audio_id": 8016,
+        "class": "Anger",
+        "midi_file": "labelled/phrases/Other_N64_GoldenEye 007_Caverns_1.mid"
+    },
+    {
+        "audio_id": 8076,
+        "class": "Anger",
+        "midi_file": "labelled/phrases/Other_N64_GoldenEye 007_Dam_0.mid"
+    },
+    {
+        "audio_id": 8009,
+        "class": "Anger",
+        "midi_file": "labelled/phrases/Other_N64_GoldenEye 007_Facility X_0.mid"
+    },
+    {
+        "audio_id": 8071,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Other_N64_GoldenEye 007_Frigate_0.mid"
+    },
+    {
+        "audio_id": 8012,
+        "class": "Sadness",
+        "midi_file": "labelled/phrases/Other_N64_GoldenEye 007_Runway X_0.mid"
+    },
+    {
+        "audio_id": 8067,
+        "class": "Anger",
+        "midi_file": "labelled/phrases/Other_N64_GoldenEye 007_Runway_0.mid"
+    },
+    {
+        "audio_id": 8050,
+        "class": "Sadness",
+        "midi_file": "labelled/phrases/Other_N64_GoldenEye 007_Statue_0.mid"
+    },
+    {
+        "audio_id": 8153,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Other_NES_Ghosts 'n Goblins_Main Theme_0.mid"
+    },
+    {
+        "audio_id": 8021,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Other_NES_Tetris_Enter Your Name_0.mid"
+    },
+    {
+        "audio_id": 8061,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Other_NES_Tetris_Music A_0.mid"
+    },
+    {
+        "audio_id": 8121,
+        "class": "Anger",
+        "midi_file": "labelled/phrases/Other_PC_Age of Empires II The Age of Kings_Menu_0.mid"
+    },
+    {
+        "audio_id": 8104,
+        "class": "Anger",
+        "midi_file": "labelled/phrases/Other_PC_Age of Empires_Title Theme_0.mid"
+    },
+    {
+        "audio_id": 8174,
+        "class": "Sadness",
+        "midi_file": "labelled/phrases/Other_PC_Aion Tower of Eternity_Death Waltz_0.mid"
+    },
+    {
+        "audio_id": 8144,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/Other_PC_Aion Tower of Eternity_Fairy of the Peace_0.mid"
+    },
+    {
+        "audio_id": 8144,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Other_PC_Aion Tower of Eternity_Fairy of the Peace_1.mid"
+    },
+    {
+        "audio_id": 8144,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/Other_PC_Aion Tower of Eternity_Fairy of the Peace_2.mid"
+    },
+    {
+        "audio_id": 8130,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/Other_PC_Aion Tower of Eternity_Forgotten Sorrow_0.mid"
+    },
+    {
+        "audio_id": 8114,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Other_PC_Aion Tower of Eternity_Main Theme_0.mid"
+    },
+    {
+        "audio_id": 8143,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/Other_PC_Aion Tower of Eternity_Song of Moonlight_0.mid"
+    },
+    {
+        "audio_id": 8181,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/Other_PC_Aion Tower of Eternity_The Still Sad World_0.mid"
+    },
+    {
+        "audio_id": 8140,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/Other_PC_Aion Tower of Eternity_Wings of the Knight_0.mid"
+    },
+    {
+        "audio_id": 8145,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/Other_PC_The Sims_Bittersweet_0.mid"
+    },
+    {
+        "audio_id": 8146,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Other_PC_The Sims_Buying Theme_0.mid"
+    },
+    {
+        "audio_id": 8117,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/Other_PC_The Sims_New Beginnings_0.mid"
+    },
+    {
+        "audio_id": 8138,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Other_PC_The Sims_Since We Met_0.mid"
+    },
+    {
+        "audio_id": 8124,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/Other_PC_The Sims_The Neighbourhood_0.mid"
+    },
+    {
+        "audio_id": 8156,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/Other_PC_The Sims_The Simple Life_0.mid"
+    },
+    {
+        "audio_id": 8134,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/Other_PC_The Sims_Theme 4_0.mid"
+    },
+    {
+        "audio_id": 8165,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/Other_PC_The Sims_Theme 5_0.mid"
+    },
+    {
+        "audio_id": 8191,
+        "class": "Anger",
+        "midi_file": "labelled/phrases/Other_PC_Warcraft III Reign of Chaos_Blackrock and Roll_0.mid"
+    },
+    {
+        "audio_id": 8125,
+        "class": "Anger",
+        "midi_file": "labelled/phrases/Other_PC_Warcraft II_Human Theme 1_0.mid"
+    },
+    {
+        "audio_id": 8127,
+        "class": "Anger",
+        "midi_file": "labelled/phrases/Other_PC_Warcraft II_Orc Theme 1_0.mid"
+    },
+    {
+        "audio_id": 8139,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/Other_PC_World of Warcraft Warlords of Draenor_Song of Elune_0.mid"
+    },
+    {
+        "audio_id": 8118,
+        "class": "Anger",
+        "midi_file": "labelled/phrases/Other_PC_World of Warcraft Warlords of Draenor_Stormwind_0.mid"
+    },
+    {
+        "audio_id": 8159,
+        "class": "Sadness",
+        "midi_file": "labelled/phrases/Other_PC_World of Warcraft Wrath of the Lich King_Arthas my Son_0.mid"
+    },
+    {
+        "audio_id": 8090,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/Other_PS2_Shadow of the Colossus_Memories_0.mid"
+    },
+    {
+        "audio_id": 8052,
+        "class": "Sadness",
+        "midi_file": "labelled/phrases/Other_PS2_Shadow of the Colossus_Prayer_0.mid"
+    },
+    {
+        "audio_id": 8034,
+        "class": "Sadness",
+        "midi_file": "labelled/phrases/Other_PS2_Shadow of the Colossus_The Farthest Land_0.mid"
+    },
+    {
+        "audio_id": 8070,
+        "class": "Anger",
+        "midi_file": "labelled/phrases/Other_PS2_Shadow of the Colossus_The Opened Way_0.mid"
+    },
+    {
+        "audio_id": 8046,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/Other_PS2_Shadow of the Colossus_The Tale of the 16 Sacrifices_0.mid"
+    },
+    {
+        "audio_id": 8120,
+        "class": "Sadness",
+        "midi_file": "labelled/phrases/Star Fox_GCN_Star Fox Adventures_Dark Ice Mines_0.mid"
+    },
+    {
+        "audio_id": 8107,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Star Fox_SNES_Star Fox_Corneria_0.mid"
+    },
+    {
+        "audio_id": 8133,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Star Fox_SNES_Star Fox_Map_0.mid"
+    },
+    {
+        "audio_id": 8123,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/Star Fox_SNES_Star Fox_SpaceArmada_0.mid"
+    },
+    {
+        "audio_id": 8163,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Star Fox_SNES_Star Fox_Stage_Clear_0.mid"
+    },
+    {
+        "audio_id": 8096,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Star Fox_SNES_Star Fox_Venom_0.mid"
+    },
+    {
+        "audio_id": 8184,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Super Mario_N64_Super Mario 64_Cool Cool Mountain_0.mid"
+    },
+    {
+        "audio_id": 8179,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/Super Mario_N64_Super Mario 64_Dire Dire Docks_0.mid"
+    },
+    {
+        "audio_id": 8128,
+        "class": "Anger",
+        "midi_file": "labelled/phrases/Super Mario_N64_Super Mario 64_Final Bowser_0.mid"
+    },
+    {
+        "audio_id": 8169,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Super Mario_N64_Super Mario 64_Haunted Merry Go Round_0.mid"
+    },
+    {
+        "audio_id": 8035,
+        "class": "Anger",
+        "midi_file": "labelled/phrases/Super Mario_N64_Super Mario 64_Koopas Theme_0.mid"
+    },
+    {
+        "audio_id": 8164,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Super Mario_N64_Super Mario 64_Princess Secret Slide_0.mid"
+    },
+    {
+        "audio_id": 8074,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Super Mario_N64_Super Mario 64_Select a File_0.mid"
+    },
+    {
+        "audio_id": 8038,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Super Mario_NES_Super Mario Bros_Main Theme_0.mid"
+    },
+    {
+        "audio_id": 8078,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/Super Mario_NES_Super Mario Bros_Underwater_0.mid"
+    },
+    {
+        "audio_id": 8040,
+        "class": "Anger",
+        "midi_file": "labelled/phrases/Super Mario_NES_Super Mario Bros_Underworld_0.mid"
+    },
+    {
+        "audio_id": 8015,
+        "class": "Anger",
+        "midi_file": "labelled/phrases/Super Mario_SNES_Super Mario World_Castle_0.mid"
+    },
+    {
+        "audio_id": 8014,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/Super Mario_SNES_Super Mario World_Ending Theme_0.mid"
+    },
+    {
+        "audio_id": 8075,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Super Mario_SNES_Super Mario World_Forest of Illusion_0.mid"
+    },
+    {
+        "audio_id": 8049,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Super Mario_SNES_Super Mario World_Overworld 2_0.mid"
+    },
+    {
+        "audio_id": 8060,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Super Mario_SNES_Super Mario World_Overworld_0.mid"
+    },
+    {
+        "audio_id": 8024,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/Super Mario_SNES_Super Mario World_Title Screen_0.mid"
+    },
+    {
+        "audio_id": 8005,
+        "class": "Anger",
+        "midi_file": "labelled/phrases/The Legend of Zelda_N64_The Legend of Zelda Majora's Mask_Alien Invasion_0.mid"
+    },
+    {
+        "audio_id": 8080,
+        "class": "Anger",
+        "midi_file": "labelled/phrases/The Legend of Zelda_N64_The Legend of Zelda Majora's Mask_Chase Theme_0.mid"
+    },
+    {
+        "audio_id": 8062,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/The Legend of Zelda_N64_The Legend of Zelda Majora's Mask_Clock Town_0.mid"
+    },
+    {
+        "audio_id": 8068,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/The Legend of Zelda_N64_The Legend of Zelda Majora's Mask_Cremias Wagon Ride_0.mid"
+    },
+    {
+        "audio_id": 8003,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/The Legend of Zelda_N64_The Legend of Zelda Majora's Mask_Deku Palace_0.mid"
+    },
+    {
+        "audio_id": 8018,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/The Legend of Zelda_N64_The Legend of Zelda Majora's Mask_Song of Healing_0.mid"
+    },
+    {
+        "audio_id": 8094,
+        "class": "Sadness",
+        "midi_file": "labelled/phrases/The Legend of Zelda_N64_The Legend of Zelda Majora's Mask_Stone Temple Tower_0.mid"
+    },
+    {
+        "audio_id": 8053,
+        "class": "Anger",
+        "midi_file": "labelled/phrases/The Legend of Zelda_N64_The Legend of Zelda Majora's Mask_Stone Tower Temple Inverted_0.mid"
+    },
+    {
+        "audio_id": 8011,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/The Legend of Zelda_N64_The Legend of Zelda Majora's Mask_The Mayors Office_0.mid"
+    },
+    {
+        "audio_id": 8167,
+        "class": "Anger",
+        "midi_file": "labelled/phrases/The Legend of Zelda_N64_The Legend of Zelda Ocarina of Time_Forest Temple_0.mid"
+    },
+    {
+        "audio_id": 8010,
+        "class": "Sadness",
+        "midi_file": "labelled/phrases/The Legend of Zelda_N64_The Legend of Zelda Ocarina of Time_Ganondorf_0.mid"
+    },
+    {
+        "audio_id": 8027,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/The Legend of Zelda_N64_The Legend of Zelda Ocarina of Time_Gerudo Valley_0.mid"
+    },
+    {
+        "audio_id": 8065,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/The Legend of Zelda_N64_The Legend of Zelda Ocarina of Time_Goron City_0.mid"
+    },
+    {
+        "audio_id": 8126,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/The Legend of Zelda_N64_The Legend of Zelda Ocarina of Time_Hyrule Castle Courtyard_0.mid"
+    },
+    {
+        "audio_id": 8058,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/The Legend of Zelda_N64_The Legend of Zelda Ocarina of Time_Hyrule Castle Town_0.mid"
+    },
+    {
+        "audio_id": 8047,
+        "class": "Anger",
+        "midi_file": "labelled/phrases/The Legend of Zelda_N64_The Legend of Zelda Ocarina of Time_Inside Jabu Jabus Belly_0.mid"
+    },
+    {
+        "audio_id": 8087,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/The Legend of Zelda_N64_The Legend of Zelda Ocarina of Time_Introduction_0.mid"
+    },
+    {
+        "audio_id": 8157,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/The Legend of Zelda_N64_The Legend of Zelda Ocarina of Time_Kakariko Village_0.mid"
+    },
+    {
+        "audio_id": 8064,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/The Legend of Zelda_N64_The Legend of Zelda Ocarina of Time_Kokiri Forest_0.mid"
+    },
+    {
+        "audio_id": 8187,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/The Legend of Zelda_N64_The Legend of Zelda Ocarina of Time_Links House_0.mid"
+    },
+    {
+        "audio_id": 8084,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/The Legend of Zelda_N64_The Legend of Zelda Ocarina of Time_Lost Woods_0.mid"
+    },
+    {
+        "audio_id": 8166,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/The Legend of Zelda_N64_The Legend of Zelda Ocarina of Time_Medley of Time_0.mid"
+    },
+    {
+        "audio_id": 8023,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/The Legend of Zelda_N64_The Legend of Zelda Ocarina of Time_Owls Theme_0.mid"
+    },
+    {
+        "audio_id": 8033,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/The Legend of Zelda_N64_The Legend of Zelda Ocarina of Time_Prelude of Light_0.mid"
+    },
+    {
+        "audio_id": 8020,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/The Legend of Zelda_N64_The Legend of Zelda Ocarina of Time_Sarias Song_0.mid"
+    },
+    {
+        "audio_id": 8183,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/The Legend of Zelda_N64_The Legend of Zelda Ocarina of Time_Serenade of Water_0.mid"
+    },
+    {
+        "audio_id": 8158,
+        "class": "Joy",
+        "midi_file": "labelled/phrases/The Legend of Zelda_N64_The Legend of Zelda Ocarina of Time_Song of Storms_0.mid"
+    },
+    {
+        "audio_id": 8031,
+        "class": "Sadness",
+        "midi_file": "labelled/phrases/The Legend of Zelda_N64_The Legend of Zelda Ocarina of Time_Temple of Time_0.mid"
+    },
+    {
+        "audio_id": 8032,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/The Legend of Zelda_N64_The Legend of Zelda Ocarina of Time_Windmill Hut_0.mid"
+    },
+    {
+        "audio_id": 8171,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/The Legend of Zelda_N64_The Legend of Zelda Ocarina of Time_Zeldas Lullaby_0.mid"
+    },
+    {
+        "audio_id": 8098,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/Xeno_PS1_Xenogears_Bonds of Sea and Fire_0.mid"
+    },
+    {
+        "audio_id": 8109,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/Xeno_PS1_Xenogears_Gathering Stars In the Night Sky_0.mid"
+    },
+    {
+        "audio_id": 8154,
+        "class": "Anger",
+        "midi_file": "labelled/phrases/Xeno_PS1_Xenogears_Knight of Fire_0.mid"
+    },
+    {
+        "audio_id": 8176,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/Xeno_PS1_Xenogears_Lost Broken Shards_0.mid"
+    },
+    {
+        "audio_id": 8152,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/Xeno_PS1_Xenogears_Ship of Regret and Sleep_0.mid"
+    },
+    {
+        "audio_id": 8135,
+        "class": "Sadness",
+        "midi_file": "labelled/phrases/Xeno_PS1_Xenogears_Tears of the Stars Hearts of the People_0.mid"
+    },
+    {
+        "audio_id": 8101,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/Xeno_PS1_Xenogears_The Wounded Shall Advance Into the Light_0.mid"
+    },
+    {
+        "audio_id": 8177,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/Xeno_PS1_Xenogears_Treasure Which Cannot Be Stolen_0.mid"
+    },
+    {
+        "audio_id": 8173,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/Xeno_PS1_Xenogears_Two Pieces_0.mid"
+    },
+    {
+        "audio_id": 8149,
+        "class": "Calmness",
+        "midi_file": "labelled/phrases/Xeno_PS1_Xenogears_Valley Where the Wind Is Born_0.mid"
+    }
+]
