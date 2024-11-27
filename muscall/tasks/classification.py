@@ -14,6 +14,8 @@ def prepare_labels(labels, prompt=None):
             text_to_tokenize = "This piece of music is composed by {}.".format(label)
         elif prompt == "vgmidi":
             text_to_tokenize = "This piece of music is composed by {}.".format(label)
+        elif prompt == "emopia":
+            text_to_tokenize = "This piece of music is composed by {}.".format(label)
         else:
             text_to_tokenize = label
         text_prompts.append(text_to_tokenize)
@@ -33,6 +35,8 @@ def encode_labels(labels, dataset_name):
     if dataset_name == "pianist8":
         tags = ["Bethel", "Clayderman", "Einaudi", "Hancock","Hillsong", "Hisaishi", "Ryuichi", "Yiruma"]
     elif dataset_name == "vgmidi":
+        tags = ["Joy", "Anger", "Sadness", "Calmness"]
+    elif dataset_name == "emopia":
         tags = ["Joy", "Anger", "Sadness", "Calmness"]
     for l in labels:
         labels_new.append(tags.index(l))
@@ -107,6 +111,10 @@ class Zeroshot:
         elif self.dataset_name == "vgmidi":
             from muscall.datasets.vgmidi import VGMIDI
             test_dataset = VGMIDI(config=self.muscall_config, dataset_type="test", midi_dic=self.muscall_config.model_config.midi.midi_dic, data_root=data_root)
+            self.tags = ["Joy", "Anger", "Sadness", "Calmness"]
+        elif self.dataset_name == "emopia":
+            from muscall.datasets.emopia import EMOPIA
+            test_dataset = EMOPIA(config=self.muscall_config, dataset_type="test", midi_dic=self.muscall_config.model_config.midi.midi_dic, data_root=data_root)
             self.tags = ["Joy", "Anger", "Sadness", "Calmness"]
         self.test_loader = DataLoader(dataset=test_dataset, batch_size=1)
 

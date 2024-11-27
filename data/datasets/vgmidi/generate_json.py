@@ -32,7 +32,7 @@ json_data = [
 ]
 
 # JSONデータを出力
-output_file = "output.json"
+output_file = "dataset_test.json"
 with open(output_file, "w") as f:
     json.dump(json_data, f, indent=4)
 
