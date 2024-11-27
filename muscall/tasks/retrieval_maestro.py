@@ -122,18 +122,13 @@ class Retrieval:
         )
         print("path to model", self.path_to_model)
 
-        self.test_set_size = test_set_size
-
         self.load_dataset()
         self.build_model()
 
     def load_dataset(self):
         dataset = MAESTRO(self.muscall_config.dataset_config, midi_dic=self.muscall_config.model_config.midi.midi_dic)
-        indices = torch.randperm(len(dataset))[: self.test_set_size]
-        random_dataset = Subset(dataset, indices)
         self.batch_size = 6
         self.data_loader = DataLoader(
-            dataset=random_dataset,
             batch_size=self.batch_size,
             drop_last=False,
             worker_init_fn=seed_worker,
