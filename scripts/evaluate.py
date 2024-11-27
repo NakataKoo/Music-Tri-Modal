@@ -56,6 +56,9 @@ if __name__ == "__main__":
     elif params.task == "zeroshot":
         from muscall.tasks.classification import Zeroshot
         evaluation = Zeroshot(muscall_config, params.dataset_name)
+    elif params.task == "retrieval_maestro":
+        from muscall.tasks.retrieval_maestro import Retrieval
+        evaluation = Retrieval(muscall_config, params.test_set_size)
     else:
         raise ValueError("{} task not supported".format(params.task))
 

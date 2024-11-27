@@ -8,7 +8,6 @@ from pytorch_memlab import profile
 
 from muscall.datasets.model import CP
 import glob
-import librosa
 
 class AudioCaptionMidiDataset(Dataset):
     def __init__(self, config, tokenizer=None, dataset_type="train", midi_dic=None):
