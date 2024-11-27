@@ -21,21 +21,9 @@ def prepare_labels(labels, prompt=None):
 
 def get_metrics(predictions, ground_truth, dataset_name):
     results = {}
-    
-    if dataset_name == "vgmidi":
-        results["ROC-AUC-macro"] = metrics.roc_auc_score(
-            ground_truth, predictions, average="macro"
-        )
-        results["MAP-avg"] = np.mean(
-            metrics.average_precision_score(ground_truth, predictions, average=None)
-        )
-    elif dataset_name == "pianist8":
-        predictions = torch.argmax(predictions, dim=1)
-        #print(predictions)
-        ground_truth = ground_truth[:, 0]
-        #print(ground_truth)
-        results["accuracy"] = metrics.accuracy_score(ground_truth, predictions)
-
+    predictions = torch.argmax(predictions, dim=1)
+    ground_truth = ground_truth[:, 0]
+    results["accuracy"] = metrics.accuracy_score(ground_truth, predictions)
     return results
 
 # ラベルが文字列の場合の処理
