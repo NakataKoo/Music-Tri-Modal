@@ -98,7 +98,7 @@ def compute_metrics(retrieved_indices, gt_indices):
 
     return retrieval_metrics
 
-def run_retrieval(model, data_loader, device, retrieval_type="midi_text"):
+def run_retrieval(model, data_loader, device):
     audio_features, midi_features = get_muscall_features(
         model, data_loader, device)
     
@@ -148,8 +148,7 @@ class Retrieval:
         retrieval_metrics_midi_audio = run_retrieval(
             self.model, 
             self.data_loader, 
-            self.device, 
-            retrieval_type="midi_audio"
+            self.device
         )
         print(f"midi_audio: {retrieval_metrics_midi_audio}")
 

@@ -95,7 +95,7 @@ class MusCALL(nn.Module):
         self.text_dim = config.clap.text_hidden_size
 
         #self.audio_projection = nn.Linear(self.audio_dim, self.projection_dim, bias=False) # audio_dimをprojection_dimへ線形変換
-        self.text_projection = nn.Linear(self.text_dim, self.projection_dim, bias=False)
+        #self.text_projection = nn.Linear(self.text_dim, self.projection_dim, bias=False)
         self.midi_projection = nn.Linear(self.midi_dim, self.projection_dim, bias=False)
 
         if self.temperature is None:
@@ -152,7 +152,7 @@ class MusCALL(nn.Module):
     
         # デバイスに移動
         text_features = text_features.to(self.device)
-        text_features = self.text_projection(text_features)
+        #text_features = self.text_projection(text_features)
         return text_features
     
     def encode_midi(self, midi_batch, first_input_midi_shape):
