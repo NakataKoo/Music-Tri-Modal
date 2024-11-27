@@ -1,4 +1,5 @@
 import os
+import re
 import json
 import numpy as np
 
@@ -14,8 +15,9 @@ class MAESTRO(Dataset):
     def __init__(self, config, tokenizer=None, midi_dic=None):
 
         super().__init__()
+        self.config = config
         self._dataset_name = "maestro"
-        self._data_dir = self.config.data_dir # ${env.data_root}/datasets/${dataset_config.dataset_name}
+        self._data_dir = re.sub(r"datasets/.*", "datasets/maestro/", self.config.data_dir) # ${env.data_root}/datasets/${dataset_config.dataset_name}
 
         self.CP = CP(dict=midi_dic)
 
@@ -30,8 +32,6 @@ class MAESTRO(Dataset):
 
     # JSONファイルからデータを読み込み、音声ID、キャプション、音声パス、midiパスをリストに格納
     def _load(self):
-
-        self._data_dir
 
         files1 = glob.glob(self._data_dir + "maestro-testset/*.midi", recursive=True)
         files2 = glob.glob(self._data_dir + "maestro-testset/*.wav", recursive=True)
@@ -84,14 +84,14 @@ class MAESTRO(Dataset):
 
     # 1つの曲の複数midiデータを取得し、すべてトークン化
     def get_midi(self, idx):
-        all_words = np.load(self.midi_dir_paths[idx]+".npy")
+        all_words = self.CP.prepare_data(self.midi_dir_paths[idx], task="", max_len=512) 
+        # all_words = np.load(self.midi_dir_paths[idx]+".npy")
         all_words = torch.from_numpy(all_words.astype(np.float32)).clone()
         all_words, first_input_midi_shape = self.midi_padding(all_words, idx)
         return all_words, first_input_midi_shape
 
     def __getitem__(self, idx):
         audio_id = "" # "audio_id"
-
         input_audio = self.get_audio(idx) # 音声データを取得
         input_text = "" # キャプションを取得
         input_midi, first_input_midi_shape = self.get_midi(idx) # midiデータを取得
@@ -109,7 +109,7 @@ class MAESTRO(Dataset):
         )
 
     def __len__(self):
-        return len(self.samples)
+        return len(self.audio_paths)
 
     @classmethod
     def config_path(cls):

@@ -129,6 +129,7 @@ class Retrieval:
         dataset = MAESTRO(self.muscall_config.dataset_config, midi_dic=self.muscall_config.model_config.midi.midi_dic)
         self.batch_size = 6
         self.data_loader = DataLoader(
+            dataset=dataset,
             batch_size=self.batch_size,
             drop_last=False,
             worker_init_fn=seed_worker,
