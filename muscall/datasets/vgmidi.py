@@ -15,7 +15,7 @@ class VGMIDI(Dataset):
             config = {}
         self.config = config # audiocaption.yamlの内容
         self._dataset_type = dataset_type
-        self._data_dir = data_root # ${env.data_root}/datasets/${dataset_name}
+        self._data_dir = data_root
 
         self.CP = CP(dict=midi_dic)
 
@@ -30,11 +30,10 @@ class VGMIDI(Dataset):
     def _load(self):
         with open(self.dataset_json) as f:
             self.samples = json.load(f) # jsonをPythonオブジェクトとして読み込み
-            self.midi_dir = os.path.join(self._data_dir, "midi") # ${env.data_root}/datasets/${dataset_name}/midi
 
             self.audio_ids = [i["audio_id"] for i in self.samples] # jsonの各オブジェクトの"audio_id"(自然数)をリストに格納
             self.classes = [i["class"].strip() for i in self.samples] # jsonの各オブジェクトの"caption"をリストに格納
-            self.midi_paths = [os.path.join(self.midi_dir, i["midi_file"]) for i in self.samples] # jsonの各オブジェクトの"audio_path"(音声ファイルパス)をリストに格納
+            self.midi_paths = [os.path.join(self._data_dir, i["midi_file"]) for i in self.samples] # jsonの各オブジェクトの"audio_path"(音声ファイルパス)をリストに格納
 
     def get_label(self, idx):
         return self.classes[idx]
@@ -44,11 +43,13 @@ class VGMIDI(Dataset):
 
         first_input_midi_shape = input_midi.shape[0]
         if input_midi.shape == torch.Size([0]):
-            print(input_midi, self.midi_dir_paths[idx])
+            print(input_midi, self.midi_paths[idx])
 
         # パディング
         if input_midi.shape[0] < self.midi_size:
             x = self.midi_size - input_midi.shape[0]
+            if isinstance(input_midi, np.ndarray):
+                input_midi = torch.tensor(input_midi)
             input_midi = torch.nn.functional.pad(input_midi, (0, 0, 0, 0, 0, x))
 
         # クロップ
