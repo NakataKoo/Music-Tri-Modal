@@ -56,6 +56,8 @@ class Pianist8(Dataset):
             x = self.midi_size - input_midi.shape[0]
             # 最初の次元にパディングを追加する
             # (0, 0) は 512 と 4 次元にはパディングを追加しないことを意味します
+            if isinstance(input_midi, np.ndarray):
+                input_midi = torch.tensor(input_midi)
             input_midi = torch.nn.functional.pad(input_midi, (0, 0, 0, 0, 0, x))
 
         # クロップ

@@ -122,6 +122,7 @@ class MusCALL(nn.Module):
             #audio_feature = self.audio_projection(audio_feature) # 最終的な共通のエンベディングの次元に変換
             audio_features.append(audio_feature)
         audio_features = torch.cat(audio_features, dim=0)
+        return audio_features
 
     @torch.no_grad()
     def encode_text(self, text, text_mask):

@@ -84,7 +84,7 @@ class MAESTRO(Dataset):
 
     # 1つの曲の複数midiデータを取得し、すべてトークン化
     def get_midi(self, idx):
-        all_words = self.CP.prepare_data(self.midi_dir_paths[idx], task="", max_len=512) 
+        all_words = self.CP.prepare_data([self.midi_dir_paths[idx]], task="", max_len=512) 
         # all_words = np.load(self.midi_dir_paths[idx]+".npy")
         all_words = torch.from_numpy(all_words.astype(np.float32)).clone()
         all_words, first_input_midi_shape = self.midi_padding(all_words, idx)
