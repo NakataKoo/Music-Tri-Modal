@@ -45,6 +45,23 @@ def prepare_labels(labels, prompt=None):
                 text_to_tokenize = "This piece of music is a poignant reflection that evokes a deep sense of sadness and melancholy, taking the listener on an emotional journey through the depths of human experience."
             elif label == "Calmness":
                 text_to_tokenize = "This piece of music is a soothing balm that washes over the listener with a gentle wave of calmness and tranquility."
+        elif prompt == "wikimt":
+            if label == "Country":
+                text_to_tokenize = "This piece of music is characterized by its roots in the traditional music of the American South, with its distinctive twangy sound and storytelling lyrics that often touch on themes of love, heartbreak, and rural life."
+            elif label == "Folk":
+                text_to_tokenize = "This piece of music draws on the traditional music of a particular culture or region, often featuring acoustic instruments and simple, catchy melodies that are easy to sing along to. Folk music often tells stories of everyday life and the struggles of ordinary people."
+            elif label == "Dance":
+                text_to_tokenize = "Whether it’s disco, hip-hop, or EDM, dance music is all about creating a high-energy atmosphere and bringing people together through the universal language of dance."
+            elif label == "Latin":
+                text_to_tokenize = " This piece of music draws on the rich musical traditions of Latin America, with its vibrant rhythms, colorful melodies, and passionate lyrics that often touch on themes of love, passion, and cultural identity."
+            elif label == "Jazz":
+                text_to_tokenize = "This piece of music is characterized by its improvisational nature, with musicians often taking turns soloing over a complex and syncopated rhythm section. Jazz music often draws on elements of blues, swing, and Bebop music, and is known for its sophisticated harmonies and inventive melodies."
+            elif label == "Pop":
+                text_to_tokenize = " This piece of music is designed to be catchy and easy to sing along to, with simple, memorable melodies and lyrics that often touch on themes of love, relationships, and self-expression. Pop music can take many forms, from bubblegum pop and boy bands to synthpop and EDM."
+            elif label == "Rock":
+                text_to_tokenize = "Whether it’s classic rock, punk, or grunge, rock music is all about pushing boundaries and challenging the status quo. Rock music has a rich history that spans decades, with iconic bands and legendary performances that continue to inspire new generations of musicians and fans."
+            elif label == "R&B":
+                text_to_tokenize = "R&B music can take many forms, from classic Motown to contemporary hip-hop and trap soul."
         else:
             text_to_tokenize = label
         text_prompts.append(text_to_tokenize)
@@ -67,6 +84,8 @@ def encode_labels(labels, dataset_name):
         tags = ["Joy", "Anger", "Sadness", "Calmness"]
     elif dataset_name == "emopia":
         tags = ["Joy", "Anger", "Sadness", "Calmness"]
+    elif dataset_name == "wikimt":
+        tags = ["Country", "Folk", "Dance", "Latin", "Jazz", "Pop", "Rock", "R&B"]
     for l in labels:
         labels_new.append(tags.index(l))
     return torch.tensor(labels_new)
@@ -85,7 +104,10 @@ def compute_muscall_similarity_score(model, data_loader, device, text_prompts, d
 
     for i, batch in enumerate(data_loader):
         batch = tuple(t.to(device=device, non_blocking=True) if isinstance(t, torch.Tensor) else t for t in batch)
-        labels, input_midi, first_input_midi_shape, _ = batch
+        if dataset_name == "wikimt":
+            labels, caption, input_midi, first_input_midi_shape, _ = batch
+        else:
+            labels, input_midi, first_input_midi_shape, _ = batch
 
         input_midi = input_midi.to(device=device)
 
@@ -145,6 +167,10 @@ class Zeroshot:
             from muscall.datasets.emopia import EMOPIA
             test_dataset = EMOPIA(config=self.muscall_config, dataset_type="test", midi_dic=self.muscall_config.model_config.midi.midi_dic, data_root=data_root)
             self.tags = ["Joy", "Anger", "Sadness", "Calmness"]
+        elif self.dataset_name == "wikimt":
+            from muscall.datasets.wikimt import WIKIMT
+            test_dataset = WIKIMT(config=self.muscall_config, dataset_type="test", midi_dic=self.muscall_config.model_config.midi.midi_dic, data_root=data_root)
+            self.tags = ["Country", "Folk", "Dance", "Latin", "Jazz", "Pop", "Rock", "R&B"]
         self.test_loader = DataLoader(dataset=test_dataset, batch_size=1)
 
     def build_model(self):

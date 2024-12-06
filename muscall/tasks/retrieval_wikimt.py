@@ -30,7 +30,7 @@ from muscall.datasets.wikimt import WIKIMT
 def get_muscall_features(model, data_loader, device):
     dataset_size = data_loader.dataset.__len__()
 
-    all_audio_features = torch.zeros(dataset_size, 512).to(device)
+    all_text_features = torch.zeros(dataset_size, 512).to(device)
     all_midi_features = torch.zeros(dataset_size, 512).to(device)
 
     samples_in_previous_batch = 0
@@ -38,12 +38,12 @@ def get_muscall_features(model, data_loader, device):
         batch = tuple(t.to(device=device, non_blocking=True) if isinstance(t, torch.Tensor) else t for t in batch)
 
         # バッチ内のデータを展開し、それぞれの変数に割り当て(__getitem__メソッドにより取得)
-        audio_id, input_audio, input_text, input_midi, first_input_midi_shape, midi_dir_paths, data_idx = batch 
+        _, caption, input_midi, first_input_midi_shape, _, = batch 
 
-        audio_features = model.encode_audio(input_audio)
+        text_features = model.encode_text(caption)
         midi_features = model.encode_midi(input_midi, first_input_midi_shape)
 
-        audio_features = audio_features / audio_features.norm(dim=-1, keepdim=True)
+        text_features = text_features / text_features.norm(dim=-1, keepdim=True)
         midi_features = midi_features / midi_features.norm(dim=-1, keepdim=True)
 
         samples_in_current_batch = input_midi.size(0)
@@ -51,10 +51,10 @@ def get_muscall_features(model, data_loader, device):
         end_index = start_index + samples_in_current_batch
         samples_in_previous_batch = samples_in_current_batch
 
-        all_audio_features[start_index:end_index] = audio_features
+        all_text_features[start_index:end_index] = text_features
         all_midi_features[start_index:end_index] = midi_features
 
-    return all_audio_features, all_midi_features
+    return all_text_features, all_midi_features
 
 
 def compute_sim_score(features1, features2):
@@ -99,10 +99,10 @@ def compute_metrics(retrieved_indices, gt_indices):
     return retrieval_metrics
 
 def run_retrieval(model, data_loader, device):
-    audio_features, midi_features = get_muscall_features(
+    text_features, midi_features = get_muscall_features(
         model, data_loader, device)
     
-    score_matrix = compute_sim_score(midi_features, audio_features)
+    score_matrix = compute_sim_score(midi_features, text_features)
     retrieved_indices, gt_indices = get_ranking(score_matrix, device)
     retrieval_metrics = compute_metrics(retrieved_indices, gt_indices)
 
@@ -126,7 +126,10 @@ class Retrieval:
         self.build_model()
 
     def load_dataset(self):
-        dataset = MAESTRO(self.muscall_config.dataset_config, midi_dic=self.muscall_config.model_config.midi.midi_dic)
+        data_root = os.path.join(self.muscall_config.env.data_root, "datasets", "wikimt")
+        dataset = WIKIMT(self.muscall_config.dataset_config, 
+                        midi_dic=self.muscall_config.model_config.midi.midi_dic,
+                        data_root=data_root)
         self.batch_size = 6
         self.data_loader = DataLoader(
             dataset=dataset,
@@ -145,11 +148,11 @@ class Retrieval:
 
     def evaluate(self):
 
-        retrieval_metrics_midi_audio = run_retrieval(
+        retrieval_metrics_midi_text = run_retrieval(
             self.model, 
             self.data_loader, 
             self.device
         )
-        print(f"midi_audio: {retrieval_metrics_midi_audio}")
+        print(f"midi_text: {retrieval_metrics_midi_text}")
 
-        return retrieval_metrics_midi_audio
+        return retrieval_metrics_midi_text
