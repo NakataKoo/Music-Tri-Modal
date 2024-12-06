@@ -59,6 +59,9 @@ if __name__ == "__main__":
     elif params.task == "retrieval_maestro":
         from muscall.tasks.retrieval_maestro import Retrieval
         evaluation = Retrieval(muscall_config, params.test_set_size)
+    elif params.task == "retrieval_wikimt":
+        from muscall.tasks.retrieval_wikimt import Retrieval
+        evaluation = Retrieval(muscall_config, params.test_set_size)
     else:
         raise ValueError("{} task not supported".format(params.task))
 
