@@ -93,3 +93,7 @@ class WIKIMT(Dataset):
     @classmethod
     def num_classes(cls):
         return 8
+
+    @classmethod
+    def config_path(cls):
+        return "configs/datasets/wikimt.yaml"

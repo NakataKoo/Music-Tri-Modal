@@ -113,4 +113,4 @@ class MAESTRO(Dataset):
 
     @classmethod
     def config_path(cls):
-        return "configs/datasets/audiocaption.yaml"
+        return "configs/datasets/maestro.yaml"

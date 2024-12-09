@@ -83,3 +83,7 @@ class VGMIDI(Dataset):
     @classmethod
     def num_classes(cls):
         return 4
+
+    @classmethod
+    def config_path(cls):
+        return "configs/datasets/vgmidi.yaml"

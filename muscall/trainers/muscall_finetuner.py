@@ -14,11 +14,16 @@ from torch.utils.data import DataLoader, Subset
 from pytorch_memlab import profile
 from pytorch_memlab import MemReporter
 
-from muscall.datasets.audiocaption import AudioCaptionMidiDataset
+from muscall.datasets.emopia import EMOPIA
+from muscall.datasets.pianist8 import Pianist8
+from muscall.datasets.vgmidi import VGMIDI
+from muscall.datasets.wikimt import WIKIMT
+
 from muscall.trainers.base_trainer import BaseTrainer
 from muscall.models.muscall import MusCALL
-from muscall.tasks.retrieval import run_retrieval
 from muscall.utils.audio_utils import get_transform_chain
+
+from muscall.models.finetune_muscall import SequenceClassification
 
 # parserなどで指定
 seed = 0
@@ -36,23 +41,31 @@ def seed_worker(worker_id):
 g = torch.Generator()
 g.manual_seed(seed)
 
-class MusCALLTrainer(BaseTrainer):
+class MusCALLFinetuner(BaseTrainer):
     def __init__(self, config, logger):
         super().__init__(config, logger)
-        self.batch_size = self.config.training.dataloader.batch_size # training.yaml→dataloader→batch_size（バッチサイズ）
-
+        self.batch_size = self.config.training.dataloader.batch_size
+        self.config = config
         self.load() # load_dataset()、build_model()、build_optimizer()、self.logger.save_config()の実行
-
         self.scaler = torch.amp.GradScaler()
 
     def load_dataset(self):
         self.logger.write("Loading dataset")
-        dataset_name = self.config.dataset_config.dataset_name # audiocaption.yaml→dataset_config→dataset_nameより、データセット名を取得
+        self.dataset_name = self.config.dataset_config.dataset_name
 
         # AudioCaptionMidiDatasetのインスタンスを生成（audiocaption.yamlの内容を引数に指定）
-        if dataset_name == "audiocaptionmidi":
-            self.train_dataset = AudioCaptionMidiDataset(self.config.dataset_config, dataset_type="train", midi_dic=self.config.model_config.midi.midi_dic)
-            self.val_dataset = AudioCaptionMidiDataset(self.config.dataset_config, dataset_type="val", midi_dic=self.config.model_config.midi.midi_dic)
+        if self.dataset_name == "piansit8":
+            self.train_dataset = Pianist8(self.config.dataset_config, dataset_type="train", midi_dic=self.config.model_config.midi.midi_dic)
+            self.val_dataset = Pianist8(self.config.dataset_config, dataset_type="val", midi_dic=self.config.model_config.midi.midi_dic)
+        elif self.dataset_name == "emopia":
+            self.train_dataset = EMOPIA(self.config.dataset_config, dataset_type="train", midi_dic=self.config.model_config.midi.midi_dic)
+            self.val_dataset = EMOPIA(self.config.dataset_config, dataset_type="val", midi_dic=self.config.model_config.midi.midi_dic)
+        elif self.dataset_name == "vgmidi":
+            self.train_dataset = VGMIDI(self.config.dataset_config, dataset_type="train", midi_dic=self.config.model_config.midi.midi_dic)
+            self.val_dataset = VGMIDI(self.config.dataset_config, dataset_type="val", midi_dic=self.config.model_config.midi.midi_dic)
+        elif self.dataset_name == "wikimt":
+            self.train_dataset = WIKIMT(self.config.dataset_config, dataset_type="train", midi_dic=self.config.model_config.midi.midi_dic)
+            self.val_dataset = WIKIMT(self.config.dataset_config, dataset_type="val", midi_dic=self.config.model_config.midi.midi_dic)
         else:
             raise ValueError("{} dataset is not supported.".format(dataset_name))
 
@@ -77,21 +90,15 @@ class MusCALLTrainer(BaseTrainer):
 
     def build_model(self):
         self.logger.write("Building model")
-        model_name = self.config.model_config.model_name # muscall.yaml→model_config→model_nameより、モデル名を取得
-
-        if model_name == "muscall":
-            self.model = MusCALL(self.config.model_config, is_train=True).to(self.device)
-        else:
-            raise ValueError("{} model is not supported.".format(model_name))
-
-        # self.print_parameters() # 全学習パラメータ表示
+        self.midibert = MusCALL(self.config.model_config, is_train=True).to(self.device)
 
         if torch.cuda.device_count() > 1:
             print("Use %d GPUS" % torch.cuda.device_count())
             self.model = torch.nn.DataParallel(self.model, device_ids=[0, 1])
-    
-        # DataParallelでラップされた場合に元のモデルにアクセスしやすくするための対策
-        #self.model = self.model.module if isinstance(self.model, torch.nn.DataParallel) else self.model
+
+        self.model = SequenceClassification(self.midibert, 
+                                            class_num=self.train_dataset.num_classes(), 
+                                            hs=self.config.model_config.projection_dim).to(self.device)
 
         self.reporter = MemReporter(self.model)
         # self.reporter.report()
@@ -110,37 +117,6 @@ class MusCALLTrainer(BaseTrainer):
         self.scheduler = CosineAnnealingLR(
             self.optimizer, T_max=num_train_optimization_steps * 0.1
         )
-
-    def get_retrieval_metrics(self):
-        indices = torch.randperm(len(self.val_dataset))[:1000]
-        random_val_subset = Subset(self.val_dataset, indices)
-        val_subset_loader = DataLoader(
-            random_val_subset,
-            batch_size=self.batch_size,
-        )
-
-        """
-        retrieval_metrics_midi_audio = run_retrieval(
-            model=self.model,
-            data_loader=val_subset_loader,
-            device=self.device,
-            retrieval_type="midi_audio"
-        )
-        print(f"midi_audio: {retrieval_metrics_midi_audio}")
-        """
-
-        retrieval_metrics_midi_text = run_retrieval(
-            model=self.model,
-            data_loader=val_subset_loader,
-            device=self.device,
-            retrieval_type="midi_text"
-        )
-        print(f"midi_text: {retrieval_metrics_midi_text}")
-
-        #retrieval_metrics = (retrieval_metrics_midi_audio["R@10"].item()+retrieval_metrics_midi_text["R@10"].item()) / 2
-        retrieval_metrics = retrieval_metrics_midi_text["R@10"].item()
-
-        return retrieval_metrics
 
     # train.pyによって実行されるメソッド
     def train(self):
@@ -224,26 +200,13 @@ class MusCALLTrainer(BaseTrainer):
         for i, batch in enumerate(pbar):
             batch = tuple(t.to(device=self.device, non_blocking=True) if isinstance(t, torch.Tensor) else t for t in batch)
 
-            audio_id, input_audio, input_text, input_midi, first_input_midi_shape, midi_dir_paths, data_idx = batch # バッチ内のデータを展開し、それぞれの変数に割り当て(__getitem__メソッドにより取得)
+            if self.dataset_name == "wikimt":
+                labels, _ , input_midi, first_input_midi_shape, _ = batch
+            else:
+                labels, input_midi, first_input_midi_shape, _ = batch
 
-            sentence_sim = None
 
-            original_audio = None
-            audio_data_config = self.config.dataset_config.audio
-            # 学習時、音声データの拡張が有効になっている場合、入力音声データ拡張
-            if is_training and audio_data_config.augment:
-                original_audio = input_audio
-                augment_chain = get_transform_chain( # 一連のデータ拡張操作
-                    p_polarity=0, # 極性変換の確率
-                    p_gain=0,# 増幅の確率
-                    p_noise=audio_data_config.p_noise, # ノイズ追加の確率
-                    p_pitch_shift=audio_data_config.p_pitch_shift,# ピッチシフトの確率
-                    sample_rate=audio_data_config.sr, # サンプルレート（ここでは16,000 Hz）
-                ) 
-                input_audio = augment_chain(input_audio.unsqueeze(1), audio_data_config.sr).squeeze(1)
 
-            # Cast operations to mixed precision
-            # 混合精度（AMP）を使用して損失を計算（順伝播forwardメソッド）
 
             with torch.amp.autocast("cuda", enabled=self.config.training.amp):
                 loss = self.model(

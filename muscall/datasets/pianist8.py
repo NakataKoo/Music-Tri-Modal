@@ -23,19 +23,18 @@ class Pianist8(Dataset):
         self.dataset_json = os.path.join(self._data_dir, "dataset_{}.json".format(self._dataset_type))
 
         # audiocaption.yamlの内容
-        self.midi_size = self.config.dataset_config.midi.size_dim0 # input_midiのtorch.Size([x, 512, 4])におけるxのサイズ
+        self.midi_size = self.config.dataset_config.midi.size_dim0
         self._load()
 
     # JSONファイルからデータを読み込み、音声ID、キャプション、音声パス、midiパスをリストに格納
     def _load(self):
         with open(self.dataset_json) as f:
             self.samples = json.load(f) # jsonをPythonオブジェクトとして読み込み
-            self.midi_dir = os.path.join(self._data_dir, "midi") # ${env.data_root}/datasets/${dataset_name}/midi
+            self.midi_dir = os.path.join(self._data_dir, "midi") 
 
-            self.audio_ids = [i["audio_id"] for i in self.samples] # jsonの各オブジェクトの"audio_id"(自然数)をリストに格納
-            self.classes = [i["class"].strip() for i in self.samples] # jsonの各オブジェクトの"caption"をリストに格納
-            self.midi_paths = [os.path.join(self.midi_dir, i["midi_file"]) for i in self.samples] # jsonの各オブジェクトの"audio_path"(音声ファイルパス)をリストに格納
-
+            self.audio_ids = [i["audio_id"] for i in self.samples] 
+            self.classes = [i["class"].strip() for i in self.samples]
+            self.midi_paths = [os.path.join(self.midi_dir, i["midi_file"]) for i in self.samples]
     def get_label(self, idx):
         return self.classes[idx]
     
@@ -90,3 +89,7 @@ class Pianist8(Dataset):
     @classmethod
     def num_classes(cls):
         return 8
+
+    @classmethod
+    def config_path(cls):
+        return "configs/datasets/pianist8.yaml"

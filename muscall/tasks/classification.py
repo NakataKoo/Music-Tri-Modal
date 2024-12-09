@@ -105,7 +105,7 @@ def compute_muscall_similarity_score(model, data_loader, device, text_prompts, d
     for i, batch in enumerate(data_loader):
         batch = tuple(t.to(device=device, non_blocking=True) if isinstance(t, torch.Tensor) else t for t in batch)
         if dataset_name == "wikimt":
-            labels, caption, input_midi, first_input_midi_shape, _ = batch
+            labels, _ , input_midi, first_input_midi_shape, _ = batch
         else:
             labels, input_midi, first_input_midi_shape, _ = batch
 
