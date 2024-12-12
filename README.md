@@ -181,7 +181,7 @@ python train.py --experiment_id <model_id>
 Once trained, you can evaluate Model on the cross-modal retrieval task:
 
 ```bash
-python evaluate.py <model_id> retrieval
+python evaluate.py --experiment_id <model_id> retrieval
 ```
 
 or, in the zero-shot transfer setting, on an arbitrary music classification task.
@@ -194,7 +194,7 @@ In our zero-shot evaluation, we include:
 - WIKIMT(Genre, class 8)
 
 ```bash
-python evaluate.py <model_id> zeroshot --dataset_name <dataset_name>
+python evaluate.py --experiment_id <model_id> zeroshot --dataset_name <dataset_name>
 ```
 
 You'll need to download the datasets inside the [`datasets/`](datasets/) folder and preprocess them before running the zeroshot evaluation.
@@ -202,7 +202,7 @@ You'll need to download the datasets inside the [`datasets/`](datasets/) folder 
 ## Fine-Tuning
 
 ```bash
-python finetune.py <model_id> --dataset <dataset_name>
+python finetune.py --experiment_id <model_id> --dataset <dataset_name>
 ```
 
 ## Reference
