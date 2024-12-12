@@ -139,7 +139,7 @@ class MusCALL(nn.Module):
         #text_features = self.text_projection(text_features)
         return text_features
     
-    def encode_midi(self, midi_batch, first_input_midi_shape):
+    def encode_midi(self, midi_batch, first_input_midi_shape=None):
         '''
         midi_batch: torch.Size([batch_size, midi_size, 512, 4])
         first_input_midi_shape: torch.Size([batch_size]) (バッチ内の各データの初期midi数が記載)

@@ -1,5 +1,6 @@
 from torch.utils.data import Dataset
 import torch
+import numpy as np
 
 class FinetuneDataset(Dataset):
     """
@@ -17,6 +18,7 @@ class FinetuneDataset(Dataset):
         512 → max token
         4 → Bar, Position, Pitch, Duration
         """
+        input_midi = torch.tensor(input_midi)
 
         first_input_midi_shape = input_midi.shape[0]
         if input_midi.shape == torch.Size([0]):

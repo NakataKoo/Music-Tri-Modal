@@ -18,7 +18,8 @@ class SequenceClassification(nn.Module):
         )
 
     def forward(self, x, attn, layer):             # x: (batch, 512, 4)
-        x = self.midibert(x, attn, output_hidden_states=True)   # (batch, 512, 768)
+        #x = self.midibert(x, attn, output_hidden_states=True)   # (batch, 512, 768)
+        x = self.midibert.encode_midi(x)
         #y = y.last_hidden_state         # (batch_size, seq_len, 768)
         x = x.hidden_states[layer]
         attn_mat = self.attention(x)        # attn_mat: (batch, r, 512)
