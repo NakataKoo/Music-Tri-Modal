@@ -68,4 +68,4 @@ if __name__ == "__main__":
     finetuner = MusCALLFinetuner(config, logger, params.dataset)
     # print("# of trainable parameters:", finetuner.count_parameters()) # 学習パラメータ数の表示
 
-    finetuner.finetune() # モデル学習開始
+    finetuner.train() # モデル学習開始

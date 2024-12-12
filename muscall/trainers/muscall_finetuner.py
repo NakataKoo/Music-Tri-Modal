@@ -43,10 +43,16 @@ class MusCALLFinetuner(BaseTrainer):
         super().__init__(config, logger)
         self.batch_size = self.config.training.dataloader.batch_size
         self.config = config
-        self.load() # load_dataset()、build_model()、build_optimizer()、self.logger.save_config()の実行
         self.scaler = torch.amp.GradScaler()
         self.dataset_name = dataset_name
         self.loss_func = torch.nn.CrossEntropyLoss(reduction='none')
+
+        if dataset_name == 'pianist8':
+            self.num_classes = 8
+        elif dataset_name == 'emopia':
+            self.num_classes = 4
+
+        self.load() # load_dataset()、build_model()、build_optimizer()、self.logger.save_config()の実行
 
     def load_dataset(self):
         self.logger.write("Loading dataset")
@@ -54,13 +60,13 @@ class MusCALLFinetuner(BaseTrainer):
         data_root = os.path.join(self.config.env.data_root, "datasets", self.dataset_name)
 
         X_train = np.load(os.path.join(data_root, f'{self.dataset_name}_train.npy'), allow_pickle=True)
-        X_val = np.load(os.path.join(data_root, f'{self.dataset_name}_valid.npy'), allow_pickle=True)
+        X_val = np.load(os.path.join(data_root, f'{self.dataset_name}_val.npy'), allow_pickle=True)
         X_test = np.load(os.path.join(data_root, f'{self.dataset_name}_test.npy'), allow_pickle=True)
 
         print('X_train: {}, X_valid: {}, X_test: {}'.format(X_train.shape, X_val.shape, X_test.shape))
 
         y_train = np.load(os.path.join(data_root, f'{self.dataset_name}_train_ans.npy'), allow_pickle=True)
-        y_val = np.load(os.path.join(data_root, f'{self.dataset_name}_valid_ans.npy'), allow_pickle=True)
+        y_val = np.load(os.path.join(data_root, f'{self.dataset_name}_val_ans.npy'), allow_pickle=True)
         y_test = np.load(os.path.join(data_root, f'{self.dataset_name}_test_ans.npy'), allow_pickle=True)
 
         print('y_train: {}, y_valid: {}, y_test: {}'.format(y_train.shape, y_val.shape, y_test.shape))
@@ -69,7 +75,7 @@ class MusCALLFinetuner(BaseTrainer):
         validset = FinetuneDataset(X=X_val, y=y_val) 
         testset = FinetuneDataset(X=X_test, y=y_test) 
 
-        self.train_loader = DataLoader(trainset, **self.config.training.dataloader, shuffle=True, drop_last=True, worker_init_fn=seed_worker, generator=g)
+        self.train_loader = DataLoader(trainset, **self.config.training.dataloader, drop_last=True, worker_init_fn=seed_worker, generator=g)
         self.val_loader = DataLoader(validset, **self.config.training.dataloader, drop_last=True, worker_init_fn=seed_worker, generator=g)
         self.test_loader = DataLoader(testset, **self.config.training.dataloader, drop_last=True, worker_init_fn=seed_worker, generator=g)
 
@@ -83,7 +89,7 @@ class MusCALLFinetuner(BaseTrainer):
 
         # 分類層の追加
         self.model = SequenceClassification(self.midibert, 
-                                            class_num=self.train_dataset.num_classes(), 
+                                            class_num=self.num_classes, 
                                             hs=self.config.model_config.projection_dim).to(self.device)
 
     def build_optimizer(self):
@@ -105,7 +111,7 @@ class MusCALLFinetuner(BaseTrainer):
         loss = self.loss_func(predict, target)
         return torch.sum(loss)/loss.shape[0] 
 
-    def finetune(self):
+    def train(self):
 
         if os.path.exists(self.logger.checkpoint_path):
             self.logger.write(
