@@ -14,10 +14,7 @@ from torch.utils.data import DataLoader, Subset
 from pytorch_memlab import profile
 from pytorch_memlab import MemReporter
 
-from muscall.datasets.emopia import EMOPIA
-from muscall.datasets.pianist8 import Pianist8
-from muscall.datasets.vgmidi import VGMIDI
-from muscall.datasets.wikimt import WIKIMT
+from muscall.datasets.finetune_dataset import FinetuneDataset
 
 from muscall.trainers.base_trainer import BaseTrainer
 from muscall.models.muscall import MusCALL
@@ -42,51 +39,39 @@ g = torch.Generator()
 g.manual_seed(seed)
 
 class MusCALLFinetuner(BaseTrainer):
-    def __init__(self, config, logger):
+    def __init__(self, config, logger, dataset_name):
         super().__init__(config, logger)
         self.batch_size = self.config.training.dataloader.batch_size
         self.config = config
         self.load() # load_dataset()、build_model()、build_optimizer()、self.logger.save_config()の実行
         self.scaler = torch.amp.GradScaler()
+        self.dataset_name = dataset_name
+        self.loss_func = torch.nn.CrossEntropyLoss(reduction='none')
 
     def load_dataset(self):
         self.logger.write("Loading dataset")
-        self.dataset_name = self.config.dataset_config.dataset_name
 
-        # AudioCaptionMidiDatasetのインスタンスを生成（audiocaption.yamlの内容を引数に指定）
-        if self.dataset_name == "piansit8":
-            self.train_dataset = Pianist8(self.config.dataset_config, dataset_type="train", midi_dic=self.config.model_config.midi.midi_dic)
-            self.val_dataset = Pianist8(self.config.dataset_config, dataset_type="val", midi_dic=self.config.model_config.midi.midi_dic)
-        elif self.dataset_name == "emopia":
-            self.train_dataset = EMOPIA(self.config.dataset_config, dataset_type="train", midi_dic=self.config.model_config.midi.midi_dic)
-            self.val_dataset = EMOPIA(self.config.dataset_config, dataset_type="val", midi_dic=self.config.model_config.midi.midi_dic)
-        elif self.dataset_name == "vgmidi":
-            self.train_dataset = VGMIDI(self.config.dataset_config, dataset_type="train", midi_dic=self.config.model_config.midi.midi_dic)
-            self.val_dataset = VGMIDI(self.config.dataset_config, dataset_type="val", midi_dic=self.config.model_config.midi.midi_dic)
-        elif self.dataset_name == "wikimt":
-            self.train_dataset = WIKIMT(self.config.dataset_config, dataset_type="train", midi_dic=self.config.model_config.midi.midi_dic)
-            self.val_dataset = WIKIMT(self.config.dataset_config, dataset_type="val", midi_dic=self.config.model_config.midi.midi_dic)
-        else:
-            raise ValueError("{} dataset is not supported.".format(dataset_name))
+        data_root = os.path.join(self.config.env.data_root, "datasets", self.dataset_name)
 
-        self.train_loader = DataLoader(
-            dataset=self.train_dataset,
-            **self.config.training.dataloader,
-            drop_last=True,
-            worker_init_fn=seed_worker,
-            generator=g,
-        )
-        self.val_loader = DataLoader(
-            dataset=self.val_dataset,
-            **self.config.training.dataloader,
-            drop_last=True,
-            worker_init_fn=seed_worker,
-            generator=g,
-        )
+        X_train = np.load(os.path.join(data_root, f'{self.dataset_name}_train.npy'), allow_pickle=True)
+        X_val = np.load(os.path.join(data_root, f'{self.dataset_name}_valid.npy'), allow_pickle=True)
+        X_test = np.load(os.path.join(data_root, f'{self.dataset_name}_test.npy'), allow_pickle=True)
 
-        self.logger.write(
-            "Number of training samples: {}".format(self.train_dataset.__len__())
-        ) # サンプル数をログに出力
+        print('X_train: {}, X_valid: {}, X_test: {}'.format(X_train.shape, X_val.shape, X_test.shape))
+
+        y_train = np.load(os.path.join(data_root, f'{self.dataset_name}_train_ans.npy'), allow_pickle=True)
+        y_val = np.load(os.path.join(data_root, f'{self.dataset_name}_valid_ans.npy'), allow_pickle=True)
+        y_test = np.load(os.path.join(data_root, f'{self.dataset_name}_test_ans.npy'), allow_pickle=True)
+
+        print('y_train: {}, y_valid: {}, y_test: {}'.format(y_train.shape, y_val.shape, y_test.shape))
+
+        trainset = FinetuneDataset(X=X_train, y=y_train)
+        validset = FinetuneDataset(X=X_val, y=y_val) 
+        testset = FinetuneDataset(X=X_test, y=y_test) 
+
+        self.train_loader = DataLoader(trainset, **self.config.training.dataloader, shuffle=True, drop_last=True, worker_init_fn=seed_worker, generator=g)
+        self.val_loader = DataLoader(validset, **self.config.training.dataloader, drop_last=True, worker_init_fn=seed_worker, generator=g)
+        self.test_loader = DataLoader(testset, **self.config.training.dataloader, drop_last=True, worker_init_fn=seed_worker, generator=g)
 
     def build_model(self):
         self.logger.write("Building model")
@@ -96,12 +81,10 @@ class MusCALLFinetuner(BaseTrainer):
             print("Use %d GPUS" % torch.cuda.device_count())
             self.model = torch.nn.DataParallel(self.model, device_ids=[0, 1])
 
+        # 分類層の追加
         self.model = SequenceClassification(self.midibert, 
                                             class_num=self.train_dataset.num_classes(), 
                                             hs=self.config.model_config.projection_dim).to(self.device)
-
-        self.reporter = MemReporter(self.model)
-        # self.reporter.report()
 
     def build_optimizer(self):
         self.logger.write("Building optimizer")
@@ -118,9 +101,11 @@ class MusCALLFinetuner(BaseTrainer):
             self.optimizer, T_max=num_train_optimization_steps * 0.1
         )
 
-    # train.pyによって実行されるメソッド
-    def train(self):
-        best_r10 = 0 # 最良のR@10スコアを追跡
+    def compute_loss(self, predict, target):
+        loss = self.loss_func(predict, target)
+        return torch.sum(loss)/loss.shape[0] 
+
+    def finetune(self):
 
         if os.path.exists(self.logger.checkpoint_path):
             self.logger.write(
@@ -138,21 +123,16 @@ class MusCALLFinetuner(BaseTrainer):
             self.start_epoch = 0
 
         torch.backends.cudnn.benchmark = True
+        best_acc = 0
 
-        for epoch in range(self.start_epoch, self.config.training.epochs): # start_epoch=0 ~ max epochs
+        for epoch in range(self.start_epoch, self.config.training.epochs):
             epoch_start_time = time.time()
 
-            train_loss = self.train_epoch(self.train_loader, is_training=True)
-            val_loss = self.train_epoch_val(self.val_loader)
-
-            # バッチごとの進捗を表示
-            print(f"Epoch [{epoch + 1}/{self.config.training.epochs}], train loss: {train_loss}, val loss: {val_loss}")
+            train_loss, train_acc = self.iteration(self.train_loader, mode="train")
+            val_loss, val_acc = self.iteration(self.val_loader, mode="val")
+            test_loss, test_acc = self.iteration(self.test_loader, model="test")
 
             torch.cuda.empty_cache()
-
-            r10 = 0
-            if self.config.training.track_retrieval_metrics:
-                r10 = self.get_retrieval_metrics() # 検索メトリクスの取得
 
             epoch_time = time.time() - epoch_start_time
             self.logger.update_training_log(
@@ -161,8 +141,10 @@ class MusCALLFinetuner(BaseTrainer):
                 val_loss,
                 epoch_time,
                 self.scheduler.get_last_lr()[0],
-                r10,
+                metric=test_acc,
             )
+
+            print('epoch: {} | Train Loss: {} | Train acc: {} | Valid Loss: {} | Valid acc: {} | Test loss: {} | Test acc: {}'.format(epoch+1, train_loss, train_acc, val_loss, val_acc, test_loss, test_acc))
 
             checkpoint = {
                 "epoch": epoch + 1,
@@ -170,13 +152,10 @@ class MusCALLFinetuner(BaseTrainer):
                 "optimizer": self.optimizer.state_dict(),
             }
 
-            is_best = r10 > best_r10
-            if is_best:
-                best_r10 = r10
-            # save checkpoint in appropriate path (new or best) (最良のモデルと最新のモデルを保存)
+            is_best = test_acc > best_acc
+            best_acc = max(test_acc, best_acc)
+            
             self.logger.save_checkpoint(state=checkpoint, is_best=is_best)
-
-            # self.reporter.report()
 
     def load_ckpt(self, checkpoint_path):
         checkpoint = torch.load(checkpoint_path, weights_only=True)
@@ -185,75 +164,40 @@ class MusCALLFinetuner(BaseTrainer):
         self.start_epoch = checkpoint["epoch"]
 
     # 1エポック分の学習を実行（各バッチの損失計算＋バックプロパゲーション）
-    def train_epoch(self, data_loader, is_training):
+    def iteration(self, data_loader, mode="train"):
         running_loss = 0.0
         n_batches = 0
 
-        if is_training:
+        if mode == "train":
             self.model.train()
-        else:
+        elif mode == "val":
             self.model.eval()
 
         pbar = tqdm.tqdm(data_loader, disable=False, leave=True)
 
         # データローダーからバッチを取り出し、学習を実行
-        for i, batch in enumerate(pbar):
-            batch = tuple(t.to(device=self.device, non_blocking=True) if isinstance(t, torch.Tensor) else t for t in batch)
-
-            if self.dataset_name == "wikimt":
-                labels, _ , input_midi, first_input_midi_shape, _ = batch
-            else:
-                labels, input_midi, first_input_midi_shape, _ = batch
-
-
-
-
-            with torch.amp.autocast("cuda", enabled=self.config.training.amp):
-                loss = self.model(
-                    input_audio,
-                    input_text,
-                    input_midi,
-                    first_input_midi_shape,
-                    original_audio=original_audio, # 元の音声データ（拡張前の音声データ）
-                    sentence_sim=sentence_sim,# 文の類似度（オプション:損失関数がweighted_clipの場合）
-                )
+        for x, y in pbar:
+            batch = x.shape[0]
+            x = x.to(self.device)
+            y = y.to(self.device)
             
-            if not self.config.training.amp:
-                loss = self.model(
-                        input_audio,
-                        input_text,
-                        input_midi,
-                        first_input_midi_shape,
-                        original_audio=original_audio, # 元の音声データ（拡張前の音声データ）
-                        sentence_sim=sentence_sim,# 文の類似度（オプション：損失関数がweighted_clipの場合）
-                )
+            attn = torch.ones((batch, 512)).to(self.device)
+            y_hat = self.model.forward(x=x, attn=attn, layer=-1)
 
-            # 逆誤差伝播とパラメータ更新
-            if is_training:
-                if self.config.training.amp:
-                    self.scaler.scale(loss).backward()
-                    self.scaler.step(self.optimizer)
-                    self.scaler.update()
-                else:
-                    loss.backward()
-                    self.optimizer.step()
+            output = np.argmax(y_hat.cpu().detach().numpy(), axis=-1)
+            output = torch.from_numpy(output).to(self.device)
 
-                # clamp temperature scaling if over log(100)
-                if self.model.logit_scale.item() > np.log(100):
-                    self.model.logit_scale.data = torch.clamp(
-                        self.model.logit_scale.data, max=np.log(100)
-                    )
+            acc = torch.sum((y==output).float())
+            total_acc += acc
+            total_cnt += y.shape[0]
 
-                self.scheduler.step()
-                self.optimizer.zero_grad()
+            loss = self.compute_loss(y_hat, y, attn)
+            total_loss += loss.item()
 
-            running_loss += loss.item() # 各バッチの損失を蓄積
-            del loss
-            n_batches += 1 # バッチ数をカウント
+            # udpate only in train
+            if mode == "train":
+                self.model.zero_grad()
+                loss.backward()
+                self.optim.step()
 
-        return running_loss / n_batches
-
-    def train_epoch_val(self, data_loader):
-        with torch.no_grad():
-            loss = self.train_epoch(data_loader, is_training=False)
-        return loss
+        return round(total_loss/len(data_loader),4), round(total_acc.item()/total_cnt,4)

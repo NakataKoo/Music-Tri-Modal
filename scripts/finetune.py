@@ -45,29 +45,18 @@ if __name__ == "__main__":
         
     base_conf = load_conf(params.config_path)
 
-    if params.dataset == "pianist8":
-            dataset_conf_path = os.path.join(base_conf.env.base_dir, Pianist8.config_path()) 
-    elif params.dataset == "emopia":
-            dataset_conf_path = os.path.join(base_conf.env.base_dir, EMOPIA.config_path())
-    elif params.dataset == "vgmidi":
-            dataset_conf_path = os.path.join(base_conf.env.base_dir, VGMIDI.config_path())
-    elif params.dataset == "wikimt":
-            dataset_conf_path = os.path.join(base_conf.env.base_dir, WIKIMT.config_path())
-    else:
-            raise ValueError("{} dataset not supported".format(params.dataset))
-
     model_conf_path = OmegaConf.load(
             "./save/experiments/{}/config.yaml".format(params.experiment_id)
     )
 
     model_conf_path = model_conf_path.model_config
 
-    config = merge_conf(params.config_path, dataset_conf_path, model_conf_path)
+    config = merge_conf(params.config_path, model_conf_path)
     update_conf_with_cli_params(params, config)
 
     logger = Logger(config)
 
-    finetuner = MusCALLFinetuner(config, logger)
+    finetuner = MusCALLFinetuner(config, logger, params.dataset)
     # print("# of trainable parameters:", finetuner.count_parameters()) # 学習パラメータ数の表示
 
-    finetuner.train() # モデル学習開始
+    finetuner.finetune() # モデル学習開始

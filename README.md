@@ -188,14 +188,22 @@ or, in the zero-shot transfer setting, on an arbitrary music classification task
 
 In our zero-shot evaluation, we include:
 
-* `mtt`: auto-tagging on the [MagnaTagATune Dataset](https://mirg.city.ac.uk/codeapps/the-magnatagatune-dataset)
-* `gtzan`: music genre classification on the [GTZAN dataset](http://marsyas.info/downloads/datasets.html)
+- Pianist8(Composer, class 8)
+- EMOPIA(Emotion, class 4)
+- VGMIDI(Emotion, class 4)
+- WIKIMT(Genre, class 8)
 
 ```bash
-python evaluate.py <model_id> zeroshot <dataset_name>
+python evaluate.py <model_id> zeroshot --dataset_name <dataset_name>
 ```
 
 You'll need to download the datasets inside the [`datasets/`](datasets/) folder and preprocess them before running the zeroshot evaluation.
+
+## Fine-Tuning
+
+```bash
+python finetune.py <model_id> --dataset <dataset_name>
+```
 
 ## Reference
 This repository is based on https://github.com/ilaria-manco/muscall
