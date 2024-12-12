@@ -71,9 +71,9 @@ class MusCALLFinetuner(BaseTrainer):
 
         print('y_train: {}, y_valid: {}, y_test: {}'.format(y_train.shape, y_val.shape, y_test.shape))
 
-        trainset = FinetuneDataset(X=X_train, y=y_train)
-        validset = FinetuneDataset(X=X_val, y=y_val) 
-        testset = FinetuneDataset(X=X_test, y=y_test) 
+        trainset = FinetuneDataset(X=X_train, y=y_train, config=self.config)
+        validset = FinetuneDataset(X=X_val, y=y_val, config=self.config) 
+        testset = FinetuneDataset(X=X_test, y=y_test, config=self.config) 
 
         self.train_loader = DataLoader(trainset, **self.config.training.dataloader, drop_last=True, worker_init_fn=seed_worker, generator=g)
         self.val_loader = DataLoader(validset, **self.config.training.dataloader, drop_last=True, worker_init_fn=seed_worker, generator=g)
