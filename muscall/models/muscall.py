@@ -146,7 +146,7 @@ class MusCALL(nn.Module):
         midiを個別に処理したい
         '''
         embedding_midi = []
-        for midi, midi_shape in zip(midi_batch, first_input_midi_shape):
+        for midi in midi_batch:
 
             midi_features = self.midibert.forward(midi) # 最もGPUを消費
             midi_features_all = midi_features.last_hidden_state.mean(dim=1).mean(dim=0)
