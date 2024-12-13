@@ -69,7 +69,7 @@ for idx, item in enumerate(tqdm(data, desc="Processing captions"), start=1):
 #all_ans = np.array(all_ans)
 
 np.save("/home/Nakata/Music-Tri-Modal/data/datasets/pianist8/pianist8.npy", all_data)
-np.save("/home/Nakata/Music-Tri-Modal/data/datasets/pianist8_ans.npy", all_ans)
+np.save("/home/Nakata/Music-Tri-Modal/data/datasets/pianist8/pianist8_ans.npy", all_ans)
 
 # データセットの分割
 # クラスごとのインデックスを取得

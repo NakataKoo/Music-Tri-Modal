@@ -157,6 +157,13 @@ class MusCALL(nn.Module):
             
         embedding_midi = torch.stack(embedding_midi, dim=0) # torch.Tensorが入ったlistを二次元のTensorに変換
         return embedding_midi
+    
+    def encode_midi_per_data(self, midi):
+        # midi: torch.Size([midi_size, 512, 4])
+        midi_features = self.midibert.forward(midi)
+        midi_features_all = midi_features.last_hidden_state.mean(dim=1).mean(dim=0)
+        midi_features_all = self.midi_projection(midi_features_all)
+        return midi_features_all
 
     # 音声とテキストの特徴をエンコードし、対照学習のための損失を計算
     def forward(

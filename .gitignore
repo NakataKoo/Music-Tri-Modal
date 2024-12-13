@@ -3,7 +3,7 @@
 **/__pycache__/
 .vector_cache/
 .ipynb_checkpoints/
-save/
+save/experiments/**/
 **venv
 data/datasets/audiocaptionmidi/audio/
 data/datasets/audiocaptionmidi/midi/

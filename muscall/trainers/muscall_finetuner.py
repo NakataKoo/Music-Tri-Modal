@@ -165,7 +165,7 @@ class MusCALLFinetuner(BaseTrainer):
 
     def load_ckpt(self, checkpoint_path):
         checkpoint = torch.load(checkpoint_path, weights_only=True)
-        self.model.load_state_dict(checkpoint["state_dict"])
+        self.midibert.load_state_dict(checkpoint["state_dict"])
         self.optimizer.load_state_dict(checkpoint["optimizer"])
         self.start_epoch = checkpoint["epoch"]
 

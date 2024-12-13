@@ -22,7 +22,10 @@ class SequenceClassification(nn.Module):
     def forward(self, x, attn, layer):             # x: (batch, 512token, 4)
         #x = self.midibert(x, attn, output_hidden_states=True)   # (batch, 512token, 512dim)
         #x = self.midibert.encode_midi(x)
+
+        # (batch, midi_size, 512, 4) -> (batch, 512, 4, midi_size)
         x = x.permute(0, 2, 3, 1)
+        x = x.float()
 
         # (batch, 512, 4, midi_size) -> (batch, 512, 4, 1)
         x = self.midi_compressor(x)
@@ -31,7 +34,7 @@ class SequenceClassification(nn.Module):
         x = x.squeeze(-1)
 
         x = self.midibert.midibert(x, attn, output_hidden_states=True)  # (batch, 512, hs)
-        
+
         #y = y.last_hidden_state         # (batch_size, seq_len, 768)
         x = x.hidden_states[layer]
         attn_mat = self.attention(x)        # attn_mat: (batch, r, 512)
