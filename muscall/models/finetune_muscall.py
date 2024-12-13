@@ -10,6 +10,8 @@ class SequenceClassification(nn.Module):
     def __init__(self, midibert, class_num, hs, da=128, r=4):
         super(SequenceClassification, self).__init__()
         self.midibert = midibert
+        midi_size = 10
+        self.midi_compressor = nn.Linear(midi_size, 1, bias=False)
         self.attention = SelfAttention(hs, da, r)
         self.classifier = nn.Sequential(
             nn.Linear(hs*r, 256),
@@ -17,9 +19,19 @@ class SequenceClassification(nn.Module):
             nn.Linear(256, class_num)
         )
 
-    def forward(self, x, attn, layer):             # x: (batch, 512, 4)
-        #x = self.midibert(x, attn, output_hidden_states=True)   # (batch, 512, 768)
-        x = self.midibert.encode_midi(x)
+    def forward(self, x, attn, layer):             # x: (batch, 512token, 4)
+        #x = self.midibert(x, attn, output_hidden_states=True)   # (batch, 512token, 512dim)
+        #x = self.midibert.encode_midi(x)
+        x = x.permute(0, 2, 3, 1)
+
+        # (batch, 512, 4, midi_size) -> (batch, 512, 4, 1)
+        x = self.midi_compressor(x)
+
+        # (batch, 512, 4, 1) -> (batch, 512, 4)
+        x = x.squeeze(-1)
+
+        x = self.midibert.midibert(x, attn, output_hidden_states=True)  # (batch, 512, hs)
+        
         #y = y.last_hidden_state         # (batch_size, seq_len, 768)
         x = x.hidden_states[layer]
         attn_mat = self.attention(x)        # attn_mat: (batch, r, 512)
