@@ -8,8 +8,6 @@ import tqdm
 import random
 import pandas as pd
 import argparse
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score
 
 from muscall.models.muscall import MusCALL
 from muscall.utils.audio_utils import get_transform_chain
@@ -94,5 +92,4 @@ if __name__ == "__main__":
 
     # 全ての行をDataFrame化
     df = pd.DataFrame(data_list)
-        
-    model = LogisticRegression()
+    df.to_csv(params.dataset+".csv", index=False)
