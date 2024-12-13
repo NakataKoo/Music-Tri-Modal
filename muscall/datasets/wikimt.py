@@ -13,16 +13,16 @@ class WIKIMT(Dataset):
         super().__init__()
         if config is None:
             config = {}
-        self.config = config # audiocaption.yamlの内容
+        self.config = config
         self._dataset_type = dataset_type
         self._data_dir = data_root # ${env.data_root}/datasets/${dataset_name}
 
         self.CP = CP(dict=midi_dic)
 
         # データセットのJSONファイル(root/data/dataset/○○/dataset_○○.json)のパス
-        self.dataset_json = os.path.join(self._data_dir, "dataset_{}.json".format(self._dataset_type))
+        self.dataset_json = os.path.join(self._data_dir, "dataset_{}.json".format("all"))
 
-        self.midi_size = self.config.dataset_config.midi.size_dim0
+        self.midi_size = self.config.midi.size_dim0
         self._load()
 
     # JSONファイルからデータを読み込み、音声ID、キャプション、音声パス、midiパスをリストに格納
@@ -52,7 +52,7 @@ class WIKIMT(Dataset):
 
         first_input_midi_shape = input_midi.shape[0]
         if input_midi.shape == torch.Size([0]):
-            print(input_midi, self.midi_dir_paths[idx])
+            print(input_midi, self.midi_paths[idx])
 
         # パディング
         if input_midi.shape[0] < self.midi_size:

@@ -125,7 +125,7 @@ class MusCALL(nn.Module):
         return audio_features
 
     @torch.no_grad()
-    def encode_text(self, text, text_mask):
+    def encode_text(self, text, text_mask=None):
         # もしタプルだったら、リストに変換
         if isinstance(text, tuple):
             text = list(text)

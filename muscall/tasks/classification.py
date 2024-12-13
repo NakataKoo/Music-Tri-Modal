@@ -169,7 +169,7 @@ class Zeroshot:
             self.tags = ["Joy", "Anger", "Sadness", "Calmness"]
         elif self.dataset_name == "wikimt":
             from muscall.datasets.wikimt import WIKIMT
-            test_dataset = WIKIMT(config=self.muscall_config, dataset_type="test", midi_dic=self.muscall_config.model_config.midi.midi_dic, data_root=data_root)
+            test_dataset = WIKIMT(config=self.muscall_config.dataset_config, dataset_type="test", midi_dic=self.muscall_config.model_config.midi.midi_dic, data_root=data_root)
             self.tags = ["Country", "Folk", "Dance", "Latin", "Jazz", "Pop", "Rock", "R&B"]
         self.test_loader = DataLoader(dataset=test_dataset, batch_size=1)
 
