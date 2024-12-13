@@ -28,7 +28,7 @@ def parse_args():
     parser.add_argument("--checkpoint",type=str,default=None)
     parser.add_argument("--finetune_config",type=str,default=os.path.join(get_root_dir(), "configs", "finetuning.yaml"))
     parser.add_argument("--model_config",type=str,default=os.path.join(get_root_dir(), "configs", "models", "muscall.yaml"))
-    parser.add_argument("--dataset", type=str, help="name of the dataset", default="piansit8")
+    parser.add_argument("--dataset", type=str, help="name of the dataset", default="pianist8")
     parser.add_argument("--midi_size", type=int, help="name of the dataset", default=10)
 
     args = parser.parse_args()
@@ -36,13 +36,12 @@ def parse_args():
 
 def midi_padding(input_midi, midi_size):
 
-    if isinstance(input_midi, np.ndarray):
-        input_midi = torch.tensor(input_midi)
+    input_midi = torch.tensor(input_midi)
 
     # パディング処理
     if input_midi.size(0) < midi_size:
         x = midi_size - input_midi.size(0)
-        input_midi = torch.nn.functional.pad(input_midi, (0, 0, 0, x))
+        input_midi = torch.nn.functional.pad(input_midi, (0, 0, 0, 0, 0, x))
 
       # クロップ処理
     elif input_midi.size(0) > midi_size:
@@ -63,12 +62,12 @@ if __name__ == "__main__":
       num_classes = 4
 
     checkpoint_path = params.checkpoint
-    feature_extractor = MusCALL(model_config, is_train=False).to("cuda")
+    feature_extractor = MusCALL(model_config.model_config, is_train=False).to("cuda")
     checkpoint = torch.load(checkpoint_path, weights_only=True)
     feature_extractor.load_state_dict(checkpoint["state_dict"])
     feature_extractor.eval()
 
-    data_root = os.path.join(params.finetune_config.env.data_root, "datasets", params.dataset)
+    data_root = os.path.join(finetune_config.env.data_root, "datasets", params.dataset)
 
     X = np.load(os.path.join(data_root, f'{params.dataset}.npy'), allow_pickle=True)
     y = np.load(os.path.join(data_root, f'{params.dataset}_ans.npy'), allow_pickle=True)
@@ -76,7 +75,7 @@ if __name__ == "__main__":
     data_list = []
     for feature, label in zip(X, y):
           feature_pad = midi_padding(feature, params.midi_size)
-          feature_new = feature_extractor.encode_midi_per_data(feature_pad).cpu().numpy()
+          feature_new = feature_extractor.encode_midi_per_data(feature_pad).cpu().detach().numpy()
             
           # 多次元配列をflattenして1次元に
           flattened = feature_new.flatten()
