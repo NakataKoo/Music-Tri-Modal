@@ -139,7 +139,7 @@ class MusCALLFinetuner(BaseTrainer):
 
             train_loss, train_acc = self.iteration(self.train_loader, mode="train")
             val_loss, val_acc = self.iteration(self.val_loader, mode="val")
-            test_loss, test_acc = self.iteration(self.test_loader, model="test")
+            test_loss, test_acc = self.iteration(self.test_loader, mode="test")
 
             torch.cuda.empty_cache()
 
@@ -174,8 +174,9 @@ class MusCALLFinetuner(BaseTrainer):
 
     # 1エポック分の学習を実行（各バッチの損失計算＋バックプロパゲーション）
     def iteration(self, data_loader, mode="train"):
-        running_loss = 0.0
-        n_batches = 0
+        total_acc = 0.0
+        total_cnt = 0
+        total_loss = 0.0
 
         if mode == "train":
             self.model.train()
@@ -200,13 +201,13 @@ class MusCALLFinetuner(BaseTrainer):
             total_acc += acc
             total_cnt += y.shape[0]
 
-            loss = self.compute_loss(y_hat, y, attn)
+            loss = self.compute_loss(y_hat, y)
             total_loss += loss.item()
 
             # udpate only in train
             if mode == "train":
                 self.model.zero_grad()
                 loss.backward()
-                self.optim.step()
+                self.optimizer.step()
 
         return round(total_loss/len(data_loader),4), round(total_acc.item()/total_cnt,4)

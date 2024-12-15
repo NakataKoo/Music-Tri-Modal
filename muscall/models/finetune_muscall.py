@@ -64,12 +64,24 @@ class SelfAttention(nn.Module):
 
 class Classification(nn.Module):
     def __init__(self, midibert, class_num, hs, da=128, r=4):
-        super(SequenceClassification, self).__init__()
+        super().__init__()
         self.midibert = midibert
-        self.classifier = nn.Linear(hs, class_num)
+        self.attention = nn.MultiheadAttention(embed_dim=hs, num_heads=4)
+        self.classifier = nn.Sequential(
+            nn.Linear(hs, 256),
+            nn.batchnorm1d(256),
+            nn.ReLU(),
+            nn.Dropout(0.3),
+            nn.Linear(256, 128),
+            nn.batchnorm1d(128),
+            nn.ReLU(),
+            nn.Dropout(0.3),
+            nn.Linear(128, class_num)
+        )
 
 
     def forward(self, x, attn, layer):             # x: (batch, midi_dim, 512token, 4)
         x = self.midibert.encode_midi(x)          # (batch, hs)
-        logits = self.classifier(x)
+        attentioin_output, _ = self.attention(x, x, x)
+        logits = self.classifier(attentioin_output)
         return logits
