@@ -20,7 +20,7 @@ from muscall.trainers.base_trainer import BaseTrainer
 from muscall.models.muscall import MusCALL
 from muscall.utils.audio_utils import get_transform_chain
 
-from muscall.models.finetune_muscall import SequenceClassification
+from muscall.models.finetune_muscall import SequenceClassification, Classification
 
 # parserなどで指定
 seed = 0
@@ -88,9 +88,12 @@ class MusCALLFinetuner(BaseTrainer):
             self.model = torch.nn.DataParallel(self.model, device_ids=[0, 1])
 
         # 分類層の追加
-        self.model = SequenceClassification(self.midibert, 
-                                            class_num=self.num_classes, 
-                                            hs=self.config.model_config.projection_dim).to(self.device)
+        #self.model = SequenceClassification(self.midibert, 
+        #                                    class_num=self.num_classes, 
+        #                                    hs=self.config.model_config.projection_dim).to(self.device)
+        self.model = Classification(self.midibert,
+                                    class_num=self.num_classes,
+                                    hs=self.config.model_config.projection_dim).to(self.device)
 
     def build_optimizer(self):
         self.logger.write("Building optimizer")

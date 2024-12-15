@@ -60,3 +60,16 @@ class SelfAttention(nn.Module):
         attn_mat = F.softmax(self.ws2(torch.tanh(self.ws1(h))), dim=1)
         attn_mat = attn_mat.permute(0,2,1)
         return attn_mat
+    
+
+class Classification(nn.Module):
+    def __init__(self, midibert, class_num, hs, da=128, r=4):
+        super(SequenceClassification, self).__init__()
+        self.midibert = midibert
+        self.classifier = nn.Linear(hs, class_num)
+
+
+    def forward(self, x, attn, layer):             # x: (batch, midi_dim, 512token, 4)
+        x = self.midibert.encode_midi(x)          # (batch, hs)
+        logits = self.classifier(x)
+        return logits
