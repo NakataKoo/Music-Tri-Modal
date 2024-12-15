@@ -69,11 +69,11 @@ class Classification(nn.Module):
         self.attention = nn.MultiheadAttention(embed_dim=hs, num_heads=4)
         self.classifier = nn.Sequential(
             nn.Linear(hs, 256),
-            nn.batchnorm1d(256),
+            nn.BatchNorm1d(256),
             nn.ReLU(),
             nn.Dropout(0.3),
             nn.Linear(256, 128),
-            nn.batchnorm1d(128),
+            nn.BatchNorm1d(128),
             nn.ReLU(),
             nn.Dropout(0.3),
             nn.Linear(128, class_num)
