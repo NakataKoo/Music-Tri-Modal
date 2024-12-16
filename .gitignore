@@ -8,5 +8,8 @@ save/experiments/**/
 data/datasets/audiocaptionmidi/audio/
 data/datasets/audiocaptionmidi/midi/
 data/datasets/audiocaptionmidi/basic-pitch-output/
-ckpt/
+ckpt/*.pt
+ckpt/*.ckpt
 core
+data/datasets/vgmidi/labelled/phrases/
+data/datasets/wikimt/midi/

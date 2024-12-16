@@ -51,6 +51,10 @@ class MusCALLFinetuner(BaseTrainer):
             self.num_classes = 8
         elif dataset_name == 'emopia':
             self.num_classes = 4
+        elif dataset_name == 'vgmidi':
+            self.num_classes = 4
+        elif dataset_name == 'wikimt':
+            self.num_classes = 8
 
         self.load() # load_dataset()、build_model()、build_optimizer()、self.logger.save_config()の実行
 
