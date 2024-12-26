@@ -16,7 +16,7 @@ logging.basicConfig(
 data = glob.glob('/home/Nakata/Music-Tri-Modal/data/datasets/audiocaptionmidi/lmd_full/**/*.mid', recursive=True)
 
 pbar = tqdm(data, disable=False, leave=True)
-cp = CP(dict="/home/Nakata/Music-Tri-Modal/muscall/modules/MidiBERT/CP.pkl")
+cp = CP(dict="/home/Nakata/Music-Tri-Modal/muscall/modules/MidiBERT/CP_origin.pkl")
 
 files = []
 

@@ -13,3 +13,4 @@ ckpt/*.ckpt
 core
 data/datasets/vgmidi/labelled/phrases/
 data/datasets/wikimt/midi/
+data/datasets/audiocaptionmidi/lmd_full/

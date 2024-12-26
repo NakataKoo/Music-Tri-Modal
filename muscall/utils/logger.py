@@ -14,7 +14,7 @@ class Logger:
 
     def init_pretrain_logger(self):
         if self.config.env.experiment_id is None:
-            self.experiment_id = self.get_timestamp() # 現在時刻を実験idとする
+            self.experiment_id = self.get_timestamp()+f"_{self.config.model_config.midi.model_name}" # 現在時刻を実験idとする
             OmegaConf.update(self.config, "env.experiment_id",
                              self.experiment_id)
         else:
