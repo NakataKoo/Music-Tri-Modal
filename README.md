@@ -1,4 +1,4 @@
-## Setup
+# 1. Setup
 Create a fresh virtual environment:
 
 ```setup
@@ -23,9 +23,9 @@ at Music-Tri-Modal/ckpt/
 wget https://huggingface.co/lukewys/laion_clap/resolve/main/music_audioset_epoch_15_esc_90.14.pt
 ```
 
-## Preparing the dataset
+# 2. Preparing the dataset
 
-### MIDI-Text-Audio Pair ver
+## 2-1. MIDI-Text-Audio Pair ver
 
 The Music-Tri-Modal is trained on a multimodal dataset of (audio, text, midi) pairs. 
 
@@ -77,9 +77,9 @@ wget http://hog.ee.columbia.edu/craffel/lmd/lmd_matched_mp3.tar.gz
 tar -xzvf lmd_matched_mp3.tar.gz
 ```
 
-### MIDI-Text Pair ver
+## 2-2. MIDI-Text Pair ver
 
-The Music-Tri-Modal is trained on a multimodal dataset of (audio, text, midi) pairs. 
+Bridge Alignment(Text-MIDI pair only) ver.
 
 Annotations should be provided in JSON format and must include the following fields:
 
@@ -115,6 +115,8 @@ wget https://huggingface.co/datasets/amaai-lab/MidiCaps/resolve/main/train.json
 wget https://huggingface.co/datasets/amaai-lab/MidiCaps/resolve/main/midicaps.tar.gz
 tar -zxvf midicaps.tar.gz
 ```
+
+To make ```dataset_all.json``` from "train.json" in [MidiCaps](https://huggingface.co/datasets/amaai-lab/MidiCaps), run bellow:
 
 ```python
 import json
@@ -159,14 +161,19 @@ print(f"JSONデータが{json_file_path}に保存されました。")
 
 ```
 
-## Training
+# 3. Quick Start
+
+- Training
+- Evaluation
+- Fine-Tune
+
+## 3-1. Training
 Dataset, model and training configurations are set in the respective `yaml` files in [`configs`](configs). You can also pass some options via the CLI, overwriting the arguments in the config files. For more details on the CLI options, please refer to the [training script](scripts/train.py).
 
 To train the model with the default configs, simply run
 
 ```bash
-cd scripts/
-python train.py 
+source scripts/train.sh
 ```
 
 This will generate a `model_id` and create a new folder in [`save/experiments/`](save/experiments/) where the output will be saved.
@@ -174,10 +181,10 @@ This will generate a `model_id` and create a new folder in [`save/experiments/`]
 If you wish to resume training from a saved checkpoint, run this command:
 
 ```bash
-python train.py --experiment_id <model_id> 
+python scripts/train.py --experiment_id <model_id> 
 ```
 
-## Evaluating
+## 3-2. Evaluating
 Once trained, you can evaluate Model on the cross-modal retrieval task:
 
 ```bash
@@ -194,16 +201,26 @@ In our zero-shot evaluation, we include:
 - WIKIMT(Genre, class 8)
 
 ```bash
-python evaluate.py --experiment_id <model_id> zeroshot --dataset_name <dataset_name>
+python scripts/evaluate.py --experiment_id <model_id> zeroshot --dataset_name <dataset_name>
 ```
 
 You'll need to download the datasets inside the [`datasets/`](datasets/) folder and preprocess them before running the zeroshot evaluation.
 
-## Fine-Tuning
+## 3-3. Fine-Tuning
 
 ```bash
-python finetune.py --experiment_id <model_id> --dataset <dataset_name>
+source scripts/finetune.sh
 ```
 
-## Reference
+In scripts/finetune.sh:
+
+```bash
+python scripts/finetune.py --experiment_id <model_id> --dataset <dataset_name>
+```
+
+# 4. Caution
+
+環境を変えて実行する場合、configファイルのパスを適宜変える必要がある。
+
+# 5. Reference
 This repository is based on https://github.com/ilaria-manco/muscall

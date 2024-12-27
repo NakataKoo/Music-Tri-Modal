@@ -3,12 +3,12 @@ model_config:
   projection_dim: 512 # dimensionality of the multimodal projection layer
   temperature: null
   clap:
-    clap_ckpt: /home/Nakata/Music-Tri-Modal/ckpt/music_audioset_epoch_15_esc_90.14.pt
+    clap_ckpt: ${PYTHONPATH}/Music-Tri-Modal/ckpt/music_audioset_epoch_15_esc_90.14.pt
     text_hidden_size: 512
     audio_hidden_size: 512
   midi:
-    midi_dic: /home/Nakata/Music-Tri-Modal/muscall/modules/MidiBERT/CP.pkl
+    midi_dic: ${PYTHONPATH}/Music-Tri-Modal/muscall/modules/MidiBERT/CP.pkl
     load_ckpt: False
-    ckpt: /home/Nakata/Music-Tri-Modal/ckpt/model_best_distilbert_loss03.ckpt
-    model_name: 'bert' # 'bert', 'albert', 'distilbert'  ALBERTだとRuntimeError: CUDA driver error: invalid argument発声
+    ckpt: ${PYTHONPATH}/Music-Tri-Modal/ckpt/model_best_distilbert_loss03.ckpt
+    model_name: 'bert'
   loss: clip # one of [clip, weighted_clip]
