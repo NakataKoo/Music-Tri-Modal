@@ -1,16 +1,23 @@
 # 1. Setup
 Create a fresh virtual environment:
 
+## 1-1. Create Venv
+Python Venv:
 ```setup
 python -m venv venv 
 source venv/bin/activate
 ```
 
-Then, clone the repository and install the dependencies:
-(研究室のA40サーバーの場合)
+Anaconda:
 ```setup
-git clone https://www.github.com/ilaria-manco/muscall 
-cd muscall 
+conda create -n venv python=3.9 jupyter
+conda activate venv
+```
+
+## 1-2. Install packages
+
+Then, clone the repository and install the dependencies(Python 3.9, CUDA=12.1):
+```setup
 pip install -r requirements.txt
 pip install -e .
 pip install torch torchaudio --index-url https://download.pytorch.org/whl/cu121
@@ -18,7 +25,9 @@ pip install laion_clap
 pip install miditoolkit
 ```
 
-at Music-Tri-Modal/ckpt/
+## 1-3. Download CLAP checkpoint
+
+at ```Music-Tri-Modal/ckpt/```
 ```
 wget https://huggingface.co/lukewys/laion_clap/resolve/main/music_audioset_epoch_15_esc_90.14.pt
 ```
@@ -108,6 +117,8 @@ dataset_name
 └── dataset_test.json
 ```
 
+### 2-2-1. Original Dataset 
+
 An illustrative example of the dataset is provided in [`data/datasets/audiocaption/`](data/datasets/audiocaption/).
 
 ```
@@ -161,6 +172,15 @@ print(f"JSONデータが{json_file_path}に保存されました。")
 
 ```
 
+### 2-2-2. My Dataset
+
+In ```data/datasets/audiocaptionmidi/```
+
+```bash
+wget https://huggingface.co/datasets/KooNakata/Music-Tri-Modal/resolve/main/midicaps.tar.gz
+tar -zxvf midicaps.tar.gz
+```
+
 # 3. Quick Start
 
 - Training
@@ -212,7 +232,7 @@ You'll need to download the datasets inside the [`datasets/`](datasets/) folder 
 source scripts/finetune.sh
 ```
 
-In scripts/finetune.sh:
+In ```scripts/finetune.sh```:
 
 ```bash
 python scripts/finetune.py --experiment_id <model_id> --dataset <dataset_name>

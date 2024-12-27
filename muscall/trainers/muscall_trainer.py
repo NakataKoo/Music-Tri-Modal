@@ -88,12 +88,12 @@ class MusCALLTrainer(BaseTrainer):
 
         if torch.cuda.device_count() > 1:
             print("Use %d GPUS" % torch.cuda.device_count())
-            self.model = torch.nn.DataParallel(self.model, device_ids=[0, 1])
+            self.model = torch.nn.DataParallel(self.model)
     
         # DataParallelでラップされた場合に元のモデルにアクセスしやすくするための対策
         #self.model = self.model.module if isinstance(self.model, torch.nn.DataParallel) else self.model
 
-        self.reporter = MemReporter(self.model)
+        # self.reporter = MemReporter(self.model)
         # self.reporter.report()
 
     def build_optimizer(self):
@@ -243,8 +243,6 @@ class MusCALLTrainer(BaseTrainer):
                 input_audio = augment_chain(input_audio.unsqueeze(1), audio_data_config.sr).squeeze(1)
 
             # Cast operations to mixed precision
-            # 混合精度（AMP）を使用して損失を計算（順伝播forwardメソッド）
-
             with torch.amp.autocast("cuda", enabled=self.config.training.amp):
                 loss = self.model(
                     input_audio,
