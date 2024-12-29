@@ -3,12 +3,12 @@ model_config:
   projection_dim: 512 # dimensionality of the multimodal projection layer
   temperature: null
   clap:
-    clap_ckpt: ${PYTHONPATH}/Music-Tri-Modal/ckpt/music_audioset_epoch_15_esc_90.14.pt
+    clap_ckpt: /raid/m236866/Music-Tri-Modal/ckpt/music_audioset_epoch_15_esc_90.14.pt
     text_hidden_size: 512
     audio_hidden_size: 512
   midi:
-    midi_dic: ${PYTHONPATH}/Music-Tri-Modal/muscall/modules/MidiBERT/CP.pkl
-    load_ckpt: False
-    ckpt: ${PYTHONPATH}/Music-Tri-Modal/ckpt/model_best_distilbert_loss03.ckpt
-    model_name: 'bert'
+    midi_dic: /raid/m236866/Music-Tri-Modal/muscall/modules/MidiBERT/CP.pkl
+    load_ckpt: True
+    ckpt: /raid/m236866/Music-Tri-Modal/ckpt/20241227_albert_restart/model_best.ckpt
+    model_name: 'albert'
   loss: clip # one of [clip, weighted_clip]

@@ -30,7 +30,6 @@ from muscall.datasets.audiocaption import AudioCaptionMidiDataset
 def get_muscall_features(model, data_loader, device):
     dataset_size = data_loader.dataset.__len__()
 
-    #all_audio_features = torch.zeros(dataset_size, 512).to(device)
     all_text_features = torch.zeros(dataset_size, 512).to(device)
     all_midi_features = torch.zeros(dataset_size, 512).to(device)
 
@@ -39,13 +38,10 @@ def get_muscall_features(model, data_loader, device):
         batch = tuple(t.to(device=device, non_blocking=True) if isinstance(t, torch.Tensor) else t for t in batch)
 
         # バッチ内のデータを展開し、それぞれの変数に割り当て(__getitem__メソッドにより取得)
-        audio_id, input_audio, input_text, input_midi, first_input_midi_shape, midi_dir_paths, data_idx = batch 
-
-        #audio_features = model.encode_audio(input_audio)
-        text_features = model.encode_text(text=input_text, text_mask=None)
+        audio_id, text_features, input_midi, first_input_midi_shape, midi_dir_paths, data_idx = batch 
+        
         midi_features = model.encode_midi(input_midi, first_input_midi_shape)
 
-        #audio_features = audio_features / audio_features.norm(dim=-1, keepdim=True)
         text_features = text_features / text_features.norm(dim=-1, keepdim=True)
         midi_features = midi_features / midi_features.norm(dim=-1, keepdim=True)
 
@@ -108,8 +104,6 @@ def run_retrieval(model, data_loader, device, retrieval_type="midi_text"):
     text_features, midi_features = get_muscall_features(
         model, data_loader, device)
     
-    #if retrieval_type == "midi_audio":
-    #    score_matrix = compute_sim_score(midi_features, audio_features)
     if retrieval_type == "midi_text":
         score_matrix = compute_sim_score(midi_features, text_features)
 

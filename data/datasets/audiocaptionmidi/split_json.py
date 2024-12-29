@@ -1,5 +1,16 @@
 import json
 import random
+import argparse
+
+def get_args():
+    parser = argparse.ArgumentParser(description='')
+
+    ### path setup ###
+    parser.add_argument('--input_file', type=str, default='data_creation/prepare_data/dict/CP.pkl')
+
+    args = parser.parse_args()
+
+    return args
 
 def split_data(input_file, train_ratio=0.7, validation_ratio=0.2, test_ratio=0.1):
     # JSONファイルを読み込む
@@ -32,5 +43,6 @@ def split_data(input_file, train_ratio=0.7, validation_ratio=0.2, test_ratio=0.1
         json.dump(test_data, test_file, ensure_ascii=False, indent=4)
 
 # 使用例
-input_file = '/home/Nakata/Music-Tri-Modal/data/datasets/audiocaptionmidi/dataset_all.json'  # 統合したJSONファイルのパス
+args = get_args()
+input_file = args.input_file  # 統合したJSONファイルのパス
 split_data(input_file)

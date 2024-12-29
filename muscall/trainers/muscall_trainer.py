@@ -43,7 +43,7 @@ class MusCALLTrainer(BaseTrainer):
 
         self.load() # load_dataset()、build_model()、build_optimizer()、self.logger.save_config()の実行
 
-        self.scaler = torch.amp.GradScaler()
+        self.scaler = torch.cuda.amp.GradScaler()
 
     def load_dataset(self):
         self.logger.write("Loading dataset")
@@ -80,7 +80,7 @@ class MusCALLTrainer(BaseTrainer):
         model_name = self.config.model_config.model_name # muscall.yaml→model_config→model_nameより、モデル名を取得
 
         if model_name == "muscall":
-            self.model = MusCALL(self.config.model_config, is_train=True).to(self.device)
+            self.model = MusCALL(self.config.model_config, is_train=True)
         else:
             raise ValueError("{} model is not supported.".format(model_name))
 
@@ -88,10 +88,7 @@ class MusCALLTrainer(BaseTrainer):
 
         if torch.cuda.device_count() > 1:
             print("Use %d GPUS" % torch.cuda.device_count())
-            self.model = torch.nn.DataParallel(self.model)
-    
-        # DataParallelでラップされた場合に元のモデルにアクセスしやすくするための対策
-        #self.model = self.model.module if isinstance(self.model, torch.nn.DataParallel) else self.model
+            self.model = torch.nn.DataParallel(self.model).to(self.device)
 
         # self.reporter = MemReporter(self.model)
         # self.reporter.report()
@@ -119,16 +116,6 @@ class MusCALLTrainer(BaseTrainer):
             batch_size=self.batch_size,
         )
 
-        """
-        retrieval_metrics_midi_audio = run_retrieval(
-            model=self.model,
-            data_loader=val_subset_loader,
-            device=self.device,
-            retrieval_type="midi_audio"
-        )
-        print(f"midi_audio: {retrieval_metrics_midi_audio}")
-        """
-
         retrieval_metrics_midi_text = run_retrieval(
             model=self.model,
             data_loader=val_subset_loader,
@@ -137,7 +124,6 @@ class MusCALLTrainer(BaseTrainer):
         )
         print(f"midi_text: {retrieval_metrics_midi_text}")
 
-        #retrieval_metrics = (retrieval_metrics_midi_audio["R@10"].item()+retrieval_metrics_midi_text["R@10"].item()) / 2
         retrieval_metrics = retrieval_metrics_midi_text["R@10"].item()
 
         return retrieval_metrics
@@ -224,42 +210,24 @@ class MusCALLTrainer(BaseTrainer):
         for i, batch in enumerate(pbar):
             batch = tuple(t.to(device=self.device, non_blocking=True) if isinstance(t, torch.Tensor) else t for t in batch)
 
-            audio_id, input_audio, input_text, input_midi, first_input_midi_shape, midi_dir_paths, data_idx = batch # バッチ内のデータを展開し、それぞれの変数に割り当て(__getitem__メソッドにより取得)
+            audio_id, input_text_enb, input_midi, first_input_midi_shape, midi_dir_paths, data_idx = batch # バッチ内のデータを展開し、それぞれの変数に割り当て(__getitem__メソッドにより取得)
 
             sentence_sim = None
 
-            original_audio = None
-            audio_data_config = self.config.dataset_config.audio
-            # 学習時、音声データの拡張が有効になっている場合、入力音声データ拡張
-            if is_training and audio_data_config.augment:
-                original_audio = input_audio
-                augment_chain = get_transform_chain( # 一連のデータ拡張操作
-                    p_polarity=0, # 極性変換の確率
-                    p_gain=0,# 増幅の確率
-                    p_noise=audio_data_config.p_noise, # ノイズ追加の確率
-                    p_pitch_shift=audio_data_config.p_pitch_shift,# ピッチシフトの確率
-                    sample_rate=audio_data_config.sr, # サンプルレート（ここでは16,000 Hz）
-                ) 
-                input_audio = augment_chain(input_audio.unsqueeze(1), audio_data_config.sr).squeeze(1)
-
             # Cast operations to mixed precision
-            with torch.amp.autocast("cuda", enabled=self.config.training.amp):
-                loss = self.model(
-                    input_audio,
-                    input_text,
+            with torch.cuda.amp.autocast(enabled=self.config.training.amp):
+                loss = self.model.forward(
+                    input_text_enb,
                     input_midi,
                     first_input_midi_shape,
-                    original_audio=original_audio, # 元の音声データ（拡張前の音声データ）
                     sentence_sim=sentence_sim,# 文の類似度（オプション:損失関数がweighted_clipの場合）
                 )
             
             if not self.config.training.amp:
-                loss = self.model(
-                        input_audio,
-                        input_text,
+                loss = self.model.forward(
+                        input_text_enb,
                         input_midi,
                         first_input_midi_shape,
-                        original_audio=original_audio, # 元の音声データ（拡張前の音声データ）
                         sentence_sim=sentence_sim,# 文の類似度（オプション：損失関数がweighted_clipの場合）
                 )
 

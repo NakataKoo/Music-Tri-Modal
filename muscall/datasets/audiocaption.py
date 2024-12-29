@@ -26,11 +26,6 @@ class AudioCaptionMidiDataset(Dataset):
         self.dataset_json = os.path.join(self._data_dir, "dataset_{}.json".format(self._dataset_type))
 
         # audiocaption.yamlの内容
-        self.sample_rate = self.config.audio.sr # サンプリングレート
-        self.num_samples = self.sample_rate * self.config.audio.crop_length # サンプリング数
-        self.crop_length = self.config.audio.crop_length # 曲の長さ（秒）
-        self.offset = self.config.audio.offset
-        self.random_crop = self.config.audio.random_crop # ランダムクロップの有無
         self.midi_size = self.config.midi.size_dim0 # input_midiのtorch.Size([x, 512, 4])におけるxのサイズ
         self._load()
 
@@ -38,39 +33,14 @@ class AudioCaptionMidiDataset(Dataset):
     def _load(self):
         with open(self.dataset_json) as f:
             self.samples = json.load(f) # jsonをPythonオブジェクトとして読み込み
-            #self.audio_dir = os.path.join(self._data_dir, "audio") # ${env.data_root}/datasets/${dataset_config.dataset_name}/audio
-            #self.midi_dir = os.path.join(self._data_dir, "midi") # ${env.data_root}/datasets/${dataset_config.dataset_name}/midi
 
             self.audio_ids = [i["audio_id"] for i in self.samples]
-            self.captions = [i["caption"].strip() for i in self.samples]
-            # self.audio_paths = [os.path.join(self.audio_dir, i["audio_path"]) for i in self.samples]
+            self.caption_enbs = [i["caption_embedding"] for i in self.samples]
             self.midi_dir_paths = [os.path.join(self._data_dir, os.path.splitext(i["audio_path"])[0].replace(".mid", ".npy")) for i in self.samples]
 
-    def get_raw_caption(self, idx):
-        """Get raw caption text"""
-        return self.captions[idx]
-
-    def get_audio(self, idx):
-
-        audio = np.load(self.audio_paths[idx])
-
-        
-        # 短い音声に対しパディング
-        if audio.shape[1] < self.num_samples:
-            x = self.num_samples - audio.shape[1]
-            padded_audio = np.pad(audio[0], ((0, x)), "mean")
-            audio = np.array([padded_audio])
-        # 長い音声に対しクロップ
-        elif audio.shape[1] > self.num_samples:
-            cropped_audio = audio[0][:self.num_samples]
-            audio = np.array([cropped_audio])
-        
-        clipped_audio = np.clip(audio[0], -1.0, 1.0)
-        clipped_audio = 2 * (clipped_audio - np.min(clipped_audio)) / (np.max(clipped_audio) - np.min(clipped_audio)) - 1
-        audio = np.array([clipped_audio])
-        
-        audio = torch.from_numpy(audio.astype(np.float32)).clone()
-        return audio
+    def get_caption_embedding(self, idx):
+        """Get text embedding"""
+        return torch.tensor(self.caption_enbs[idx])
     
     def midi_padding(self, input_midi, idx):
         """
@@ -116,17 +86,14 @@ class AudioCaptionMidiDataset(Dataset):
     def __getitem__(self, idx):
         audio_id = torch.tensor(self.audio_ids[idx], dtype=torch.long) # "audio_id"
 
-        #input_audio = self.get_audio(idx) # 音声データを取得
-        input_audio = "" # 音声データを使わない
-        input_text = self.get_raw_caption(idx) # キャプションを取得
+        input_text_enb = self.get_caption_embedding(idx) # キャプションを取得
         input_midi, first_input_midi_shape = self.get_midi(idx) # midiデータを取得
 
         idx = torch.tensor(idx)
 
         return (
             audio_id,
-            input_audio,
-            input_text,
+            input_text_enb,
             input_midi,
             first_input_midi_shape,
             self.midi_dir_paths,

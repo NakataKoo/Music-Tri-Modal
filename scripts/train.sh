@@ -5,7 +5,7 @@
 # export PYTHONWARNINGS="ignore"
 # export CUDA_LAUNCH_BLOCKING=1
 # python scripts/train.py 2> result.txt \
+#export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 export PYTHONPATH="."
-export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
-export CUDA_VISIBLE_DEVICES="0"
+export CUDA_VISIBLE_DEVICES="0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15"
 python scripts/train.py

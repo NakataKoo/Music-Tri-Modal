@@ -6,7 +6,6 @@ from pytorch_memlab import profile
 
 from muscall.modules.MidiBERT.model import *
 from transformers import BertConfig, AlbertConfig, DistilBertConfig #RobertaConfig,
-import laion_clap
 
 # クロスエントロピー誤差
 def contrastive_loss(logits: torch.Tensor) -> torch.Tensor:
@@ -26,9 +25,6 @@ class MusCALL(nn.Module):
         self.type_loss = config.loss
         self.temperature = config.temperature
         self.device = torch.device("cuda")
-
-        self.clap = laion_clap.CLAP_Module(enable_fusion=False, amodel='HTSAT-base', device=self.device)
-        self.clap.load_ckpt(config.clap.clap_ckpt, verbose=False)
         
         with open(config.midi.midi_dic, 'rb') as f:
             e2w, w2e = pickle.load(f)
@@ -82,62 +78,18 @@ class MusCALL(nn.Module):
         if config.midi.load_ckpt and is_train:
             print("\nLoad Check point to restart\n")
             print(config.midi.ckpt)
-            cpt = torch.load(config.midi.ckpt, weights_only=True)
+            cpt = torch.load(config.midi.ckpt, weights_only=False)
             stdict_m = cpt['state_dict']
             stdict_o = cpt['optimizer']
             self.midibert.load_state_dict(stdict_m, strict=False)
 
-        for param in self.clap.parameters():
-            param.requires_grad = False
-
         self.projection_dim = config.projection_dim # 最終的な共通のエンベディングの512次元
-        #self.audio_dim = config.clap.audio_hidden_size
         self.text_dim = config.clap.text_hidden_size
 
-        #self.audio_projection = nn.Linear(self.audio_dim, self.projection_dim, bias=False) # audio_dimをprojection_dimへ線形変換
-        #self.text_projection = nn.Linear(self.text_dim, self.projection_dim, bias=False)
         self.midi_projection = nn.Linear(self.midi_dim, self.projection_dim, bias=False)
 
         if self.temperature is None:
             self.logit_scale = nn.Parameter(torch.ones([]) * np.log(1 / 0.07))
-
-    @torch.no_grad()
-    def encode_audio(self, audio):
-        """
-        audio: batchで来る, torch.Tensor型
-        """
-
-        audio_features = []
-        for data in audio:
-            
-            data = torch.nan_to_num(data, nan=0.0) # nanを0に変換
-            audio_feature = self.clap.get_audio_embedding_from_data(data, use_tensor=True) # 音声エンベディングを抽出
-            
-            # numpy.ndarray から torch.Tensor に変換
-            if isinstance(audio_feature, np.ndarray):
-                audio_feature = torch.from_numpy(audio_feature.astype(np.float32)).clone()
-            
-            # デバイスに移動
-            audio_feature = audio_feature.to(self.device)
-            #audio_feature = self.audio_projection(audio_feature) # 最終的な共通のエンベディングの次元に変換
-            audio_features.append(audio_feature)
-        audio_features = torch.cat(audio_features, dim=0)
-        return audio_features
-
-    @torch.no_grad()
-    def encode_text(self, text, text_mask=None):
-        # もしタプルだったら、リストに変換
-        if isinstance(text, tuple):
-            text = list(text)
-        # textがリストではない場合、リストに変換
-        if not isinstance(text, list):
-            text = [text]
-        text_features = self.clap.get_text_embedding(text, use_tensor=True)
-    
-        # デバイスに移動
-        text_features = text_features.to(self.device)
-        #text_features = self.text_projection(text_features)
-        return text_features
     
     def encode_midi(self, midi_batch, first_input_midi_shape=None):
         '''
@@ -168,24 +120,19 @@ class MusCALL(nn.Module):
     # 音声とテキストの特徴をエンコードし、対照学習のための損失を計算
     def forward(
         self,
-        audio, # 拡張後の音声データ（バッチ）
-        text, # テキストデータ（バッチ）
+        text_features, # テキストデータ（バッチ）
         midi,  # midiデータ（バッチ）
         first_input_midi_shape,
-        original_audio=None, # 元音声データ
         sentence_sim=None, # 文の類似度(オプション)
         text_mask=None, #テキストのマスク(オプション)
         return_loss=True, # 損失を計算して返すかどうかを指定するフラグ
     ):
 
-        # 音声とテキストとmidiの特徴をそれぞれエンコード
-        #audio_features = self.encode_audio(audio)
-        text_features = self.encode_text(text, text_mask)
+        # midiの特徴をそれぞれエンコード
         midi_features = self.encode_midi(midi, first_input_midi_shape)
 
         # normalise features（各特徴ベクトルをそのノルムで割ることで、単位ベクトルに変換）
         epsilon = 1e-6
-        #audio_features = audio_features / (audio_features.norm(dim=-1, keepdim=True) + epsilon)
         text_features = text_features / (text_features.norm(dim=-1, keepdim=True) + epsilon)
         midi_features = midi_features / (midi_features.norm(dim=-1, keepdim=True) + epsilon)
 
@@ -199,8 +146,6 @@ class MusCALL(nn.Module):
 
         logits_per_midi_text = logit_scale * midi_features @ text_features.t()
         logits_per_text_midi = logits_per_midi_text.t()
-        #logits_per_midi_audio = logit_scale * midi_features @ audio_features.t()
-        #logits_per_audio_midi = logits_per_midi_audio.t()
 
         # マルチモーダル損失を計算
         if return_loss:

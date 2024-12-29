@@ -10,7 +10,12 @@ data/datasets/audiocaptionmidi/midi/
 data/datasets/audiocaptionmidi/basic-pitch-output/
 ckpt/*.pt
 ckpt/*.ckpt
+ckpt/**/
 core
 data/datasets/vgmidi/labelled/phrases/
 data/datasets/wikimt/midi/
 data/datasets/audiocaptionmidi/lmd_full/
+data/datasets/audiocaptionmidi/dataset_all_with_caption_emb.json
+data/datasets/audiocaptionmidi/dataset_train.json
+data/datasets/audiocaptionmidi/dataset_val.json
+data/datasets/audiocaptionmidi/dataset_test.json
