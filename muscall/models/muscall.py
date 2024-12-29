@@ -13,7 +13,7 @@ def contrastive_loss(logits: torch.Tensor) -> torch.Tensor:
     return nn.functional.cross_entropy(logits, labels)
 
 # 誤差関数
-def clip_loss(similarity: torch.Tensor, sentence_sim=None, type_loss="clip") -> torch.Tensor:
+def clip_loss(similarity: torch.Tensor, type_loss="clip") -> torch.Tensor:
     loss1 = contrastive_loss(similarity)
     loss2 = contrastive_loss(similarity.T)
     return (loss1 + loss2) / 2.0
@@ -121,8 +121,6 @@ class MusCALL(nn.Module):
         text_features, # テキストデータ（バッチ）
         midi,  # midiデータ（バッチ）
         first_input_midi_shape,
-        sentence_sim=None, # 文の類似度(オプション)
-        text_mask=None, #テキストのマスク(オプション)
         return_loss=True, # 損失を計算して返すかどうかを指定するフラグ
     ):
 

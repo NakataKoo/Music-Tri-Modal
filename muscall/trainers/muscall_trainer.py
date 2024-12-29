@@ -206,17 +206,14 @@ class MusCALLTrainer(BaseTrainer):
         for i, batch in enumerate(pbar):
             batch = tuple(t.to(device=self.device, non_blocking=True) if isinstance(t, torch.Tensor) else t for t in batch)
 
-            audio_id, input_text_enb, input_midi, first_input_midi_shape, midi_dir_paths, data_idx = batch # バッチ内のデータを展開し、それぞれの変数に割り当て(__getitem__メソッドにより取得)
-
-            sentence_sim = None
+            audio_id, input_text_enb, input_midi, first_input_midi_shape, data_idx = batch # バッチ内のデータを展開し、それぞれの変数に割り当て(__getitem__メソッドにより取得)
 
             # Cast operations to mixed precision
             with torch.cuda.amp.autocast(enabled=self.config.training.amp):
                 loss = self.model.forward(
                     input_text_enb,
                     input_midi,
-                    first_input_midi_shape,
-                    sentence_sim=sentence_sim,# 文の類似度（オプション:損失関数がweighted_clipの場合）
+                    first_input_midi_shape
                 )
             
             if not self.config.training.amp:
@@ -224,7 +221,6 @@ class MusCALLTrainer(BaseTrainer):
                         input_text_enb,
                         input_midi,
                         first_input_midi_shape,
-                        sentence_sim=sentence_sim,# 文の類似度（オプション：損失関数がweighted_clipの場合）
                 )
 
             #loss = loss.mean()

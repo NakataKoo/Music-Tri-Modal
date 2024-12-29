@@ -96,7 +96,6 @@ class AudioCaptionMidiDataset(Dataset):
             input_text_enb,
             input_midi,
             first_input_midi_shape,
-            self.midi_dir_paths,
             idx,
         )
 

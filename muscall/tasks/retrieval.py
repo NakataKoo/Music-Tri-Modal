@@ -38,7 +38,7 @@ def get_muscall_features(model, data_loader, device):
         batch = tuple(t.to(device=device, non_blocking=True) if isinstance(t, torch.Tensor) else t for t in batch)
 
         # バッチ内のデータを展開し、それぞれの変数に割り当て(__getitem__メソッドにより取得)
-        audio_id, text_features, input_midi, first_input_midi_shape, midi_dir_paths, data_idx = batch 
+        audio_id, text_features, input_midi, first_input_midi_shape, data_idx = batch 
         
         midi_features = model.encode_midi(input_midi, first_input_midi_shape)
 
