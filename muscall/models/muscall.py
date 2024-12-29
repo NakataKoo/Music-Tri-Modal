@@ -84,8 +84,6 @@ class MusCALL(nn.Module):
             self.midibert.load_state_dict(stdict_m, strict=False)
 
         self.projection_dim = config.projection_dim # 最終的な共通のエンベディングの512次元
-        self.text_dim = config.clap.text_hidden_size
-
         self.midi_projection = nn.Linear(self.midi_dim, self.projection_dim, bias=False)
 
         if self.temperature is None:

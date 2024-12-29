@@ -78,17 +78,13 @@ class MusCALLTrainer(BaseTrainer):
     def build_model(self):
         self.logger.write("Building model")
         model_name = self.config.model_config.model_name # muscall.yaml→model_config→model_nameより、モデル名を取得
-
-        if model_name == "muscall":
-            self.model = MusCALL(self.config.model_config, is_train=True)
-        else:
-            raise ValueError("{} model is not supported.".format(model_name))
-
-        # self.print_parameters() # 全学習パラメータ表示
+        self.model = MusCALL(self.config.model_config, is_train=True)
 
         if torch.cuda.device_count() > 1:
             print("Use %d GPUS" % torch.cuda.device_count())
             self.model = torch.nn.DataParallel(self.model).to(self.device)
+        else:
+            self.model = self.model.to(self.device)
 
         # self.reporter = MemReporter(self.model)
         # self.reporter.report()
@@ -230,6 +226,8 @@ class MusCALLTrainer(BaseTrainer):
                         first_input_midi_shape,
                         sentence_sim=sentence_sim,# 文の類似度（オプション：損失関数がweighted_clipの場合）
                 )
+
+            #loss = loss.mean()
 
             # 逆誤差伝播とパラメータ更新
             if is_training:

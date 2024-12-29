@@ -9,6 +9,6 @@ model_config:
   midi:
     midi_dic: /raid/m236866/Music-Tri-Modal/muscall/modules/MidiBERT/CP.pkl
     load_ckpt: True
-    ckpt: /raid/m236866/Music-Tri-Modal/ckpt/20241227_albert_restart/model_best.ckpt
-    model_name: 'albert'
+    ckpt: /raid/m236866/Music-Tri-Modal/ckpt/model_best_distilbert_loss03.ckpt
+    model_name: 'distilbert'
   loss: clip # one of [clip, weighted_clip]
