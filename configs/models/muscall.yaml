@@ -8,7 +8,7 @@ model_config:
     audio_hidden_size: 512
   midi:
     midi_dic: /raid/m236866/Music-Tri-Modal/muscall/modules/MidiBERT/CP.pkl
-    load_ckpt: True
+    load_ckpt: False
     ckpt: /raid/m236866/Music-Tri-Modal/ckpt/model_best_bert_HL6_loss03.ckpt
     model_name: 'bert'
   loss: clip # one of [clip, weighted_clip]
