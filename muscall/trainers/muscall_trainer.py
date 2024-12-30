@@ -170,11 +170,18 @@ class MusCALLTrainer(BaseTrainer):
                 r10,
             )
 
-            checkpoint = {
-                "epoch": epoch + 1,
-                "state_dict": self.model.state_dict(),
-                "optimizer": self.optimizer.state_dict(),
-            }
+            if torch.cuda.device_count() > 1:
+                checkpoint = {
+                    "epoch": epoch + 1,
+                    "state_dict": self.model.module.state_dict(),
+                    "optimizer": self.optimizer.state_dict(),
+                }
+            else:
+                checkpoint = {
+                    "epoch": epoch + 1,
+                    "state_dict": self.model.state_dict(),
+                    "optimizer": self.optimizer.state_dict(),
+                }
 
             is_best = r10 > best_r10
             if is_best:
@@ -206,7 +213,7 @@ class MusCALLTrainer(BaseTrainer):
         for i, batch in enumerate(pbar):
             batch = tuple(t.to(device=self.device, non_blocking=True) if isinstance(t, torch.Tensor) else t for t in batch)
 
-            audio_id, input_text_enb, input_midi, first_input_midi_shape, data_idx = batch # バッチ内のデータを展開し、それぞれの変数に割り当て(__getitem__メソッドにより取得)
+            _, input_text_enb, input_midi, first_input_midi_shape, _ = batch # バッチ内のデータを展開し、それぞれの変数に割り当て(__getitem__メソッドにより取得)
 
             # Cast operations to mixed precision
             with torch.cuda.amp.autocast(enabled=self.config.training.amp):
@@ -223,7 +230,8 @@ class MusCALLTrainer(BaseTrainer):
                         first_input_midi_shape,
                 )
 
-            #loss = loss.mean()
+            if torch.cuda.device_count() > 1:
+                loss = loss.mean()
 
             # 逆誤差伝播とパラメータ更新
             if is_training:
@@ -236,10 +244,16 @@ class MusCALLTrainer(BaseTrainer):
                     self.optimizer.step()
 
                 # clamp temperature scaling if over log(100)
-                if self.model.logit_scale.item() > np.log(100):
-                    self.model.logit_scale.data = torch.clamp(
-                        self.model.logit_scale.data, max=np.log(100)
-                    )
+                if torch.cuda.device_count() > 1:
+                    if self.model.module.logit_scale.item() > np.log(100):
+                        self.model.module.logit_scale.data = torch.clamp(
+                            self.model.module.logit_scale.data, max=np.log(100)
+                        )
+                else:
+                    if self.model.logit_scale.item() > np.log(100):
+                        self.model.logit_scale.data = torch.clamp(
+                            self.model.logit_scale.data, max=np.log(100)
+                        )
 
                 self.scheduler.step()
                 self.optimizer.zero_grad()

@@ -7,5 +7,5 @@
 # python scripts/train.py 2> result.txt \
 #export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 export PYTHONPATH="."
-export CUDA_VISIBLE_DEVICES="0"
+export CUDA_VISIBLE_DEVICES="2, 3, 4, 5, 6"
 python scripts/train.py
